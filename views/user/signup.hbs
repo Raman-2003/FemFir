@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{!-- <title>Signup</title> --}}
+
+    <style>
+        /* Reset some default styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        .signup-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .signup-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .signup-card h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .signup-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="signup-container">
+        <div class="signup-card">
+            <h2>Sign Up</h2>
+            <form id="signupForm" action="/signup" method="post"  autocomplete="off">
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" onchange="validatefirstname()"  id="firstname" name="firstname" placeholder="First Name" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" onchange="validatelastname()" id="lastname" name="lastname" placeholder="Last Name" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="tel" class="form-control" onchange="validatePhoneNumber()" id="mobileNumber" name="mobileNumber" placeholder="Mobile Number" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="email" class="form-control" onchange="validate_email()" id="email" name="email" placeholder="Email" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" class="form-control" onchange="validatePassword()" id="password" name="password" placeholder="Password" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" class="form-control" onchange="validateConfirmPassword()" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
+                </div>
+                <button type="submit" class="signup-btn">Sign Up</button>
+
+                <div class="text-muted text-center mt-2">Already have an account? <a href="/login">Sign in now</a></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        /* firstname Validation */
+        function validatefirstname(){
+            var first = document.getElementById('firstname').value;
+
+            var userPattern = /^[a-zA-Z\s]{3,}$/;
+
+            if(!userPattern.test(first)){
+                alert("Invalid username please try again.");
+
+                document.getElementById('firstname').value = '';
+                document.getElementById('firstname').focus();
+                return false;
+            }
+            return true;
+        }
+
+        /* lastname Validation */
+         function validatelastname(){
+            var first = document.getElementById('lastname').value;
+
+            var userPattern = /^[a-zA-Z\s]{3,}$/;
+
+            if(!userPattern.test(first)){
+                alert("Invalid username please try again.");
+
+                document.getElementById('lastname').value = '';
+                document.getElementById('lastname').focus();
+                return false;
+            }
+            return true;
+        }
+
+         /* Mobile number Validation */
+        function validatePhoneNumber(){
+            var phoneNumber = document.getElementById('mobileNumber').value;
+
+            var phonePattern =  /^\d{10}$/;
+            if(!phonePattern.test(phoneNumber)){
+                 alert('Invalid phone number! Please enter a 10-digit number.');
+
+             // Clear the input field
+             document.getElementById('phone').value = '';
+
+              // Focus on the input field for correction
+             document.getElementById('phone').focus();
+             return false; 
+            }
+
+            return true;
+        }
+
+         /* email Validation */
+        function validate_email(){
+            var email = document.getElementById('email').value;
+            var emailPattern = /^\S+@\S+\.\S+$/;
+
+            if(!emailPattern.test(email)){
+                alert("Invalid email please try again.");
+                document.getElementById('email').value='';
+                document.getElementById('email').focus();
+                return false;
+            }
+            return true;
+        }
+
+          /* password Validation */
+        function validatePassword(){
+             var password = document.getElementById('password').value;
+
+            // Define a regular expression for a strong password (at least 8 characters)
+            var passwordPattern = /^.{8,}$/;
+
+            if(!passwordPattern.test(password)){
+                alert('Invalid password! Password should be at least 8 characters long.');
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+                return false; 
+            }            
+            
+            return true;
+        }
+
+          /* confirm password Validation */
+          function validateConfirmPassword(){
+            
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
+
+            if(password !== confirmPassword){
+                alert('Passwords do not match! Please enter the same password in both fields.');
+
+                document.getElementById('confirmPassword').value = '';
+                document.getElementById("password").focus();
+                return false; 
+            }
+
+            return true;
+          }
+          
+    </script>
+
+
+
+
+
+
+</body>
+
+</html>
