@@ -10,7 +10,8 @@ const nocache = require('nocache');
 const bodyParser = require('body-parser');
 
 //Require the Routes
-const authRouter = require('./routes/authRoutes')
+const authRouter = require('./routes/authRoutes');
+const adminRouter = require('./routes/adminRoutes');
 const app = express();
 
 //Configs
@@ -18,7 +19,7 @@ require('dotenv').config();
 const PORT = process.env.PORT || 8000 
 require('./config/dbConnect')  
 
-// app.use(logger('dev'));
+app.use(logger('dev'));
 app.use(express.json()); 
 app.use(express.urlencoded({extended:true}));
 
@@ -28,7 +29,7 @@ app.use(cookieParser());
 app.use(session({
     secret: 'key',
     saveUninitialized:true,
-    cookie: {maxAge:1200000000 },
+    cookie: {maxAge:72 * 60 * 60 * 10000, httpOnly: true },
     resave: false
 }));
 app.use(nocache());
@@ -37,9 +38,7 @@ app.use(nocache());
 app.set('view engine','hbs');
 app.set('views',path.join(__dirname,'views'));
 
-app.engine('hbs',engine({layoutsDir:__dirname+'/views/layouts/',extname:'hbs',defaultLayout:'layout',partialsDir:__dirname+'/views/partials/'}))
-
-app.use(express.static(path.join(__dirname,'public')));
+app.engine('hbs',engine({layoutsDir:__dirname+'/views/layout/',extname:'hbs',defaultLayout:'layout',partialsDir:__dirname+'/views/partials/'}))
 
 
 //Body parser 
@@ -53,6 +52,8 @@ app.use(bodyParser.json());
  
 
 app.use('/',authRouter);
+app.use('/admin',adminRouter);
+app.use(express.static('public'))
 app.get('*', function (req, res) {
     res.redirect("/404 page");
 });

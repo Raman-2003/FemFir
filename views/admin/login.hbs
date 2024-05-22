@@ -1,0 +1,133 @@
+<!-- HTML -->
+<style>
+/* CSS */
+
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.btn-primary {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 15px;
+    }
+}
+</style>
+
+
+<div class="login-container mt-5 mb-5">
+    <a href="/">Home</a>
+    <h2>Login</h2>
+
+     <!-- Display error messages -->
+    {{#if msg}}
+    <h5 class="text-center alert alert-danger" style="color: red;">{{msg}}</h5>
+    {{/if}}
+
+
+    <form id="loginForm" action="/admin/adminlogin" method="post">
+
+        
+        <div class="form-group">
+            <input type="email" class="form-control" onchange="validate_email()" id="email" name="email" placeholder="Email" required>
+        </div>
+
+        <div class="form-group">
+            <input type="password" class="form-control" onchange="validatePassword()" id="password" name="password" placeholder="Password"  required>
+        </div>
+
+         <a class="text-muted" href="/forget_passsword">Forgot password?</a>
+
+        <div class="form-group mt-2">
+            <button type="submit" class="btn btn-primary" name="login">Login</button>
+        </div>
+
+        <div class="text-muted text-center">Have an account? <a href="/admin/signup">
+                Signup</a>
+        </div>
+    </form>
+
+    
+</div>
+
+
+<script>
+
+    /*Email validation */
+    function validate_email(){
+        var email = document.getElementById('email').value.trim();
+        var emailPattern = /^\S+@\S+\.\S+$/;
+        var emailError = document.getElementById('emailError');
+    
+        if(!emailPattern.test(email)){
+            emailError.textContent = "Invalid email. Please try again";
+            document.getElementById('email').focus();
+            return false;
+        }else {
+            emailError.textContent = '';
+            return true;
+        }
+    }
+
+    /*Password validation */
+    function validatePassword() {
+        var password = document.getElementById('password').value.trim();
+        var passwordPattern = /^.{8,}$/;
+        var passwordError = document.getElementById('passwordError');
+
+        if(!passwordPattern.test(password)) {
+            passwordError.textContent = "Invalid password. Password must be at leat 8 characters";
+            document.getElementById('password').focus();
+            return false;
+        }else {
+            passwordError.textContent = '';
+            return true;
+        }
+    }
+
+
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        if(!validate_email() || !validatePassword()){
+            event.preventDefault();
+        }
+    })
+</script>

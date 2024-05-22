@@ -36,7 +36,10 @@ router.get('/resend_otp', resendOtp);
 
 router.get('/logout', doLogout);
 
-
+router.get('/product', (req,res)=>res.render('user/product'))
+router.get('/producttwo', (req,res)=>res.render('user/producttwo'))
+router.get('/productthree', (req,res)=>res.render('user/productthree'))
+router.get('/viewone', (req,res)=>res.render('user/view'))
 
 module.exports = router;
 

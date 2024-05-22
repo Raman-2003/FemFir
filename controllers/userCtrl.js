@@ -5,12 +5,14 @@ const userHelper = require('../helpers/user_helper');
 const argon2 = require('argon2');
 const bcrypt = require('bcrypt');
 
+
 let otp;
 let userotp;
 let usermail;
 let hashedPassword;
 let userRegesterData;
 let userData;
+
 
 // 404 Not Found Page
 const pagenotFound = async (req, res) => {
@@ -24,10 +26,16 @@ const pagenotFound = async (req, res) => {
 // Home page
 const getHome = async (req, res) => {
     try {
+        if(req.session.user){
+            res.render('user/index')
+        }
+        else{
+            res.redirect('/login');
+        }
         // const categories = await Category.find({ is_unListed: false }).lean();
         // const products = await Product.find({ is_blocked: false }).lean();
         // res.render('user/index'), { products, categories, userData });
-        res.render('user/index')
+        
     } catch (error) {
         console.log(error.message);
     }
@@ -35,7 +43,11 @@ const getHome = async (req, res) => {
 
 const showloginPage = async (req, res) => {
     try {
-        res.render('user/login');
+        if(!req.session.user){
+            res.render('user/login');
+        }else{
+            res.redirect('/');
+        }
     } catch (error) {
         console.log(error);
     }
@@ -46,9 +58,9 @@ const doLogin = async (req, res) => {
     try {
         const Email = req.body.email;
         const Password = req.body.password;
-        console.log(Password);
+        // console.log(Password);
         userData = await User.findOne({ email: Email }).lean();
-        console.log(userData);
+        // console.log(userData);
         if (userData.is_blocked === true) res.redirect('/login')
 
             if(userData){
@@ -87,7 +99,12 @@ const doLogout = async (req, res) => {
 // Render signup page
 const showsignupPage = async (req, res) => {
     try {
-        res.render('user/signup');
+        if(!req.session.user){
+            res.render('user/signup');
+        }
+        else{
+            res.redirect('/')
+        }
     } catch (error) {
         console.log(error);
     }
@@ -116,7 +133,11 @@ const dosignup = async (req, res) => {
 // Get otp page
 const getotppage = async (req, res) => {
     try {
-        res.render('user/otp');
+        if(!req.session.user){
+            res.render('user/otp');
+        }else{
+            res.redirect('/')
+        }
     } catch (error) {
         console.log(error);
     }
