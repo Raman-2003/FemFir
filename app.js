@@ -8,7 +8,13 @@ const cookieParser = require('cookie-parser')
 const session = require('express-session');
 const nocache = require('nocache');
 const bodyParser = require('body-parser');
+const passport = require('./config/passport');
+const Handlebars = require('handlebars');
 
+
+Handlebars.registerHelper('eq', function (a, b) {
+    return a === b;
+});
 //Require the Routes
 const authRouter = require('./routes/authRoutes');
 const adminRouter = require('./routes/adminRoutes');
@@ -16,10 +22,10 @@ const app = express();
 
 //Configs
 require('dotenv').config();
-const PORT = process.env.PORT || 8000 
+const PORT = process.env.APP_PORT || 8000 
 require('./config/dbConnect')  
 
-app.use(logger('dev'));
+// app.use(logger('dev'));
 app.use(express.json()); 
 app.use(express.urlencoded({extended:true}));
 
@@ -30,15 +36,21 @@ app.use(session({
     secret: 'key',
     saveUninitialized:true,
     cookie: {maxAge:72 * 60 * 60 * 10000, httpOnly: true },
-    resave: false
+    resave: false 
 }));
 app.use(nocache());
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 app.set('view engine','hbs');
 app.set('views',path.join(__dirname,'views'));
 
-app.engine('hbs',engine({layoutsDir:__dirname+'/views/layout/',extname:'hbs',defaultLayout:'layout',partialsDir:__dirname+'/views/partials/'}))
+app.engine('hbs',engine({layoutsDir:__dirname+'/views/layout/',extname:'hbs',defaultLayout:'layout',partialsDir:__dirname+'/views/partials/', runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true,
+},}))
 
 
 //Body parser 
@@ -47,10 +59,6 @@ app.use(bodyParser.json());
 
 
 
-
-
- 
-
 app.use('/',authRouter);
 app.use('/admin',adminRouter);
 app.use(express.static('public'))
@@ -58,11 +66,11 @@ app.get('*', function (req, res) {
     res.redirect("/404 page");
 });
 
-app.listen(PORT, ()=>{
+app.listen(8000, ()=>{
     console.log('Server has started on Port 8000');
 })
 
-
+ 
 
 
 

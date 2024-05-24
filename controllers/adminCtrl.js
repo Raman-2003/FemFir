@@ -1,5 +1,6 @@
 const Admin = require('../models/adminSchema');
 const argon2 = require('argon2');
+const User = require('../models/userSchema');
 
 let adminmail;
 let hashedPassword;
@@ -117,6 +118,50 @@ const doadminsignup = async (req, res) => {
     }
 };
 
+const getAllUsers = async(req,res) => {
+    try{    
+    if(req.session.admin){
+            const allUsers = await User.find();
+            res.render('admin/userManagement', {
+                layout: 'adminLayout',
+                title: "User Management page",
+                users: allUsers
+            });
+            
+        }else{
+            res.redirect('/admin/adminlogin')
+        }
+     }
+    catch(error){
+            console.log('Some Error '+error);
+            res.redirect('/admin/');
+       }
+ }
+
+ const blockUser = async (req,res)=>{
+    try{
+        const userId = req.params.id;
+        await User.findByIdAndUpdate(userId, {is_blocked:true});
+        res.redirect('/admin/userm');
+        
+    }catch(error){
+        console.log('Error blocking user: ', error);
+        res.redirect('/admin/userm')
+    }
+ }
+
+ const unblockUser = async (req,res) => {
+    try{
+        const userId = req.params.id;
+        await User.findByIdAndUpdate(userId, {is_blocked: false});
+        res.redirect('/admin/userm')
+    }
+    catch(error){
+        console.error('Error unblocking user: ', error);
+        res.redirect('/admin/userm');
+    }
+ }
+
 module.exports = {
     adminLogin,
     adminSignup,
@@ -124,4 +169,7 @@ module.exports = {
     doadminLogin,
     doadminLogout,
     adminHome,
+    getAllUsers,
+    blockUser,
+    unblockUser
 };

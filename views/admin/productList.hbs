@@ -1,0 +1,39 @@
+{{! adminLayout.hbs should have the basic layout including header, footer, and other common components }}
+
+  <div class="content-body">
+    <div class="container-fluid">
+    <div class="container">
+        <h2>Product Management</h2>
+        <a href="/admin/products/add" class="btn btn-primary">Add Product</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products}}
+                <tr>
+                    <td>{{this.name}}</td>
+                    <td>{{this.description}}</td>
+                    <td>{{this.price}}</td>
+                    <td>{{this.stock}}</td>
+                    <td>{{this.category}}</td>
+                    <td>{{this.status}}</td>
+                    <td>
+                        <a href="/admin/products/edit/{{this._id}}" class="btn btn-warning">Edit</a>
+                        <a href="/admin/products/delete/{{this._id}}" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>

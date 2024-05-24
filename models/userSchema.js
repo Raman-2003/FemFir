@@ -12,7 +12,7 @@ const userSchema =new mongoose.Schema({
     },
     mobile:{
         type:Number,
-        required:true,
+        required:false,
         unique:true
     },
     email:{
@@ -22,7 +22,11 @@ const userSchema =new mongoose.Schema({
     },
     password:{
         type:String,
-        required:true
+        required:false
+    },
+    googleId: {
+        type:String,
+        required:false
     },
     isVerified:{
         type:Boolean,

@@ -1,0 +1,40 @@
+
+    <div class="content-body">
+    <div class="container-fluid">
+    <div class="container">
+
+        <h2>Add Product</h2>
+        <form action="/admin/products/add" method="POST">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" class="form-control" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" id="price" name="price" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="stock">Stock</label>
+                <input type="number" id="stock" name="stock" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" id="category" name="category" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="mainImage">Main Image URL</label>
+                <input type="text" id="mainImage" name="mainImage" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="subImages">Sub Images URLs (comma separated)</label>
+                <input type="text" id="subImages" name="subImages" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Product</button>
+        </form>
+    </div>
+    </div>
+    </div>

@@ -1,44 +1,40 @@
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema
-
-const productSchema = new Schema({
-    name:{
-        type:String,
-        required:true
-    },
-    price:{
-        type:Number,
-        required:true
-    },
-    description:{
-        type:String,
+const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
         required: true
     },
-    category:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'Category',
+    description: {
+        type: String,
         required: true
     },
-    image:{
-        type: Array,
+    price: {
+        type: Number,
         required: true
     },
-    is_blocked: {
-        type: Boolean,
-        default: false,
+    stock: {
+        type: Number,
+        required: true
     },
-    isWishlisted: {
-        type: Boolean,
-        dafault: false
+    category: {
+        type: String,
+        required: true
     },
-    isOnCart: {
-        type: Boolean,
-        default: false,
+    mainImage: {
+        type: String,
+        required: true
+    },
+    subImages: [{
+        type: String
+    }],
+    status: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'active'
     }
-})
+}, {
+    timestamps: true
+});
 
-const Product = mongoose.model('Product',productSchema);
-module.exports = {
-    Product
-}
+module.exports = mongoose.model('Product', productSchema);
