@@ -121,7 +121,7 @@
                 <p><strong>Order ID:</strong> {{order._id}}</p>
                 <p><strong>Order Date:</strong> {{formatDate order.createdAt}}</p>
                 <p><strong>Status:</strong> {{order.status}}</p>
-                <p><strong>Total Amount:</strong> ${{order.totalAmount}}</p>
+                <p><strong>Total Amount:</strong> ₹{{order.totalAmount}}</p>
                 <p><strong>Payment Method:</strong> {{order.paymentMethod}}</p>
             </div>
 
@@ -162,7 +162,7 @@
                             <td><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"></td>
                             <td>{{this.product.name}}</td>
                             <td>{{this.quantity}}</td>
-                            <td>${{this.product.price}}</td>
+                            <td>₹{{this.product.price}}</td>
                         </tr>
                         {{/each}}
                     </tbody>

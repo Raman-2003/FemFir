@@ -1,76 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit category</title>
+    <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
+    <style>
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .image-preview-item {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+        .image-preview img {
+            max-width: 130px;
+            max-height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .delete-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+
+         /* Style for the modal (cropper) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .cropper-container {
+            height: 400px;
+            width: 100%;
+        }
+        .cropper-view-box {
+            border-radius: 4px;
+        }
+        .cropper-face {
+            border-radius: 4px;
+        }
+        .btn-crop {
+            margin-top: 10px;
+            background: green;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .btn-close {
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    
 <div class="content-body">
     <div class="container-fluid">
-    <h2>Edit Category</h2>
-    <form action="/admin/categories/edit/{{category._id}}" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" name="name" class="form-control" value="{{category.name}}" required>
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea name="description" class="form-control">{{category.description}}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="mainImage">Image</label>
-            <input type="file" name="mainImage" id="mainImage" class="form-control">
-            <input type="hidden" name="existingImage" value="{{category.image}}">
-            <img id="cropped-image" src="/uploads/categories/{{category.image}}" alt="Current Image" style="width: 100px;">
-            <div id="mainImagePreview" class="image-preview"></div>
-        </div>
-        <button type="submit" class="btn btn-primary">Update Category</button>
-    </form>
-</div>
+        <h2>Edit Category</h2>
+        <form action="/admin/categories/edit/{{category._id}}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" class="form-control" value="{{category.name}}" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" class="form-control">{{category.description}}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="mainImage">Image</label>
+                <input type="file" name="mainImage" id="mainImage" class="form-control">
+                <input type="hidden" name="existingImage" value="{{category.image}}">
+                <img id="cropped-image" src="/uploads/categories/{{category.image}}" alt="Current Image" style="width: 100px;">
+                <div id="mainImagePreview" class="image-preview">
+                    {{#if product.mainImage}}
+                        <div class="image-preview-item">
+                            <img src="{{product.mainImage}}" alt="Main Image">
+                            <button type="button" class="delete-button" onclick="removeImage('mainImagePreview')">&times;</button>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Category</button>
+        </form>
+    </div>
 </div> 
 
-<style>
-    .image-preview {
-        display: flex;
-        flex-wrap: wrap;
-        margin-top: 10px;
-    }
-    .image-preview-item {
-        position: relative;
-        display: inline-block;
-        margin: 5px;
-    }
-    .image-preview img {
-        max-width: 130px;
-        max-height: 150px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 5px;
-    }
-   
-</style>
+<!-- Modal for Cropping -->
+<div id="cropModal" class="modal">
+    <div class="modal-content">
+        <div class="cropper-container">
+            <img id="imageToCrop" src="" alt="Image for cropping">
+        </div>
+        <button class="btn-crop" id="cropButton">Crop</button>
+        <button class="btn-close" onclick="closeCropModal()">Cancel</button>
+    </div>
+</div>
 
-
+<script src="https://unpkg.com/cropperjs"></script>
 <script>
-     document.getElementById('mainImage').addEventListener('change', function(event) {
-        const mainImagePreview = document.getElementById('mainImagePreview');
-        mainImagePreview.innerHTML = ''; // Clear previous previews
+    let cropper;
+
+    function showCropModal(imageSrc, callback) {
+        const cropModal = document.getElementById('cropModal');
+        const imageToCrop = document.getElementById('imageToCrop');
+        imageToCrop.src = imageSrc;
+        cropModal.style.display = 'block';
+
+        if (cropper) {
+            cropper.destroy();
+        }
+
+        cropper = new Cropper(imageToCrop, {
+            aspectRatio: NaN,
+            viewMode: 1,
+            movable: true,
+            cropBoxResizable: true,
+            autoCropArea: 1,
+            ready() {
+                document.getElementById('cropButton').onclick = function () {
+                    const canvas = cropper.getCroppedCanvas();
+                    canvas.toBlob((blob) => {
+                        const croppedImageUrl = URL.createObjectURL(blob);
+                        callback(croppedImageUrl, blob);
+                        cropper.destroy();
+                        cropModal.style.display = 'none';
+                    });
+                };
+            }
+        });
+    }
+
+    function closeCropModal() {
+        document.getElementById('cropModal').style.display = 'none';
+        if (cropper) {
+            cropper.destroy();
+        }
+    }
+
+    function removeImage(previewId) {
+        const preview = document.getElementById(previewId);
+        preview.innerHTML = '';
+    }
+
+    document.getElementById('mainImage').addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const imgContainer = document.createElement('div');
-                imgContainer.className = 'image-preview-item';
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
+                showCropModal(e.target.result, function(croppedImageUrl, blob) {
+                    const mainImagePreview = document.getElementById('mainImagePreview');
+                    mainImagePreview.innerHTML = ''; // Clear previous previews
 
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-button';
-                deleteButton.innerHTML = '&times;';
-                deleteButton.addEventListener('click', function() {
-                    mainImagePreview.innerHTML = '';
-                    document.getElementById('mainImage').value = ''; 
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'image-preview-item';
+
+                    const img = document.createElement('img');
+                    img.src = croppedImageUrl;
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.innerHTML = '&times;';
+                    deleteButton.addEventListener('click', function() {
+                        mainImagePreview.innerHTML = '';
+                        document.getElementById('mainImage').value = '';
+                    });
+
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(deleteButton);
+                    mainImagePreview.appendChild(imgContainer);
+
+                    // Update the hidden input with the cropped image blob
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(new File([blob], file.name, { type: file.type }));
+                    document.getElementById('mainImage').files = dataTransfer.files;
                 });
-
-                imgContainer.appendChild(img);
-                imgContainer.appendChild(deleteButton);
-                mainImagePreview.appendChild(imgContainer);
-            }
+            };
             reader.readAsDataURL(file);
         }
     });
 </script>
+
+</body>
+</html>
