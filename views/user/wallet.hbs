@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +31,8 @@
             transition: background-color 0.3s ease;
         }
 
-        .dashboard-menu li a:hover, .dashboard-menu li a.active {
+        .dashboard-menu li a:hover,
+        .dashboard-menu li a.active {
             background-color: #0056b3;
         }
 
@@ -98,6 +100,32 @@
             background-color: #165292;
             color: #fff;
         }
+
+        .wallet-summary-hr {
+            border: 0;
+            height: 1px;
+            background-color: #333;
+            margin-top: 10px;
+        }
+
+        .filter-form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+       
+        .form-inline {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            width: 100%;
+        }
+
+       
+
+        
     </style>
 </head>
 
@@ -111,12 +139,13 @@
                             <h2>Wallet Balance: ₹{{wallet.balance}}</h2>
                             <a href="/wallet/add-money" style="color: #0056b3;">Add Money</a>
                         </div>
-                        
+                        <hr class="wallet-summary-hr">
+
                         <div class="filter-form">
-                            <h3>Sort Transactions</h3>
+                            <h3 class="sort-header">Sort Transactions</h3>
                             <form action="/wallet" method="get" class="form-inline">
-                                <div class="form-group">
-                                    <label for="sort">Sort by:</label>
+                                <div class="form-group sort-group">
+                                    <label for="sort" class="sort-label">Sort by:</label>
                                     <select id="sort" name="sort" class="form-control">
                                         <option value="">Select</option>
                                         <option value="maxAmount">Maximum Price</option>
@@ -130,7 +159,8 @@
                                 </div>
                             </form>
                         </div>
-                        
+
+
                         <div class="table-responsive">
                             <h3>Transaction History</h3>
                             <table class="table">

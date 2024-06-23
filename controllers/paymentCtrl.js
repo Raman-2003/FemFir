@@ -2,9 +2,8 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Wallet = require('../models/walletschema');
 const Transaction = require('../models/transactionschema');
-const Order = require('../models/orderSchema'); 
-const Product = require('../models/productSchema')
-
+const Order = require('../models/orderSchema');
+const Product = require('../models/productSchema');
 
 const razorpayInstance = new Razorpay({
     key_id: "rzp_test_oO3a8uVtaGGjX8",
@@ -14,7 +13,7 @@ const razorpayInstance = new Razorpay({
 const getWallet = async (req, res) => {
     try {
         if (!req.session.user) {
-            return res.redirect('/login'); 
+            return res.redirect('/login');
         }
 
         const userId = req.session.user._id;
@@ -53,7 +52,7 @@ const getWallet = async (req, res) => {
                 sortOrder.createdAt = 1; // date ascending (oldest first)
                 break;
             case 'newDate':
-                sortOrder.createdAt = -1; //date descending (newest first)
+                sortOrder.createdAt = -1; // date descending (newest first)
                 break;
             default:
                 sortOrder.createdAt = -1; // Default newest first)
@@ -63,7 +62,7 @@ const getWallet = async (req, res) => {
 
         res.render('user/wallet', {
             title: "Wallet",
-            wallet: wallet || { balance: 0 }, 
+            wallet: wallet || { balance: 0 },
             transactions
         });
     } catch (error) {
@@ -72,18 +71,17 @@ const getWallet = async (req, res) => {
     }
 };
 
-
 // Render the add money form
 const addMoneyForm = async (req, res) => {
     try {
         if (!req.session.user) {
-            return res.redirect('/login'); 
+            return res.redirect('/login');
         }
 
         res.render('user/addmoney', { title: "Add Money" });
     } catch (error) {
         console.error('Error rendering add money form:', error);
-        res.status(500).redirect('/login'); 
+        res.status(500).redirect('/login');
     }
 };
 
@@ -102,7 +100,7 @@ const initiatePayment = async (req, res) => {
         }
 
         const options = {
-            amount: amount * 100, 
+            amount: amount * 100,
             currency: 'INR',
             receipt: `receipt_${new Date().getTime()}`,
             notes: {
@@ -122,7 +120,7 @@ const initiatePayment = async (req, res) => {
 const verifyPayment = async (req, res) => {
     try {
         if (!req.session.user) {
-            return res.redirect('/login'); 
+            return res.redirect('/login');
         }
 
         const { razorpay_payment_id, razorpay_order_id, razorpay_signature, amount, note } = req.body;
@@ -165,7 +163,6 @@ const verifyPayment = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
-
 
 module.exports = {
     getWallet,

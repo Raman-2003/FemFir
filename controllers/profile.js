@@ -3,7 +3,8 @@ const User = require('../models/userSchema');
 const Order = require('../models/orderSchema'); 
 const bcrypt = require('bcrypt');
 const ReturnOrder = require('../models/returnOrdersSchema'); 
-
+const Transaction = require('../models/transactionschema')
+const Wallet = require('../models/walletschema')
 
 module.exports = {
 
@@ -180,18 +181,56 @@ editDetails: (req, res) => {
     },
 
     // Cancel order
-    cancelOrder: async (req, res) => {
-        try {
-            const orderId = req.params.id;
+cancelOrder: async (req, res) => {
+    try {
+        const orderId = req.params.id;
 
-            await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' });
+        // Find the order and populate the product details
+        const order = await Order.findById(orderId).populate('items.product');
 
-            res.redirect('/profile#orders-tab');
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Internal Server Error');
+        if (!order) {
+            return res.status(404).send('Order not found');
         }
-    },
+
+        // Update order status to 'Cancelled'
+        order.status = 'Cancelled';
+        await order.save();
+
+        // Handle refund based on payment method
+        if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay') {
+            const userId = order.userId;
+            let wallet = await Wallet.findOne({ userId });
+
+            if (!wallet) {
+                wallet = new Wallet({ userId, balance: 0, transactions: [] });
+            }
+
+            const productNames = order.items.map(item => item.product.name).join(', ');
+            const description = `Refund for cancelled order: ${productNames}`;
+
+            // Credit the order amount back to the wallet
+            wallet.balance += order.totalAmount;
+
+            const transaction = new Transaction({
+                userId,
+                amount: order.totalAmount,
+                description: description,
+                type: 'credit',
+                status: 'completed'
+            });
+
+            await transaction.save();
+            wallet.transactions.push(transaction._id);
+            await wallet.save();
+        }
+
+        res.redirect('/profile#orders-tab');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+},
+
 
     viewOrder : async (req, res) => {
         try {

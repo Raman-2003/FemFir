@@ -1,5 +1,3 @@
-// controllers/admin/returnOrders.js
-
 const ReturnOrder = require('../models/returnOrdersSchema');
 const Order = require('../models/orderSchema');
 
