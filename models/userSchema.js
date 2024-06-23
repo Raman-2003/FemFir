@@ -1,4 +1,13 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+
+const cartItemSchema = new Schema({
+    product: { type: Schema.Types.ObjectId, ref: 'Product' },
+    quantity: { type: Number, required: true },
+    total: { type: Number, required: true }
+});
+
 
 const userSchema =new mongoose.Schema({
 
@@ -39,10 +48,26 @@ const userSchema =new mongoose.Schema({
     isAdmin:{
         type:Boolean,
         default:false
-    }
+    },
+   
+    hintname:{
+        type:String,
+        required:false
+    },
+    gender:{
+        type:String,
+        required:false
+    },
+    
+    cart: [cartItemSchema] ,
+
+    wishlist:[
+        { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
+    ],
+
 },{
     timestamps:true
 })
 
-module.exports = mongoose.model('User',userSchema);
 
+module.exports = mongoose.model('User', userSchema);

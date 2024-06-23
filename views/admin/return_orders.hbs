@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Return Orders Management</title>
+   <style>
+     body {
+          font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+          background-color: rgb(245, 243, 241);
+          margin: 0;
+          margin: 0;
+    }
+
+    .content-body {
+        padding: 10px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(4, 2, 1, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+        font: bold;
+        color: #333;
+    }
+
+    .return-orders-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .return-orders-table th, .return-orders-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .return-orders-table tr:nth-child(even){
+        background-color: rgb(235, 229, 229);
+    }
+    .view-btn {
+        margin-top: 5px;
+        padding: 10px 15px;
+        border: none;
+        background-color: rgb(113, 59, 108);
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+        margin-left: 3px;
+    }
+
+
+   </style>
+   
+</head>
+<body>
+    <div class="content-body">
+        <div class="container-fluid">
+            <div class="container">
+                <div class="return-orders-container">
+                    <h2>Return Orders</h2>
+                    <table class="return-orders-table">
+                        <thead>
+                            <tr style="color: black;">
+                                <th>No</th>
+                                <th>Order ID</th>
+                                <th>User</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Requested At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: #333;">
+                            {{#each returnOrders}}
+                            <tr>
+                                <td>{{@index}}</td>
+                                <td>{{this.orderId._id}}</td>
+                                <td>{{this.userId.firstname}} {{this.userid.lastname}}</td>
+                                <td>{{this.returnReason}}</td>
+                                <td>{{this.status}}</td>
+                                <td>{{formatDate this.createdAt}}</td>
+                                <td>
+                                    <a href="/admin/return-orders/{{this._id}}" class="view-btn">View</a>
+                                    {{#if (eq this.status 'Requested')}}
+                                        <form action="/return-orders/{{this._id}}/status" method="POST" style="display: inline;">
+                                            <input type="hidden" name="status" value="Canceled">
+                                            <button type="submit">Cancel</button>
+                                        </form>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<div class="coupons-list">
+    <h3>Available Coupons</h3>
+    <ul>
+        {{#each coupons}}
+        <li>
+            <span>Code: {{this.code}}</span>
+            <span>Discount: {{this.discount}}%</span>
+            <span>Expires on: {{this.expiryDate}}</span>
+            <button onclick="applyCoupon('{{this.code}}')">Apply</button>
+        </li>
+        {{/each}}
+    </ul>
+</div>
+
+<script>
+    // Function to apply coupon
+    function applyCoupon(code) {
+        fetch(`/apply_coupon?code=${code}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Coupon Applied', `Discount of $500 applied`, 'success');
+                    document.getElementById('grand-total').innerText = `$${data.newGrandTotal.toFixed(2)}`;
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error applying coupon:', error);
+                Swal.fire('Error', 'An error occurred while applying the coupon', 'error');
+            });
+    }
+</script>

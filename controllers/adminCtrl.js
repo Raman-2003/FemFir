@@ -1,28 +1,31 @@
 const Admin = require('../models/adminSchema');
 const argon2 = require('argon2');
 const User = require('../models/userSchema');
+const Coupon = require('../models/couponSchema');
+const moment = require('moment');
 
 let adminmail;
 let hashedPassword;
 let adminRegesterData;
 let adminData;
 
-// Home page
+// dashboard page
 const adminHome = async (req, res) => {
     try {
-        const locals = {title: 'Admin Home page'};
-        if (req.session.admin) {
-            res.render('admin/dashboard', {title: locals.title, layout: 'adminLayout'});
-        } else {
-            res.redirect('/admin/adminlogin');
-        }
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Internal Server Error');
+    const locals = {title: 'Admin Home page'};
+    if (req.session.admin) {
+    res.render('admin/dashboard', {title: locals.title, layout: 'adminLayout', admin: req.session.admin});
+    } else {
+    res.redirect('/admin/adminlogin');
     }
-};
+    } catch (error) {
+    console.log(error.message);
+    res.status(500).send('Internal Server Error');
+    }
+    };
+    
 
-// Show login
+// show login
 const adminLogin = async (req, res) => {
     try {
         const locals = {title: 'Admin Login'};
@@ -37,7 +40,7 @@ const adminLogin = async (req, res) => {
     }
 };
 
-// Login details submission
+// login details submission
 const doadminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -56,7 +59,7 @@ const doadminLogin = async (req, res) => {
     }
 };
 
-// Logout functionality
+// logout functionality
 const doadminLogout = async (req, res) => {
     try {
         req.session.destroy((err) => {
@@ -73,7 +76,7 @@ const doadminLogout = async (req, res) => {
     }
 };
 
-// Render signup page
+// render signup page
 const adminSignup = async (req, res) => {
     try {
         const locals = {title: 'Admin Signup'};
@@ -88,7 +91,7 @@ const adminSignup = async (req, res) => {
     }
 };
 
-// Admin signup
+// admin signup
 const doadminsignup = async (req, res) => {
     try {
         const locals = {title: 'Admin Signup'};
@@ -118,6 +121,8 @@ const doadminsignup = async (req, res) => {
     }
 };
 
+
+//user management get all users informations 
 const getAllUsers = async(req,res) => {
     try{    
     if(req.session.admin){
@@ -138,6 +143,8 @@ const getAllUsers = async(req,res) => {
        }
  }
 
+
+//block a user
  const blockUser = async (req,res)=>{
     try{
         const userId = req.params.id;
@@ -150,6 +157,7 @@ const getAllUsers = async(req,res) => {
     }
  }
 
+//unblock a user
  const unblockUser = async (req,res) => {
     try{
         const userId = req.params.id;
@@ -161,6 +169,135 @@ const getAllUsers = async(req,res) => {
         res.redirect('/admin/userm');
     }
  }
+ 
+
+ // Load all coupons
+ const loadCoupon = async (req, res) => {
+    try {
+        const coupons = await Coupon.find();
+
+        const couponData = coupons.map((cpn) => ({
+            ...cpn.toObject(), // Convert to plain JS object
+            expiryDate: moment(cpn.expiryDate).format("MMMM D, YYYY"),
+            createdDate: moment(cpn.createdDate).format("MMMM D, YYYY")
+        }));
+
+        res.render("admin/coupon", { couponData, layout: 'adminlayout' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Error loading coupons');
+    }
+};
+
+ 
+ // Render add coupon page
+ const addCoupon = (req, res) => {
+     try {
+         const message = req.session.message;
+         req.session.message = null; // Clear the session message
+ 
+         res.render("admin/add_coupon", { message, layout: 'adminlayout' });
+     } catch (error) {
+         console.log(error);
+         res.status(500).send('Error rendering add coupon page');
+     }
+ };
+ 
+ const addCouponPost = async (req, res) => {
+    try {
+        const { code, percent, expDate, maxPrice, description } = req.body; 
+
+        const cpnExist = await Coupon.findOne({ code: code });
+
+        if (!cpnExist) {
+            const coupon = new Coupon({
+                code,
+                discount: percent,
+                expiryDate: expDate,
+                maxPrice: maxPrice,
+                description 
+            });
+
+            await coupon.save();
+            req.session.message = "Coupon added successfully!";
+        } else {
+            req.session.message = "Coupon already exists!";
+        }
+
+        res.redirect("/admin/add_coupon");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Error adding coupon');
+    }
+};
+
+ 
+ // Handle delete coupon
+ const deleteCoupon = async (req, res) => {
+     try {
+         const id = req.query.id;
+ 
+         await Coupon.findByIdAndDelete(id);
+ 
+         res.redirect("/admin/coupons");
+     } catch (error) {
+         console.log(error);
+         res.status(500).send('Error deleting coupon');
+     }
+ };
+ 
+ // Render edit coupon page
+ const editCoupon = async (req, res) => {
+     try {
+         const id = req.query.id;
+         const coupon = await Coupon.findById(id);
+ 
+         if (coupon) {
+             res.render("admin/edit_coupon", { coupon, layout: 'adminlayout' });
+         } else {
+             res.redirect("/admin/coupons");
+         }
+     } catch (error) {
+         console.log(error);
+         res.status(500).send('Error loading edit coupon page');
+     }
+ };
+ 
+ // Handle edit coupon form submission
+ const editCouponPost = async (req, res) => {
+    try {
+        const { id, code, percent, expDate, maxPrice, description } = req.body; 
+
+        await Coupon.findByIdAndUpdate(id, {
+            code,
+            discount: percent,
+            expiryDate: expDate,
+            maxPrice: maxPrice,
+            description 
+        });
+
+        res.redirect("/admin/coupons");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Error editing coupon');
+    }
+};
+
+ 
+ // Toggle coupon status
+ const toggleStatusCoupon = async (req, res) => {
+     try {
+         const { id, status } = req.query;
+         await Coupon.findByIdAndUpdate(id, { status: status === 'true' });
+ 
+         res.redirect("/admin/coupons");
+     } catch (error) {
+         console.log(error);
+         res.status(500).send('Error toggling coupon status');
+     }
+ };
+ 
+
 
 module.exports = {
     adminLogin,
@@ -171,5 +308,12 @@ module.exports = {
     adminHome,
     getAllUsers,
     blockUser,
-    unblockUser
+    unblockUser,
+    loadCoupon,
+    addCoupon,
+    addCouponPost,
+    deleteCoupon,
+    editCoupon,
+    editCouponPost,
+    toggleStatusCoupon
 };

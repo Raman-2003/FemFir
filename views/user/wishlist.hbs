@@ -1,0 +1,167 @@
+<head>
+    <!-- Include SweetAlert via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<!-- Wishlist Start -->
+<div class="cart-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Add to Cart</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle">
+                            {{#each WishListProd}}
+                            <tr>
+                                <td>
+                                    <a href="/product/{{this.productId}}">
+                                        <img src="{{this.productImage}}" alt="Image" style="max-width: 100px; max-height: 100px;">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="/product/{{this.productId}}">
+                                        {{this.productName}}
+                                    </a>
+                                </td>
+                                <td>${{this.productPrice}}</td>
+                                <td>{{this.productQuantity}}</td>
+                                <td>
+                                    <button class="add-to-cart" data-product-id="{{this.productId}}" data-stock="{{this.productQuantity}}" {{#if (eq this.productQuantity 0)}}disabled{{/if}}>
+                                        {{#if (eq this.productQuantity 0)}} Out of Stock{{else}}Move to Cart{{/if}}
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="remove-from-wishlist" data-product-id="{{this.productId}}" data-wishlist-id="{{this._id}}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Wishlist End -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Remove from Wishlist functionality
+        document.querySelectorAll('.remove-from-wishlist').forEach(button => {
+            button.addEventListener('click', async function() {
+                const productId = this.dataset.productId;
+                const wishlistId = this.dataset.wishlistId;
+
+                try {
+                    const response = await fetch('/wishlist/remove-from-wishlist', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: productId, wishId: wishlistId })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        this.closest('tr').remove();
+
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Product has been removed from your wishlist.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to remove product from wishlist.',
+                            icon: 'error',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while removing the product from the wishlist.',
+                        icon: 'error',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        // Add to Cart functionality
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', async function() {
+                const productId = this.dataset.productId;
+                const stock = parseInt(this.dataset.stock, 10);
+
+                if (stock === 0) {
+                    Swal.fire({
+                        title: 'Out of Stock!',
+                        text: 'This product is currently out of stock and cannot be added to the cart.',
+                        icon: 'warning',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/wishlist/add-to-cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: productId })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Product has been added to your cart.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '/cart'; // Redirect to cart page
+                        });
+
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to add product to cart.',
+                            icon: 'error',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while adding the product to the cart.',
+                        icon: 'error',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+    });
+</script>

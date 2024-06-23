@@ -1,10 +1,9 @@
 const User = require('../models/userSchema');
-const { Category } = require('../models/categorySchema');
-const { Product } = require('../models/productSchema');
+const  Category  = require('../models/categorySchema');
+const Product = require('../models/productSchema');
 const userHelper = require('../helpers/user_helper');
 const argon2 = require('argon2');
 const bcrypt = require('bcrypt');
-
 
 let otp;
 let userotp;
@@ -14,16 +13,7 @@ let userRegesterData;
 let userData;
 
 
-// 404 Not Found Page
-const pagenotFound = async (req, res) => {
-    try {
-        res.render("404 page");
-    } catch (error) {
-        console.log(error.message);
-    }
-};
-
-// Home page
+// home page
 const getHome = async (req, res) => {
     try {
         if(req.session.user){
@@ -32,15 +22,13 @@ const getHome = async (req, res) => {
         else{
             res.redirect('/login');
         }
-        // const categories = await Category.find({ is_unListed: false }).lean();
-        // const products = await Product.find({ is_blocked: false }).lean();
-        // res.render('user/index'), { products, categories, userData });
         
     } catch (error) {
         console.log(error.message);
     }
 };
 
+//render login page
 const showloginPage = async (req, res) => {
     try {
         if(!req.session.user){
@@ -53,50 +41,51 @@ const showloginPage = async (req, res) => {
     }
 };
 
-// Login Details submission
 const doLogin = async (req, res) => {
     try {
-        const Email = req.body.email;
-        const Password = req.body.password;
-        // console.log(Password);
-        userData = await User.findOne({ email: Email }).lean();
-        // console.log(userData);
-        if (userData.is_blocked === true) res.redirect('/login')
+        const { email, password } = req.body;
+        const userData = await User.findOne({ email }).lean();
 
-            if(userData){
-            if (await argon2.verify(userData.password, Password)) {
-                req.session.LoggedIn = true;
-                req.session.user = userData;
-               res.redirect('/');
-            }
-        }        
-    
-     else {
-            res.redirect('/login');
+        if (!userData) {
+            return res.redirect('/login');  // User not found
+        }
+
+        if (userData.is_blocked) {
+            return res.redirect('/login');  // User is blocked
+        }
+
+        const passwordValid = await argon2.verify(userData.password, password);
+        
+        if (passwordValid) {
+            req.session.LoggedIn = true;
+            req.session.user = userData;
+            return res.redirect('/');
+        } else {
+            return res.redirect('/login');  // Invalid password
         }
     } catch (error) {
         console.log(error);
+        return res.status(500).send('Internal Server Error');
     }
 };
 
-// Logout functionality
-const doLogout = async (req, res) => {
+
+const doLogout = (req, res) => {
     try {
         req.session.destroy((err) => {
             if (err) {
-                console.log('Logout error');
-                res.redirect('/');
+                console.log('Logout error:', err);
+                return res.redirect('/');
             }
-            console.log('Logged out successfully');
             res.redirect('/login');
         });
-        userData = null;
     } catch (error) {
         console.log(error.message);
+        res.redirect('/');
     }
 };
 
-// Render signup page
+// render signup page
 const showsignupPage = async (req, res) => {
     try {
         if(!req.session.user){
@@ -110,7 +99,7 @@ const showsignupPage = async (req, res) => {
     }
 };
 
-// User signup
+// user signup
 const dosignup = async (req, res) => {
     try {
         let msg = 'User already exists';
@@ -130,7 +119,8 @@ const dosignup = async (req, res) => {
     }
 };
 
-// Get otp page
+
+// get otp page
 const getotppage = async (req, res) => {
     try {
         if(!req.session.user){
@@ -143,11 +133,11 @@ const getotppage = async (req, res) => {
     }
 };
 
-// Verify otp and add user data in our Database
+
+// verify otp
 const submitotp = async (req, res) => {
     try {
         userotp = req.body.otp;
-        // const hashedPassword = await argon2.hash(req.body.password);
         if (userotp == otp) {
             const user = new User({
                 firstname: userRegesterData.firstname,
@@ -171,7 +161,7 @@ const submitotp = async (req, res) => {
     }
 };
 
-// Resend otp
+// resend otp
 const resendOtp = async (req, res) => {
     try {
         console.log('Resending OTP..');
@@ -186,6 +176,8 @@ const getAdditionalInfoPage = async(req,res)=>{
     res.render('user/additionalinfo', {title: 'Additional Information'})
 }
 
+
+//during google authentication, we want additional informations
 const saveAdditionalInfo = async(req,res)=>{
     try{
             const {mobile,password, password2} = req.body;
@@ -212,6 +204,93 @@ const saveAdditionalInfo = async(req,res)=>{
     }
 }
 
+
+const getProducts = async (req, res) => {
+    try {
+        const perPage = 9;
+        const page = parseInt(req.query.page) || 1;
+        const sortOption = req.query.sort || 'default';
+        const searchQuery = req.query.search || '';
+
+        let sortCondition;
+        switch (sortOption) {
+            case 'price_high':
+                sortCondition = { price: -1 };
+                break;
+            case 'price_low':
+                sortCondition = { price: 1 };
+                break;
+            case 'name_asc':
+                sortCondition = { name: 1 };
+                break;
+            case 'name_desc':
+                sortCondition = { name: -1 };
+                break;
+            default:
+                sortCondition = {};
+        }
+
+        const listedCategories = await Category.find({ status: 'listed' }).select('_id');
+        const listedCategoryIds = listedCategories.map(category => category._id);
+
+        let query = {
+            status: 'listed',
+            category: { $in: listedCategoryIds }
+        };
+
+        if (searchQuery) {
+            query.name = { $regex: searchQuery, $options: 'i' };
+        }
+
+        const products = await Product.find(query)
+            .sort(sortCondition)
+            .skip((perPage * page) - perPage)
+            .limit(perPage);
+
+        const count = await Product.countDocuments(query);
+
+        res.render('user/product', {
+            products,
+            current: page,
+            pages: Math.ceil(count / perPage),
+            sortOption, 
+            query: req.query
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Something went wrong');
+    }
+};
+const getProductDetails = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id).populate('category').lean();
+
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+
+        let relatedProducts = await Product.find({
+            category: product.category._id,
+            _id: { $ne: product._id }
+        }).limit(3).lean();
+
+        if (relatedProducts.length === 0) {
+            relatedProducts = await Product.find({ _id: { $ne: product._id } }).limit(3).lean();
+        }
+
+        res.render('user/view', {
+            title: product.name,
+            product,
+            relatedProducts
+        });
+
+    } catch (error) {
+        console.error('Error fetching product details:', error.message);
+        res.status(500).send('Server Error');
+    }
+};
+
+
 module.exports = {
     showloginPage,
     showsignupPage,
@@ -222,7 +301,8 @@ module.exports = {
     doLogout,
     getHome,
     resendOtp,
-    pagenotFound,
     getAdditionalInfoPage,
-    saveAdditionalInfo
+    saveAdditionalInfo,
+    getProducts,
+    getProductDetails
 };

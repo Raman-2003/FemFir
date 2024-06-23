@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Order Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-body {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .order-details {
+            margin-bottom: 20px;
+        }
+
+        .order-details h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .order-details p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .order-items {
+            margin-top: 20px;
+        }
+
+        .order-items table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-items th, .order-items td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .order-items th {
+            background-color: #007bff;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .order-items img {
+            max-width: 75px;
+            max-height: 75px;
+            border-radius: 4px;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #0056b3;
+        }
+
+        .hans {
+              font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            color: #333;
+        }
+        
+        .user-details {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            color: #333;
+        }
+
+        .final{
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            color:cadetblue
+        }
+    </style>
+</head>
+<body>
+    <div class="content-body">
+        <div class="container">
+            <h1>Order Details</h1>
+
+            <div class="order-details">
+                <h2>Order Information</h2>
+                <p><strong>Order ID:</strong> {{order._id}}</p>
+                <p><strong>Order Date:</strong> {{formatDate order.createdAt}}</p>
+                <p><strong>Status:</strong> {{order.status}}</p>
+                <p><strong>Total Amount:</strong> ${{order.totalAmount}}</p>
+                <p><strong>Payment Method:</strong> {{order.paymentMethod}}</p>
+            </div>
+
+            <div class="user-details">
+                <h2>User Information</h2>
+                <p class="user-details"><strong>Name:</strong> {{order.userId.firstname}} {{order.userId.lastname}}</p>
+                <p class="user-details"><strong>Email:</strong> {{order.userId.email}}</p>
+                <p class="user-details"><strong>Phone:</strong> {{order.userId.mobile}}</p>
+                <p><strong>Return Status:</strong> {{order.returnStatus}}</p>
+            </div>
+
+             <div class="shipping-details">
+                <h2>Shipping Address</h2>
+                {{#if order.billingAddress}}
+                    <p class="hans"><strong>Street:</strong> {{order.billingAddress.locality}}</p>
+                    <p class="hans"><strong>City:</strong> {{order.billingAddress.city}}</p>
+                    <p class="hans"><strong>State:</strong> {{order.billingAddress.state}}</p>
+                    <p class="hans"><strong>Postal Code:</strong> {{order.billingAddress.pin}}</p>
+                {{else}}
+                    <p>No shipping address provided.</p>
+                {{/if}}
+            </div>
+
+            <div class="order-items">
+                <h2>Items Ordered</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each order.items}}
+                        <tr class="final">
+                            <td><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"></td>
+                            <td>{{this.product.name}}</td>
+                            <td>{{this.quantity}}</td>
+                            <td>${{this.product.price}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="back-link">
+                <a href="/admin/orders">Back to Order List</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    Handlebars.registerHelper('formatDate', function(date) {
+        return new Date(date).toLocaleDateString();
+    });
+</script>

@@ -1,22 +1,91 @@
+<!-- admin/addCategory.hbs -->
 
 <div class="content-body">
     <div class="container-fluid">
-    <h2>Add Category</h2>
-    <form action="/admin/categories/add" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" name="name" class="form-control" required>
+        <h2>Add Category</h2>
+        {{#if errorMessage}}
+        <div class="alert alert-danger" role="alert">
+            {{errorMessage}}
         </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea name="description" class="form-control"></textarea>
-        </div>
-        <div class="form-group">
-            <label for="image">Image</label>
-            <input type="file" name="image" id="image" class="form-control" required>
-            <img id="cropped-image" src="#" alt="Cropped Image" style="display:none;">
-        </div>
-        <button type="submit" class="btn btn-primary">Add Category</button>
-    </form>
+        {{/if}}
+        <form action="/admin/categories/add" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                    <label for="mainImage">Image</label>
+                    <input type="file" id="mainImage" name="mainImage" class="form-control" required>
+                    <div id="mainImagePreview" class="image-preview"></div>
+                </div>
+            <button type="submit" class="btn btn-primary">Add Category</button>
+        </form>
+    </div>
 </div>
-</div>
+<style>
+    .image-preview {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    .image-preview-item {
+        position: relative;
+        display: inline-block;
+        margin: 5px;
+    }
+    .image-preview img {
+        max-width: 130px;
+        max-height: 150px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+    }
+    .delete-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+    }
+</style>
+
+
+<script>
+     document.getElementById('mainImage').addEventListener('change', function(event) {
+        const mainImagePreview = document.getElementById('mainImagePreview');
+        mainImagePreview.innerHTML = ''; // Clear previous previews
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'image-preview-item';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.innerHTML = '&times;';
+                deleteButton.addEventListener('click', function() {
+                    mainImagePreview.innerHTML = ''; // Remove the preview
+                    document.getElementById('mainImage').value = ''; // Clear the file input
+                });
+
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(deleteButton);
+                mainImagePreview.appendChild(imgContainer);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>

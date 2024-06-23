@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .profile-container,
+        .address-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-container h2,
+        .address-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-details,
+        .address-details {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .profile-details li,
+        .address-details li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-details li:last-child,
+        .address-details li:last-child {
+            border-bottom: none;
+        }
+
+        .edit-button,
+        .edit-address-button,
+        .add-address-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            background-color: #ff477e;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .edit-button:hover,
+        .edit-address-button:hover,
+        .add-address-button:hover {
+            background-color: #ff678e;
+        }
+
+        @media (max-width: 600px) {
+
+            .profile-details li,
+            .address-details li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .profile-details li span,
+            .address-details li span {
+                margin-bottom: 5px;
+            }
+        }
+
+        .orders-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+        }
+
+        .orders-container h4 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+        }
+
+        .orders-table th {
+            background-color: #f4f4f4;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        .orders-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .orders-table td button {
+            padding: 5px 10px;
+            background-color: #ff477e;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .orders-table td button:hover {
+            background-color: #ff678e;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Breadcrumb Start -->
+    <div class="breadcrumb-wrap">
+        <div class="container">
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">User</a></li>
+                <li class="breadcrumb-item active">My Account</li>
+            </ul>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- My Account Start -->
+    <div class="my-account">
+        <div class="container">
+            <div class="row">
+               <div class="col-md-3">
+                <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link active" id="dashboard-nav" data-toggle="pill" href="#profile-tab" role="tab">Profile</a>
+                    <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab">Orders</a>
+                    <a class="nav-link" id="payment-nav" data-toggle="pill" href="#payment-tab" role="tab">Payment Method</a>
+                    <a class="nav-link" id="address-nav" data-toggle="pill" href="#address-tab" role="tab">Address</a>
+                    <a class="nav-link" id="account-nav" data-toggle="pill" href="#account-tab" role="tab">Account Details</a>
+                    <a class="nav-link" id="change-password-nav" data-toggle="pill" href="#change-password-tab" role="tab">Change Password</a>
+                    <a class="nav-link" href="/logout">Logout</a>
+                </div>
+            </div>
+                <div class="col-md-9">
+                    <div class="tab-content">
+
+                        <!-- Profile Details Tab -->
+                       <div class="tab-pane fade show active" id="profile-tab" role="tabpanel" aria-labelledby="profile-nav">
+                        <div class="profile-container">
+                            <h2>Profile Details</h2>
+                            <ul class="profile-details">
+                                <li><span>Full Name</span><span>{{userData.firstname}} {{userData.lastname}}</span></li>
+                                <li><span>Mobile Number</span><span>{{userData.mobile}}</span></li>
+                                <li><span>Email ID</span><span>{{userData.email}}</span></li>
+                                <li><span>Hint Name</span><span>{{userData.hintname}}</span></li>
+                                <li><span>Gender</span><span>{{userData.gender}}</span></li>
+                            </ul>
+                            <a href="/edit-details" class="edit-button">EDIT</a>
+                        </div>
+                    </div>
+
+                      <div class="tab-pane fade" id="change-password-tab" role="tabpanel" aria-labelledby="change-password-nav">
+                        <div class="change-password-container">
+                            <h2>Change Password</h2>
+                            <form id="change-password-form" action="/profile/change-password" method="POST">
+                                <div class="form-group">
+                                    <label for="current-password">Current Password</label>
+                                    <input type="password" class="form-control" id="current-password" name="currentPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-password">New Password</label>
+                                    <input type="password" class="form-control" id="new-password" name="newPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirm-password" name="confirmPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Change Password</button>
+                            </form>
+                        </div>
+                    </div>
+
+
+
+<!-- profiles.hbs -->
+
+<!-- Orders Tab -->
+<div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
+    <div class="orders-container">
+        <h4>Order Details</h4>
+        <div class="table-responsive">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Product</th>
+                        <th>Image</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each userOrders}}
+                    <tr>
+                        <td>{{@index}}</td>
+                        <td>
+                            {{#each this.items}}
+                            <div><a href="/viewone/{{this.product._id}}">{{this.product.name}}</a></div>
+                            {{/each}}
+                        </td>
+                        <td>
+                            {{#each this.items}}
+                            <div><img src="{{this.product.mainImage}}" alt="{{this.product.name}}" style="width: 80px; height: 110px;"></div>
+                            {{/each}}
+                        </td>
+                        <td>
+                            {{#each this.items}}
+                            <div>{{this.quantity}}</div>
+                            {{/each}}
+                        </td>
+                        <td>{{this.totalAmount}}</td>
+                        <td>{{formatDate this.createdAt}}</td>
+                        <td>{{this.status}}</td>
+                        <td>
+                            <button onclick="location.href='/view-order/{{this._id}}'" style="width:90px;">View</button>
+                            {{#if (eq this.status 'Pending')}}
+                            <form action="/cancel-order/{{this._id}}" method="POST" style="display:inline;">
+                                <button type="submit" style="background-color: red; color: white; width:90px;">Cancel</button>
+                            </form>
+                            {{/if}}
+                            {{#if (eq this.status 'Delivered')}}
+                            <form action="/return-order/{{this._id}}" method="GET" style="display:inline;">
+                                <button type="submit" style="background-color: orange; width:90px; color: white;">Return</button>
+                            </form>
+                            {{/if}}
+                            {{#if (eq this.status 'Request Processed')}}
+                            {{!-- <span style="color: blue;">Return Requested</span> --}}
+                            <form action="/cancel-return/{{this._id}}" method="POST" >
+                                <button type="submit" style="background-color: grey; color: white; width:90px; height: 60px">Cancel Request</button>
+                            </form>
+                            {{/if}}
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+                        <!-- Address Tab -->
+                        <div class="tab-pane fade" id="address-tab" role="tabpanel" aria-labelledby="address-nav">
+                            <div class="address-container">
+                                <h2>Saved Address</h2>
+                                <a href="/add-new-address" class="add-address-button">+ Add New Address</a>
+                                {{#each userAddress}}
+                                <ul class="address-details">
+                                    <li><span>Full Name</span><span>{{this.name}}</span></li>
+                                    <li><span>Mobile Number</span><span>{{this.mobile}}</span></li>
+                                    <li><span>Address</span><span>{{this.addressLine1}} <br> {{this.locality}},
+                                            {{this.city}}, <br> {{this.state}}, {{this.pin}}</span></li>
+                                    <li><span>Type</span><span>{{this.addressType}}</span></li>
+                                </ul>
+                                <a href="/edit-address/{{this._id}}" class="edit-address-button">EDIT</a>
+                                <form action="/delete-address/{{this._id}}" method="POST" style="display:inline;">
+                                    <button type="submit" class="edit-address-button"
+                                        style="background-color:red;">DELETE</button>
+                                </form>
+                                {{/each}}
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="payment-tab" role="tabpanel" aria-labelledby="payment-nav">
+                            <h4>Payment Method</h4>
+                            <p>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. In condimentum quam ac mi
+                                viverra dictum. In efficitur ipsum diam, at dignissim lorem tempor in. Vivamus tempor
+                                hendrerit finibus. Nulla tristique viverra nisl, sit amet bibendum ante suscipit non.
+                                Praesent in faucibus tellus, sed gravida lacus. Vivamus eu diam eros. Aliquam et sapien
+                                eget arcu rhoncus scelerisque.
+                            </p>
+                        </div>
+
+                        <div class="tab-pane fade" id="account-tab" role="tabpanel" aria-labelledby="account-nav">
+                            <h4>Account Details</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input class="form-control" type="text" placeholder="First Name">
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control" type="text" placeholder="Last Name">
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control" type="text" placeholder="Mobile">
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control" type="text" placeholder="Email">
+                                </div>
+                                <div class="col-md-12">
+                                    <input class="form-control" type="text" placeholder="Address">
+                                </div>
+                                <div class="col-md-12">
+                                    <button class="btn">Update Account</button>
+                                    <br><br>
+                                    <h4>Password change</h4>
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control" type="password" placeholder="Current Password">
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control" type="password" placeholder="New Password">
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control" type="password" placeholder="Confirm Password">
+                                </div>
+                                <div class="col-md-12">
+                                    <button class="btn">Save Changes</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Other tabs content -->
+            </div>
+        </div>
+    </div>
+    <!-- My Account End -->
+</body>
+
+</html>
+
+<script>
+document.getElementById('change-password-form').addEventListener('submit', function (event) {
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+
+    if (newPassword !== confirmPassword) {
+        event.preventDefault();
+        alert('New password and confirm password do not match');
+    }
+});
+</script>

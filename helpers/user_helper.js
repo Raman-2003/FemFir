@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const argon2 = require('argon2');
 const bcrypt = require('bcrypt');
 
-//Email Verification
+//email Verification
 const verifyEmail = async(email)=> {
     try{
        const  otp = generateOtp();
@@ -44,14 +44,13 @@ const verifyEmail = async(email)=> {
 }
 
 //Generate OTP
-
 var generateOtp = ()=> {
    var otp = `${Math.floor(1000 + Math.random() * 9000)}`      
     return otp 
 }
 
 
-//Password hashing using argon2 module.
+//password hashing using argon2 module.
 const hashpassword = async(password)=>{
     try{
         const passwordhash = await argon2.hash(password)

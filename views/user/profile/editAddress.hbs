@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Address</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .address-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .address-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="address-container">
+        <h2>Edit Address</h2>
+        <form action="/edit-address/{{address._id}}" method="POST" novalidate>
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{address.name}}" required minlength="3" maxlength="100">
+                <div class="invalid-feedback">
+                    Please enter a valid Full Name (3-100 characters).
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile Number</label>
+                <input type="text" class="form-control" id="mobile" name="mobile" value="{{address.mobile}}" required pattern="^\d{10}$">
+                <div class="invalid-feedback">
+                    Please enter a valid 10-digit Mobile Number.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address1">Address Line 1</label>
+                <input type="text" class="form-control" id="address1" name="address1" value="{{address.addressLine1}}" required maxlength="200">
+                <div class="invalid-feedback">
+                    Address Line 1 is required and should be less than 200 characters.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address2">Address Line 2</label>
+                <input type="text" class="form-control" id="address2" name="address2" value="{{address.addressLine2}}" maxlength="200">
+                <div class="invalid-feedback">
+                    Address Line 2 should be less than 200 characters.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" class="form-control" id="city" name="city" value="{{address.city}}" required maxlength="100">
+                <div class="invalid-feedback">
+                    Please enter a valid City (up to 100 characters).
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" class="form-control" id="state" name="state" value="{{address.state}}" required maxlength="100">
+                <div class="invalid-feedback">
+                    Please enter a valid State (up to 100 characters).
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="pin">PIN Code</label>
+                <input type="text" class="form-control" id="pin" name="pin" value="{{address.pin}}" required pattern="^\d{6}$">
+                <div class="invalid-feedback">
+                    Please enter a valid 6-digit PIN Code.
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+
+    <script>
+        // JavaScript to handle client-side form validation feedback
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByTagName('form');
+                // Loop over them and prevent submission
+                Array.prototype.forEach.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+</body>
+</html>

@@ -14,6 +14,16 @@ const categorySchema = new mongoose.Schema({
     image: {
         type: String,
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['listed', 'unlisted'],
+        default: 'unlisted'
+    },
+    nameLower: {
+        type: String,
+        required: true,
+        unique: true // Ensure uniqueness on the normalized name
     }
 }, { timestamps: true });
 

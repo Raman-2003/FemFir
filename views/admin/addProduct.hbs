@@ -1,40 +1,146 @@
-
-    <div class="content-body">
+<div class="content-body">
     <div class="container-fluid">
-    <div class="container">
+        <div class="container">
+            <h2>Add Product</h2>
+            <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number" id="price" name="price" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" name="stock" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" class="form-control" required>
+                        <option value="">Select Category</option>
+                        {{#each categories}}
+                        <option value="{{this.name}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mainImage">Main Image</label>
+                    <input type="file" id="mainImage" name="mainImage" class="form-control" required>
+                    <div id="mainImagePreview" class="image-preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="subImages">Sub Images</label>
+                    <input type="file" id="subImages" name="subImages" class="form-control" multiple>
+                    <div id="subImagesPreview" class="image-preview"></div>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Product</button>
+            </form>
+        </div>
+    </div>
+</div>
 
-        <h2>Add Product</h2>
-        <form action="/admin/products/add" method="POST">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" class="form-control" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="price">Price</label>
-                <input type="number" id="price" name="price" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="stock">Stock</label>
-                <input type="number" id="stock" name="stock" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="category">Category</label>
-                <input type="text" id="category" name="category" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="mainImage">Main Image URL</label>
-                <input type="text" id="mainImage" name="mainImage" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="subImages">Sub Images URLs (comma separated)</label>
-                <input type="text" id="subImages" name="subImages" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-primary">Add Product</button>
-        </form>
-    </div>
-    </div>
-    </div>
+<style>
+    .image-preview {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    .image-preview-item {
+        position: relative;
+        display: inline-block;
+        margin: 5px;
+    }
+    .image-preview img {
+        max-width: 130px;
+        max-height: 150px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+    }
+    .delete-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+    }
+</style>
+
+
+<script>
+    document.getElementById('mainImage').addEventListener('change', function(event) {
+        const mainImagePreview = document.getElementById('mainImagePreview');
+        mainImagePreview.innerHTML = ''; // Clear previous previews
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'image-preview-item';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.innerHTML = '&times;';
+                deleteButton.addEventListener('click', function() {
+                    mainImagePreview.innerHTML = ''; // Remove the preview
+                    document.getElementById('mainImage').value = ''; // Clear the file input
+                });
+
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(deleteButton);
+                mainImagePreview.appendChild(imgContainer);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('subImages').addEventListener('change', function(event) {
+        const subImagesPreview = document.getElementById('subImagesPreview');
+        subImagesPreview.innerHTML = ''; // Clear previous previews
+        const files = event.target.files;
+        if (files) {
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'image-preview-item';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.innerHTML = '&times;';
+                    deleteButton.addEventListener('click', function() {
+                        imgContainer.remove(); 
+                        const dt = new DataTransfer(); 
+                        for (let j = 0; j < files.length; j++) {
+                            if (j !== i) {
+                                dt.items.add(files[j]);
+                            }
+                        }
+                        document.getElementById('subImages').files = dt.files; 
+                    });
+
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(deleteButton);
+                    subImagesPreview.appendChild(imgContainer);
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        }
+    });
+</script>

@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Order List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-body {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-table th, .order-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+       
+        .order-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+
+        .order-table img {
+            border-radius: 4px;
+            max-width: 75px;
+            max-height: 75px;
+        }
+
+        select[name="status"] {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 14px;
+            appearance: none; 
+            -webkit-appearance: none; 
+            -moz-appearance: none; 
+            position: relative;
+            width: 150px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        select[name="status"]:hover,
+        select[name="status"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        
+        select[name="status"]::after {
+            content: '\25BC';
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        button {
+            margin-top: 5px;
+            padding: 10px 15px;
+            border: none;
+            background-color: #28a745;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            margin-left: 3px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination a {
+            padding: 10px 15px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #a49595;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .pagination a.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+     <div class="content-body">
+        <div class="container">
+            <h1>Order List</h1>
+            <table class="order-table">
+                <thead>
+                    <tr style="color: black;">
+                        <th>Username</th>
+                        <th>Product Image</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Order Date</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each orders}}
+                    <tr>
+                        <td>{{this.userId.firstname}} {{this.userId.lastname}}</td>
+                        <td>
+                            {{#each this.items}}
+                            <img src="{{this.product.mainImage}}" alt="{{this.product.name}}">
+                            {{/each}}
+                        </td>
+                        <td>
+                            {{#each this.items}}
+                            {{this.product.name}} <br>
+                            {{/each}}
+                        </td>
+                        <td>${{this.totalAmount}}</td>
+                        <td>{{formatDate this.createdAt}}</td>
+                        <td>
+                            {{#each this.items}}
+                            {{this.quantity}} <br>
+                            {{/each}}
+                        </td>
+                        <td>{{this.returnStatus}}</td>
+                        <td>
+                            <form action="/admin/orders/status" method="POST">
+                                <input type="hidden" name="orderId" value="{{this._id}}">
+                                <select name="status">
+                                    <option value="Pending" {{#ifCond this.status '==' 'Pending'}}selected{{/ifCond}}>Pending</option>
+                                    <option value="Processed" {{#ifCond this.status '==' 'Processed'}}selected{{/ifCond}}>Processed</option>
+                                    <option value="Shipped" {{#ifCond this.status '==' 'Shipped'}}selected{{/ifCond}}>Shipped</option>
+                                    <option value="Delivered" {{#ifCond this.status '==' 'Delivered'}}selected{{/ifCond}}>Delivered</option>
+                                    <option value="Cancelled" {{#ifCond this.status '==' 'Cancelled'}}selected{{/ifCond}}>Cancelled</option>
+                                    <option value="Returned" {{#ifCond this.status '==' 'Returned'}}selected{{/ifCond}}>Returned</option>
+                                </select>
+                                <button type="submit" style="width: 145px;"><i class="fas fa-save"></i> Update</button>
+                            </form>
+                        </td>
+                        <td><a href="/admin/orders/details?id={{this._id}}"><i class="fas fa-eye"></i> View Details</a></td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                {{#each pagination}}
+                <a href="/admin/orders?page={{this}}" class="{{#ifCond this '==' ../currentPage}}active{{/ifCond}}">{{this}}</a>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    Handlebars.registerHelper('formatDate', function(date) {
+        return new Date(date).toLocaleDateString();
+    });
+
+    Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+        switch (operator) {
+            case '==':
+                return (v1 == v2) ? options.fn(this) : options.inverse(this);
+            case '===':
+                return (v1 === v2) ? options.fn(this) : options.inverse(this);
+            case '!=':
+                return (v1 != v2) ? options.fn(this) : options.inverse(this);
+            case '!==':
+                return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+            case '<':
+                return (v1 < v2) ? options.fn(this) : options.inverse(this);
+            case '<=':
+                return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+            case '>':
+                return (v1 > v2) ? options.fn(this) : options.inverse(this);
+            case '>=':
+                return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+            case '&&':
+                return (v1 && v2) ? options.fn(this) : options.inverse(this);
+            case '||':
+                return (v1 || v2) ? options.fn(this) : options.inverse(this);
+            default:
+                return options.inverse(this);
+        }
+    });
+</script>

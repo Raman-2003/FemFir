@@ -1,316 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
 
-        
-        <!-- Product Detail Start -->
-        <div class="product-detail">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-9">
-                        <div class="row align-items-center product-detail-top">
-                            <div class="col-md-5">
-                                <div class="product-slider-single">
-                                    <img src="img/product-1.png" alt="Product Image">
-                                    <img src="img/product-2.png" alt="Product Image">
-                                    <img src="img/product-3.png" alt="Product Image">
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <div class="product-content">
-                                    <div class="title"><h2>Phasellus Gravida</h2></div>
-                                    <div class="ratting">
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                    </div>
-                                    <div class="price">$22 <span>$25</span></div>
-                                    <div class="details">
-                                        <p>
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. In condimentum quam ac mi viverra dictum. In efficitur ipsum diam, at dignissim lorem tempor in. Vivamus tempor hendrerit finibus. Nulla tristique viverra nisl, sit amet bibendum ante suscipit non.
-                                        </p>
-                                    </div>
+<head>
+    <!-- Required meta tags and other head content -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/js-image-zoom@0.4.1/js-image-zoom.js" type="application/javascript"></script>
 
-                                    <div class="quantity">
-                                        <h4>Quantity:</h4>
-                                        <div class="qty">
-                                            <button class="btn-minus"><i class="fa fa-minus"></i></button>
-                                            <input type="text" value="1">
-                                            <button class="btn-plus"><i class="fa fa-plus"></i></button>
-                                        </div>
-                                    </div>
-                                    <div class="action">
-                                        <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                        <a href="#"><i class="fa fa-heart"></i></a>
-                                        <a href="#"><i class="fa fa-search"></i></a>
-                                    </div>
-                                </div>
+    <style>
+        /* General button styles */
+.action button {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Add to Wishlist button */
+.add-to-wishlist {
+    background-color: #0c5d83;
+    color: #fffafa;
+}
+
+.add-to-wishlist:hover {
+    background-color: #ecb939;
+}
+
+/* Add to Cart button */
+.add-to-cart {
+    background-color: #155c83;
+    color: white;
+}
+
+.add-to-cart:hover {
+    background-color: #e68a00;
+}
+
+/* Additional styles for both buttons */
+.action button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
+}
+
+    </style>
+</head>
+
+<body>
+    <!-- Product Detail Start -->
+    <div class="product-detail">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row align-items-center product-detail-top">
+                        <div class="col-md-5">
+                            <div class="product-slider-single" id="summasample">
+                                <img src="{{product.mainImage}}" alt="{{product.name}}">
+                                {{#each product.subImages}}
+                                <img src="{{this}}" alt="{{../product.name}}">
+                                {{/each}}
                             </div>
                         </div>
-                        
-                        <div class="row product-detail-bottom">
-                            <div class="col-lg-12">
-                                <ul class="nav nav-pills nav-justified">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" data-toggle="pill" href="#description">Description</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-toggle="pill" href="#specification">Specification</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-toggle="pill" href="#reviews">Reviews (1)</a>
-                                    </li>
-                                </ul>
+                        <div class="col-md-7">
+                            <div class="product-content">
+                                <div class="title">
+                                    <h2>{{product.name}}</h2>
+                                </div>
+                                <div class="ratting">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="price">${{product.price}} <span>${8999}</span></div>
+                                <div class="details">
+                                    <p>{{product.description}}</p>
+                                </div>
+                                <div class="stock">
+                                    <h4>Stock:</h4>
+                                    <p>{{#if product.stock}} {{product.stock}} {{else}} OUT OF STOCK {{/if}}</p>
+                                </div>
+                                <div class="category">
+                                    <h4>Category:</h4>
+                                    <p>{{product.category.name}}</p>
+                                </div>
 
-                                <div class="tab-content">
-                                    <div id="description" class="container tab-pane active"><br>
-                                        <h4>Product description</h4>
-                                        <p>
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. In condimentum quam ac mi viverra dictum. In efficitur ipsum diam, at dignissim lorem tempor in. Vivamus tempor hendrerit finibus. Nulla tristique viverra nisl, sit amet bibendum ante suscipit non. Praesent in faucibus tellus, sed gravida lacus. Vivamus eu diam eros. Aliquam et sapien eget arcu rhoncus scelerisque. Suspendisse sit amet neque neque. Praesent suscipit et magna eu iaculis. Donec arcu libero, commodo ac est a, malesuada finibus dolor. Aenean in ex eu velit semper fermentum. In leo dui, aliquet sit amet eleifend sit amet, varius in turpis. Maecenas fermentum ut ligula at consectetur. Nullam et tortor leo. 
-                                        </p>
-                                    </div>
-                                    <div id="specification" class="container tab-pane fade"><br>
-                                        <h4>Product specification</h4>
-                                        <ul>
-                                            <li>Lorem ipsum dolor sit amet</li>
-                                            <li>Lorem ipsum dolor sit amet</li>
-                                            <li>Lorem ipsum dolor sit amet</li>
-                                            <li>Lorem ipsum dolor sit amet</li>
-                                            <li>Lorem ipsum dolor sit amet</li>
-                                        </ul>
-                                    </div>
-                                    <div id="reviews" class="container tab-pane fade"><br>
-                                        <div class="reviews-submitted">
-                                            <div class="reviewer">Phasellus Gravida - <span>01 Jan 2020</span></div>
-                                            <div class="ratting">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                            <p>
-                                                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.
-                                            </p>
-                                        </div>
-                                        <div class="reviews-submit">
-                                            <h4>Give your Review:</h4>
-                                            <div class="ratting">
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                            </div>
-                                            <div class="row form">
-                                                <div class="col-sm-6">
-                                                    <input type="text" placeholder="Name">
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <input type="email" placeholder="Email">
-                                                </div>
-                                                <div class="col-sm-12">
-                                                    <textarea placeholder="Review"></textarea>
-                                                </div>
-                                                <div class="col-sm-12">
-                                                    <button>Submit</button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="quantity">
+                                    <h4>Quantity:</h4>
+                                    <div class="qty">
+                                        <button class="btn-minus" data-product-id="{{product._id}}"><i class="fa fa-minus"></i></button>
+                                        <input type="text" value="1" data-product-id="{{product._id}}">
+                                        <button class="btn-plus" data-product-id="{{product._id}}"><i class="fa fa-plus"></i></button>
                                     </div>
                                 </div>
+
+                              <div class="action">
+    <!-- Add to Wishlist Button -->
+    <button class="add-to-wishlist" data-product-id="{{product._id}}">Add to Wishlist</button>
+    <!-- Add to Cart Button -->
+    <button class="add-to-cart" data-product-id="{{product._id}}">Add to Cart</button>
+</div>
+
                             </div>
                         </div>
-                        
-                        <div class="container">
-                            <div class="section-header">
-                                <h3>Related Products</h3>
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra at massa sit amet ultricies. Nullam consequat, mauris non interdum cursus
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="row align-items-center product-slider product-slider-3">
-                            <div class="col-lg-3">
-                                <div class="product-item">
-                                    <div class="product-image">
-                                        <a href="product-detail.html">
-                                            <img src="img/product-1.png" alt="Product Image">
-                                        </a>
-                                        <div class="product-action">
-                                            <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                            <a href="#"><i class="fa fa-heart"></i></a>
-                                            <a href="#"><i class="fa fa-search"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="product-content">
-                                        <div class="title"><a href="#">Phasellus Gravida</a></div>
-                                        <div class="ratting">
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                        </div>
-                                        <div class="price">$22 <span>$25</span></div>
-                                    </div>
+                    </div>
+
+                    <div class="row product-detail-bottom">
+                        <div class="col-lg-12">
+                            <ul class="nav nav-pills nav-justified">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="pill" href="#description">Description</a>
+                                </li>
+                                {{!-- <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#specification">Specification</a>
+                                </li> --}}
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#reviews">Reviews (1)</a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div id="description" class="container tab-pane active"><br>
+                                    <h4>Product description</h4>
+                                    <p>{{product.description}}</p>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="product-item">
-                                    <div class="product-image">
-                                        <a href="product-detail.html">
-                                            <img src="img/product-2.png" alt="Product Image">
-                                        </a>
-                                        <div class="product-action">
-                                            <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                            <a href="#"><i class="fa fa-heart"></i></a>
-                                            <a href="#"><i class="fa fa-search"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="product-content">
-                                        <div class="title"><a href="#">Phasellus Gravida</a></div>
+                                {{!-- <div id="specification" class="container tab-pane fade"><br>
+                                    <h4>Product specification</h4>
+                                    <ul>
+                                        {{#each product.specifications}}
+                                        <li>{{this}}</li>
+                                        {{/each}}
+                                    </ul>
+                                </div> --}}
+                                <div id="reviews" class="container tab-pane fade"><br>
+                                    <div class="reviews-submitted">
+                                        {{#each product.reviews}}
+                                        <div class="reviewer">{{this.reviewer}} - <span>{{this.date}}</span></div>
                                         <div class="ratting">
+                                            {{#times this.rating}}
                                             <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
+                                            {{/times}}
+                                            {{#times (subtract 5 this.rating)}}
+                                            <i class="fa fa-star-o"></i>
+                                            {{/times}}
                                         </div>
-                                        <div class="price">$22 <span>$25</span></div>
+                                        <p>{{this.comment}}</p>
+                                        {{/each}}
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="product-item">
-                                    <div class="product-image">
-                                        <a href="product-detail.html">
-                                            <img src="img/product-3.png" alt="Product Image">
-                                        </a>
-                                        <div class="product-action">
-                                            <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                            <a href="#"><i class="fa fa-heart"></i></a>
-                                            <a href="#"><i class="fa fa-search"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="product-content">
-                                        <div class="title"><a href="#">Phasellus Gravida</a></div>
+                                    <div class="reviews-submit">
+                                        <h4>Give your Review:</h4>
                                         <div class="ratting">
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
                                         </div>
-                                        <div class="price">$22 <span>$25</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="product-item">
-                                    <div class="product-image">
-                                        <a href="product-detail.html">
-                                            <img src="img/product-4.png" alt="Product Image">
-                                        </a>
-                                        <div class="product-action">
-                                            <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                            <a href="#"><i class="fa fa-heart"></i></a>
-                                            <a href="#"><i class="fa fa-search"></i></a>
+                                        <div class="row form">
+                                            <div class="col-sm-6">
+                                                <input type="text" placeholder="Name">
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <input type="email" placeholder="Email">
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <textarea placeholder="Review"></textarea>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <button>Submit</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="product-content">
-                                        <div class="title"><a href="#">Phasellus Gravida</a></div>
-                                        <div class="ratting">
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                        </div>
-                                        <div class="price">$22 <span>$25</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="product-item">
-                                    <div class="product-image">
-                                        <a href="product-detail.html">
-                                            <img src="img/product-5.png" alt="Product Image">
-                                        </a>
-                                        <div class="product-action">
-                                            <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                            <a href="#"><i class="fa fa-heart"></i></a>
-                                            <a href="#"><i class="fa fa-search"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="product-content">
-                                        <div class="title"><a href="#">Phasellus Gravida</a></div>
-                                        <div class="ratting">
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                        </div>
-                                        <div class="price">$22 <span>$25</span></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-lg-3">
-                        <div class="sidebar-widget category">
-                            <h2 class="title">Category</h2>
-                            <ul>
-                                <li><a href="#">Lorem Ipsum</a><span>(83)</span></li>
-                                <li><a href="#">Cras sagittis</a><span>(198)</span></li>
-                                <li><a href="#">Vivamus</a><span>(95)</span></li>
-                                <li><a href="#">Fusce vitae</a><span>(48)</span></li>
-                                <li><a href="#">Vestibulum</a><span>(210)</span></li>
-                                <li><a href="#">Proin phar</a><span>(78)</span></li>
-                            </ul>
+
+                    <!-- Related Products Section -->
+                    <div class="container">
+                        <div class="section-header">
+                            <h3>Related Products</h3>
+                            <p>Made from 100% pure silk, this saree exudes luxury and sophistication. The vibrant colors and subtle sheen of the silk fabric will make you stand out at any occasion.</p>
                         </div>
-                        
-                        <div class="sidebar-widget image">
-                            <h2 class="title">Featured Product</h2>
-                            <a href="#">
-                                <img src="img/category-1.jpg" alt="Image">
-                            </a>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <h3>Related Products</h3>
                         </div>
-                        
-                        <div class="sidebar-widget brands">
-                            <h2 class="title">Our Brands</h2>
-                            <ul>
-                                <li><a href="#">Nulla </a><span>(45)</span></li>
-                                <li><a href="#">Curabitur </a><span>(34)</span></li>
-                                <li><a href="#">Nunc </a><span>(67)</span></li>
-                                <li><a href="#">Ullamcorper</a><span>(74)</span></li>
-                                <li><a href="#">Fusce </a><span>(89)</span></li>
-                                <li><a href="#">Sagittis</a><span>(28)</span></li>
-                            </ul>
+                        {{#each relatedProducts}}
+                        <div class="col-md-3">
+                            <div class="product-item">
+                                <div class="product-thumb">
+                                    <img src="{{this.mainImage}}" class="img-fluid" alt="{{this.name}}">
+                                    <div class="preview-meta">
+                                        <ul></ul>
+                                    </div>
+                                </div>
+                                <div class="product-content">
+                                    <h4><a href="/viewone/{{this._id}}">{{this.name}}</a></h4>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div class="sidebar-widget tag">
-                            <h2 class="title">Tags Cloud</h2>
-                            <a href="#">Lorem ipsum</a>
-                            <a href="#">Vivamus</a>
-                            <a href="#">Phasellus</a>
-                            <a href="#">pulvinar</a>
-                            <a href="#">Curabitur</a>
-                            <a href="#">Fusce</a>
-                            <a href="#">Sem quis</a>
-                            <a href="#">Mollis metus</a>
-                            <a href="#">Sit amet</a>
-                            <a href="#">Vel posuere</a>
-                            <a href="#">orci luctus</a>
-                            <a href="#">Nam lorem</a>
-                        </div>
+                        {{/each}}
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Product Detail End -->
-        
-        
-        
+    </div>
+    <!-- Product Detail End -->
+
+    <script>
+        var options = {
+            width: 400,
+            height: 650,
+            zoomWidth: 500,
+            offset: { vertical: 0, horizontal: 10 },
+            scale: 1.2
+        }
+        new ImageZoom(document.getElementById('summasample'), options);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const stock = {{product.stock}};
+            const addToWishlistButton = document.querySelector('.add-to-wishlist');
+            const quantityInputs = document.querySelectorAll('.quantity input');
+
+            // Quantity minus button functionality
+            document.querySelectorAll('.btn-minus').forEach(button => {
+                button.addEventListener('click', () => {
+                    const productId = button.getAttribute('data-product-id');
+                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                    let newQuantity = parseInt(quantityInput.value) - 1;
+                    if (newQuantity > 0) {
+                        quantityInput.value = newQuantity;
+                    } else {
+                        Swal.fire({
+                            title: 'Warning!',
+                            text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
+                            icon: 'warning',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        quantityInput.value = 1;
+                    }
+                });
+            });
+
+            // Quantity plus button functionality
+            document.querySelectorAll('.btn-plus').forEach(button => {
+                button.addEventListener('click', () => {
+                    const productId = button.getAttribute('data-product-id');
+                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                    let newQuantity = parseInt(quantityInput.value) + 1;
+                    if (newQuantity <= stock) {
+                        quantityInput.value = newQuantity;
+                    } else {
+                        Swal.fire({
+                            title: 'Stock Limit Reached!',
+                            text: `Stock is only available ${stock}.`,
+                            icon: 'info',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
+
+            if (addToWishlistButton) {
+                addToWishlistButton.addEventListener('click', async function () {
+                    const productId = this.dataset.productId;
+                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                    const quantity = parseInt(quantityInput.value);
+
+                    if (quantity < 1) {
+                        Swal.fire({
+                            title: 'Warning!',
+                            text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
+                            icon: 'warning',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/wishlist/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ id: productId, quantity: quantity })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            Swal.fire({
+                                title: 'Added!',
+                                text: 'Product has been added to your wishlist.',
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Sorry!',
+                                text: 'Already added to wishlist',
+                                icon: 'error',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred while adding the product to the wishlist.',
+                            icon: 'error',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            } else {
+                console.error('Add to Wishlist button not found.');
+            }
+
+          const addToCartButton = document.querySelector('.add-to-cart');
+            // Add to Cart functionality
+        if (addToCartButton) {
+            addToCartButton.addEventListener('click', async function () {
+                const productId = this.dataset.productId;
+                const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                const quantity = parseInt(quantityInput.value);
+
+                if (quantity < 1) {
+                    Swal.fire({
+                        title: 'Warning!',
+                        text: 'Quantity is zero. Please increase your quantity before adding to cart.',
+                        icon: 'warning',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/cart/add-to-cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: productId, quantity: quantity })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire({
+                            title: 'Added!',
+                            text: 'Product has been added to your cart.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: result.message || 'An error occurred while adding the product to the cart.',
+                            icon: 'error',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while adding the product to the cart.',
+                        icon: 'error',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        } else {
+            console.error('Add to Cart button not found.');
+        }
+        });
+    </script>
+</body>
+</html>

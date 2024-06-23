@@ -1,0 +1,129 @@
+<!-- views/reportForm.hbs -->
+<style>
+  .content-body{
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 1200px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+  }
+
+  .container{
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content: center;
+  }
+
+  h1{
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+    font: 300;
+  }
+
+  .forms{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .forms label {
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 5px;
+  }
+
+  .forms select, 
+  .forms input[type='date'] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.3s;
+  }
+
+  .forms select:focus,
+  .forms input[type='date']:focus{
+    border-color: #888;
+    outline: none;
+  }
+
+  .forms button[type='submit'] {
+    padding: 12px;
+    background-color: #26578b;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; 
+  }
+
+  .forms button[type='submit']:hover{
+    background-color: #0056b3;
+    transform: scale(1.01);
+  }
+
+  #customDates {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @media (max-width: 600px){
+    .content-body {
+      padding: 15px;
+    }
+    .forms {
+      gap: 10px
+    }
+
+    .forms select, 
+    .forms input[type='date'],
+    .forms button[type='submit'] {
+      font-size: 0.9rem;
+      padding: 8px;
+    }
+  }
+
+</style>
+<div class="content-body">
+    <div class="container">
+<h1>Generate Sales Report</h1>
+<form action="/admin/report" method="POST" class="forms">
+  <label for="reportType" class="select-report">Report Type:</label>
+  <select id="reportType" name="reportType">
+    <option value="daily">Daily</option>
+    <option value="weekly">Weekly</option>
+    <option value="monthly">Monthly</option>
+    <option value="custom">Custom</option>
+  </select>
+  
+  <div id="customDates" style="display:none;">
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" name="startDate">
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" name="endDate">
+  </div>
+
+  <button type="submit">Generate Report</button>
+</form>
+</div>
+</div>
+<script>
+  document.getElementById('reportType').addEventListener('change', function() {
+    if (this.value === 'custom') {
+      document.getElementById('customDates').style.display = 'block';
+    } else {
+      document.getElementById('customDates').style.display = 'none';
+    }
+  });
+</script>
+  

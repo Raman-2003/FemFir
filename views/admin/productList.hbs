@@ -1,39 +1,131 @@
-{{! adminLayout.hbs should have the basic layout including header, footer, and other common components }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .product-image {
+            width: 150px;
+            height: 180px;
+            object-fit: contain; 
+            border: 1px solid #ddd; 
+            padding: 5px; 
+            background-color: #f8f8f8;
+        }
+        .table, .table th, .table td {
+            border: 1px solid #ddd; 
+            border-collapse: collapse; 
+        }
+        .table th, .table td {
+            padding: 8px; 
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination a {
+            text-decoration: none;
+            color: #007bff;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+        }
+        .pagination a:hover {
+            background-color: #ddd;
+        }
+        .pagination .active a {
+            background-color: #007bff;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-body">
+        <div class="container-fluid">
+            <div class="container">
+                <h2>Product Management</h2>
+                <a href="/admin/products/add" class="btn btn-primary">Add Product</a>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each products}}
+                        <tr>
+                            <td><img src="{{this.mainImage}}" alt="{{this.name}}" class="product-image"></td>
+                            <td>{{this.name}}</td>
+                            <td>{{this.description}}</td>
+                            <td>{{this.price}}</td>
+                            <td>
+                                {{#if (eq this.stock 0)}}
+                                <span style="color: red; font-weight: bold;">OUT OF STOCK</span>
+                                {{else}}
+                                {{this.stock}}
+                                {{/if}}
+                            </td>
+                            <td>{{this.category.name}}</td>
+                            <td>{{this.status}}</td>
+                            <td>
+                                <a href="/admin/products/edit/{{this._id}}" class="btn btn-warning">Edit</a>
+                                <a href="#" class="btn btn-danger" onclick="confirmDelete('{{this._id}}', '{{this.name}}')">Delete</a>
+                                {{#ifCond this.status '===' 'listed'}}
+                                <a href="/admin/products/unlist/{{this._id}}" class="btn btn-secondary">Unlist</a>
+                                {{else}}
+                                <a href="/admin/products/list/{{this._id}}" class="btn btn-success">List</a>
+                                {{/ifCond}}
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
 
-  <div class="content-body">
-    <div class="container-fluid">
-    <div class="container">
-        <h2>Product Management</h2>
-        <a href="/admin/products/add" class="btn btn-primary">Add Product</a>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each products}}
-                <tr>
-                    <td>{{this.name}}</td>
-                    <td>{{this.description}}</td>
-                    <td>{{this.price}}</td>
-                    <td>{{this.stock}}</td>
-                    <td>{{this.category}}</td>
-                    <td>{{this.status}}</td>
-                    <td>
-                        <a href="/admin/products/edit/{{this._id}}" class="btn btn-warning">Edit</a>
-                        <a href="/admin/products/delete/{{this._id}}" class="btn btn-danger">Delete</a>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
+                <!-- Pagination Controls -->
+                <ul class="pagination">
+                    {{#if (gt currentPage 1)}}
+                    <li><a href="?page=1&limit=5">First</a></li>
+                    <li><a href="?page={{decrement currentPage}}&limit=5">Previous</a></li>
+                    {{/if}}
+                    {{#each (range 1 totalPages)}}
+                    <li class="{{#if (eq this ../currentPage)}}active{{/if}}"><a href="?page={{this}}&limit=5">{{this}}</a></li>
+                    {{/each}}
+                    {{#if (lt currentPage totalPages)}}
+                    <li><a href="?page={{increment currentPage}}&limit=5">Next</a></li>
+                    <li><a href="?page={{totalPages}}&limit=5">Last</a></li>
+                    {{/if}}
+                </ul>
+            </div>
+        </div>
     </div>
-</div>
-</div>
+
+    <script>
+        function confirmDelete(productId, productName) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Are you sure you want to delete the product "${productName}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/admin/products/delete/${productId}`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -18,21 +18,26 @@ const productSchema = new mongoose.Schema({
         required: true
     },
     category: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category', 
         required: true
     },
     mainImage: {
         type: String,
         required: true
     },
-    subImages: [{
-        type: String
-    }],
+    subImages: {
+        type: [String]
+    },
     status: {
         type: String,
-        enum: ['active', 'inactive'],
-        default: 'active'
-    }
+        enum: ['listed', 'unlisted'],
+        default: 'listed'
+    },
+    isWishlisted: {
+        type: Boolean,
+        default: false
+    },
 }, {
     timestamps: true
 });

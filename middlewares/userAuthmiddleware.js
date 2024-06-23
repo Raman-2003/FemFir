@@ -1,46 +1,46 @@
-const {compareSync} = require('bcrypt');
-const {User} = require('../models/userSchema');
+const User = require('../models/userSchema');
 
-const logedin = async(req,res,next)=>{
-    try{
-        if(!req.session.user) {
-            res.redirect('/login')
+const logedin = async (req, res, next) => {
+    try {
+        if (!req.session.user) {
+            console.log('login checked');
+            return res.redirect('/login');
         }
-        else next()
-    }
-    catch(error){
+        next();
+    } catch (error) {
         console.log(error);
     }
 }
 
-
-const logedout = async (req,res,next)=>{
-    try{
-        if(req.session.user){
-            res.redirect('/')
+const logedout = async (req, res, next) => {
+    try {
+        if (req.session.user) {
+            console.log('logout checked');
+            return res.redirect('/');
         }
-        else next()
-    }
-    catch(error){
+        next();
+    } catch (error) {
         console.log(error);
     }
 }
 
-
-const isBlocked = async (req,res,next)=>{
-    try{
-        const user = await User.findById(req.session.user._id)
-        console.log(req.session.user._id);
-        if(user.isBlocked){
-            res.redirect('/logout')
+const isBlocked = async (req, res, next) => {
+    try {
+        if (!req.session.user || !req.session.user._id) {
+            return res.redirect('/login');
         }
-        else next()
-    }
-    catch(error){
+        
+        const user = await User.findById(req.session.user._id);
+        
+        if (user && user.is_blocked) {
+            return res.redirect('/logout');
+        } else {
+            next();
+        }
+    } catch (error) {
         console.log(error);
     }
-}
-
+};
 
 module.exports = {
     logedin,

@@ -1,13 +1,13 @@
+
 const Category = require('../models/categorySchema');
 
 // Fetch all categories
 const getCategories = async (req, res) => {
     try {
-        if(req.session.admin){
+        if (req.session.admin) {
             const categories = await Category.find();
-            res.render('admin/categories', { title: "Category List", categories ,layout:'adminLayout'});
-        }
-        else{
+            res.render('admin/categories', { title: "Category List", categories, layout: 'adminLayout' });
+        } else {
             res.redirect('/admin/login');
         }
     } catch (error) {
@@ -18,23 +18,33 @@ const getCategories = async (req, res) => {
 
 // Render the add category page
 const getAddCategoryPage = (req, res) => {
-    res.render('admin/addCategory', { title: "Add Category" ,layout:'adminLayout'});
+    res.render('admin/addCategory', { title: "Add Category", layout: 'adminLayout' });
 };
 
 // Add a new category
 const addCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
-        const image = req.file.filename;
+        const image = req.file ? req.file.filename : null;
 
-        const newCategory = new Category({ name, description, image });
+        const normalizedName = name.toLowerCase();
+
+        // Check if category with the same name already exists
+        const existingCategory = await Category.findOne({ nameLower: normalizedName });
+        if (existingCategory) {
+            return res.render('admin/addCategory', {
+                title: "Add Category",
+                errorMessage: "Category name already exists. Please choose another name.",
+                layout: 'adminLayout'
+            });
+        }
+
+        const newCategory = new Category({ name, description, image, nameLower: normalizedName });
         await newCategory.save();
 
-        // req.flash('success_msg', 'Category added successfully');
         res.redirect('/admin/categories');
     } catch (error) {
         console.error(error);
-        // req.flash('error_msg', 'Error adding category');
         res.redirect('/admin/categories');
     }
 };
@@ -43,7 +53,7 @@ const addCategory = async (req, res) => {
 const getEditCategoryPage = async (req, res) => {
     try {
         const category = await Category.findById(req.params.id);
-        res.render('admin/editCategory', { title: "Edit Category", category,layout:'adminLayout' });
+        res.render('admin/editCategory', { title: "Edit Category", category, layout: 'adminLayout' });
     } catch (error) {
         console.error(error);
         res.status(500).send("Server Error");
@@ -56,14 +66,37 @@ const updateCategory = async (req, res) => {
         const { name, description } = req.body;
         const image = req.file ? req.file.filename : req.body.existingImage;
 
-        await Category.findByIdAndUpdate(req.params.id, { name, description, image });
+        // Normalize the name for consistency
+        const normalizedName = name.toLowerCase();
 
-        // req.flash('success_msg', 'Category updated successfully');
+        // Check if another category with the same normalized name exists (excluding current)
+        const existingCategory = await Category.findOne({ 
+            nameLower: normalizedName, 
+            _id: { $ne: req.params.id } 
+        });
+
+        if (existingCategory) {
+            const category = await Category.findById(req.params.id);
+            return res.render('admin/editCategory', {
+                title: "Edit Category",
+                errorMessage: "Category name already exists. Please choose another name.",
+                category,
+                layout: 'adminLayout'
+            });
+        }
+
+        // Update category with new details
+        await Category.findByIdAndUpdate(req.params.id, { 
+            name, 
+            description, 
+            image, 
+            nameLower: normalizedName 
+        });
+
         res.redirect('/admin/categories');
     } catch (error) {
         console.error(error);
-        // req.flash('error_msg', 'Error updating category');
-        res.redirect('/admin/categories');
+        res.status(500).send("Server Error");
     }
 };
 
@@ -71,11 +104,31 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     try {
         await Category.findByIdAndDelete(req.params.id);
-        // req.flash('success_msg', 'Category deleted successfully');
         res.redirect('/admin/categories');
     } catch (error) {
         console.error(error);
-        // req.flash('error_msg', 'Error deleting category');
+        res.redirect('/admin/categories');
+    }
+};
+
+// List a category
+const listCategory = async (req, res) => {
+    try {
+        await Category.findByIdAndUpdate(req.params.id, { status: 'listed' });
+        res.redirect('/admin/categories');
+    } catch (error) {
+        console.error(error);
+        res.redirect('/admin/categories');
+    }
+};
+
+// Unlist a category
+const unlistCategory = async (req, res) => {
+    try {
+        await Category.findByIdAndUpdate(req.params.id, { status: 'unlisted' });
+        res.redirect('/admin/categories');
+    } catch (error) {
+        console.error(error);
         res.redirect('/admin/categories');
     }
 };
@@ -86,5 +139,7 @@ module.exports = {
     addCategory,
     getEditCategoryPage,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    listCategory,
+    unlistCategory
 };

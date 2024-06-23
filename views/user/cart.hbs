@@ -1,0 +1,322 @@
+<head>
+    <!-- Include SweetAlert via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+    .coupon-item {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .coupon-item input[type="checkbox"] {
+        margin-right: 10px;
+    }
+
+    .coupon-item label {
+        font-weight: bold;
+        margin-right: 20px;
+        transition: color 0.3s ease;
+    }
+
+    .coupon-item input[type="checkbox"]:checked + label {
+        color: #007bff;
+    }
+
+    .coupon-item:hover {
+        background-color: #f9f9f9;
+    }
+
+    #couponsModal .modal-body {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+.coupon-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.coupon-item input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.coupon-item label {
+    display: block;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    margin-bottom: 5px;
+}
+
+.coupon-code {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.coupon-description {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.coupon-expiry {
+    color: #999;
+    font-size: 12px;
+}
+
+.coupon-item:hover {
+    background-color: #f9f9f9;
+}
+    </style>
+</head>
+
+<!-- Breadcrumb Start -->
+<div class="breadcrumb-wrap">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/product">Products</a></li>
+            <li class="breadcrumb-item active">Cart</li>
+        </ul>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Cart Start -->
+<div class="cart-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle">
+                            {{#each cart}}
+                            <tr data-product-id="{{this.product._id}}" class="cart-item" data-stock="{{this.product.stock}}">
+                                <td><a href="#"><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"></a></td>
+                                <td><a href="/viewone/{{this.product._id}}">{{this.product.name}}</a></td>
+                                <td class="item-price">${{this.product.price}}</td>
+                                <td>
+                                    <div class="qty">
+                                        <button class="btn-minus" data-product-id="{{this.product._id}}"><i class="fa fa-minus"></i></button>
+                                        <input type="number" value="{{this.quantity}}" class="quantity-input" data-product-id="{{this.product._id}}">
+                                        <button class="btn-plus" data-product-id="{{this.product._id}}"><i class="fa fa-plus"></i></button>
+                                    </div>
+                                </td>
+                                <td class="item-total" id="lasttotal">${{this.total}}</td>
+                                <td><button class="btn-remove" data-product-id="{{this.product._id}}"><i class="fa fa-trash"></i></button></td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+       
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="cart-summary">
+                    <div class="cart-content">
+                        <h3>Cart Summary</h3>
+                        <p>Sub Total<span id="sub-total">${{subTotal}}</span></p>
+                        <p>Shipping Cost<span>Free</span></p>
+                        <h4>Grand Total<span id="grand-total">${{grandTotal}}</span></h4>
+                    </div>
+                <div class="cart-btn">
+                    {{!-- <button id="update-cart-btn">Update Cart</button> --}}
+                    <button id="checkout-btn" onclick="goToCheckout()">Checkout</button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cart End -->
+
+
+<script>
+function goToCheckout() {
+    window.location.href = '/checkout';
+}
+
+function placeOrder() {
+    const paymentMethod = document.getElementById('payment-method').value;   
+    const billingAddress = document.getElementById('billing-address').value; 
+
+    fetch('/checkout/placeOrder', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ paymentMethod, billingAddress })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/checkout/success'; 
+        } else {
+            Swal.fire('Error', data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error placing order:', error);
+        Swal.fire('Error', 'An error occurred while placing the order', 'error');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const handleResponse = (response, successMessage, errorMessage) => {
+        if (response.success) {
+            Swal.fire('Successcccccccccccccccccc', successMessage, 'success');
+        } else {
+            Swal.fire('Error', errorMessage || response.message, 'error');
+        }
+    };
+
+    const updateCartSummary = (subTotal, grandTotal) => {
+        document.getElementById('sub-total').innerText = `$${subTotal.toFixed(2)}`;
+        document.getElementById('grand-total').innerText = `$${grandTotal.toFixed(2)}`;
+    };
+
+    const totals = (subTotal) => {
+        document.getElementById('lasttotal').innerText = `$${subTotal.toFixed(2)}`
+    }
+
+    const updateCartOnServer = (productId, quantity) => {
+        fetch('/cart/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, quantity }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateCartSummary(data.subTotal, data.grandTotal);
+            }
+            handleResponse(data, 'Cart updated successfully', 'Failed to update cart');
+        })
+        .catch(error => {
+            console.error('Error updating cart:', error);
+            Swal.fire('Error', 'An error occurred while updating the cart', 'error');
+        });
+    };
+
+    const removeItem = (item) => {
+        fetch(`/cart/remove?proId=${item.getAttribute('data-product-id')}`, {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                item.closest('tr').remove();
+                updateCartSummary(data.subTotal, data.grandTotal);
+                Swal.fire('Success', 'Item removed from cart', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error removing item from cart:', error);
+            Swal.fire('Error', 'An error occurred while removing the item from the cart', 'error');
+        });
+    };
+
+    document.querySelectorAll('.btn-remove').forEach(button => {
+        button.addEventListener('click', (e) => {
+            removeItem(e.currentTarget);
+        });
+    });
+
+    document.querySelectorAll('.btn-plus').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const input = document.querySelector(`.quantity-input[data-product-id="${e.currentTarget.getAttribute('data-product-id')}"]`);
+            const stock = parseInt(input.closest('tr').getAttribute('data-stock'));
+            const quantity = parseInt(input.value) + 1;
+
+            if (quantity <= stock) {
+                input.value = quantity;
+                updateCartOnServer(e.currentTarget.getAttribute('data-product-id'), quantity);
+            } else {
+                Swal.fire('Warning', 'Exceeds available stock', 'warning');
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-minus').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const input = document.querySelector(`.quantity-input[data-product-id="${e.currentTarget.getAttribute('data-product-id')}"]`);
+            const quantity = parseInt(input.value) - 1;
+
+            if (quantity >= 1) {
+                input.value = quantity;
+                updateCartOnServer(e.currentTarget.getAttribute('data-product-id'), quantity);
+            } else {
+                Swal.fire('Warning', 'Quantity cannot be zero', 'warning');
+            }
+        });
+    });
+
+     document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+            const stock = parseInt(e.currentTarget.closest('tr').getAttribute('data-stock'));
+            const maxQuantity = 10;
+            let quantity = parseInt(e.currentTarget.value);
+
+            if (quantity >= 1 && quantity <= stock && quantity <= maxQuantity) {
+                updateCartOnServer(e.currentTarget.getAttribute('data-product-id'), quantity);
+            } else if (quantity < 1) {
+                e.currentTarget.value = 1;
+                Swal.fire('Warning', 'Quantity cannot be less than 1', 'warning');
+            } else if (quantity > maxQuantity) {
+                e.currentTarget.value = maxQuantity;
+                Swal.fire('Warning', `Quantity cannot exceed maximum allowed per person (${maxQuantity})`, 'warning');
+            } else {
+                e.currentTarget.value = stock;
+                Swal.fire('Warning', 'Exceeds available stock', 'warning');
+            }
+        });
+    });
+
+    document.getElementById('update-cart-btn').addEventListener('click', () => {
+        const quantities = Array.from(document.querySelectorAll('.quantity-input')).map(input => ({
+            productId: input.getAttribute('data-product-id'),
+            quantity: parseInt(input.value)
+        }));
+
+        fetch('/cart/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantities }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            handleResponse(data, 'Cart updated successfully', 'Failed to update cart');
+            updateCartSummary(data.subTotal, data.grandTotal);
+        })
+        .catch(error => {
+            console.error('Error updating cart:', error);
+        });
+    });
+});
+</script>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .edit-profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .edit-profile-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="tel"], .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .save-button, .cancel-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            text-align: center;
+            background-color: #ff477e;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background-color: #ccc;
+            margin-left: 10px;
+        }
+
+        .save-button:hover {
+            background-color: #ff678e;
+        }
+
+        .cancel-button:hover {
+            background-color: #ddd;
+        }
+
+        @media (max-width: 600px) {
+            .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="tel"], .form-group select {
+                padding: 8px;
+            }
+        }
+
+        /* Error message styles */
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-profile-container">
+        <h2>Edit Profile</h2>
+        <form id="editProfileForm" action="/edit-details/{{userData._id}}" method="post">
+            <div class="form-group">
+                <label for="firstname">First Name</label>
+                <input type="text" id="firstname" name="firstname" value="{{userData.firstname}}" required minlength="2" maxlength="50">
+                <div class="error" id="firstnameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="lastname">Last Name</label>
+                <input type="text" id="lastname" name="lastname" value="{{userData.lastname}}" required minlength="2" maxlength="50">
+                <div class="error" id="lastnameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile Number</label>
+                <input type="tel" id="mobile" name="mobile" value="{{userData.mobile}}" required pattern="^\d{10}$" title="Mobile number should be 10 digits.">
+                <div class="error" id="mobileError"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email ID</label>
+                <input type="email" id="email" name="email" value="{{userData.email}}" required>
+                <div class="error" id="emailError"></div>
+            </div>
+            <div class="form-group">
+                <label for="hintname">Hint Name</label> 
+                <input type="text" id="hintname" name="hintname" value="{{userData.hintname}}" maxlength="100">
+                <div class="error" id="hintnameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required>
+                    <option value="Male" {{#if (eq userData.gender 'Male')}}selected{{/if}}>Male</option>
+                    <option value="Female" {{#if (eq userData.gender 'Female')}}selected{{/if}}>Female</option>
+                    <option value="Other" {{#if (eq userData.gender 'Other')}}selected{{/if}}>Other</option>
+                </select>
+                <div class="error" id="genderError"></div>
+            </div>
+            <button type="submit" class="save-button">Save Changes</button>
+            <a href="/profile" class="cancel-button">Cancel</a>
+        </form>
+    </div>
+
+    <script>
+        // JavaScript Validation
+        document.getElementById('editProfileForm').addEventListener('submit', function(event) {
+            let isValid = true;
+
+            // Clear all previous error messages
+            document.querySelectorAll('.error').forEach(e => e.textContent = '');
+
+            // Validate First Name
+            const firstName = document.getElementById('firstname').value.trim();
+            if (firstName.length < 2 || firstName.length > 50) {
+                document.getElementById('firstnameError').textContent = 'First name must be between 2 and 50 characters.';
+                isValid = false;
+            }
+
+            // Validate Last Name
+            const lastName = document.getElementById('lastname').value.trim();
+            if (lastName.length < 2 || lastName.length > 50) {
+                document.getElementById('lastnameError').textContent = 'Last name must be between 2 and 50 characters.';
+                isValid = false;
+            }
+
+            // Validate Mobile Number
+            const mobile = document.getElementById('mobile').value.trim();
+            const mobilePattern = /^\d{10}$/;
+            if (!mobilePattern.test(mobile)) {
+                document.getElementById('mobileError').textContent = 'Mobile number should be exactly 10 digits.';
+                isValid = false;
+            }
+
+            // Validate Email
+            const email = document.getElementById('email').value.trim();
+            const emailPattern = /^\S+@\S+\.\S+$/;
+            if (!emailPattern.test(email)) {
+                document.getElementById('emailError').textContent = 'Please enter a valid email address.';
+                isValid = false;
+            }
+
+            // Validate Gender
+            const gender = document.getElementById('gender').value;
+            if (!gender) {
+                document.getElementById('genderError').textContent = 'Please select a gender.';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

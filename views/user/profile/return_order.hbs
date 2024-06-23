@@ -1,0 +1,97 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Order</title>
+    <style>
+        body{
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: 600;
+            color: #333;
+        }
+        .content-body {
+            padding: 30px;
+        }
+
+        p {
+            font-size: 40px;
+            display: flex;
+            justify-content: center;
+            color: brown;
+        }
+        .boxes {
+            border-radius: 8px;
+            box-shadow: 12px 20px rgba(0 0 0 0.1);
+             border-bottom: 1px solid #333;
+        }
+        .inpts {
+            display: inline-flex;
+            padding: 10px;
+        }
+
+        .reason {
+            display: flex;
+            justify-content: center;
+            color: brown;
+            font-size: 30px;
+        }
+
+        .btns {
+            display: flex;
+            margin-left: 50px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="content-body">
+        <div class="container">
+       
+     <div class="return-order-container">
+        {{!-- <h3>Return Order for Order ID: {{order._id}}</h3> --}}
+      <p>Order Items:</p>
+           <ul>
+    {{#each order.items}}
+    <li class="boxes">
+        <strong class="inpts">Product Name:</strong> {{this.product.name}}<br>
+        <strong class="inpts">Quantity:</strong> {{this.quantity}}<br>
+        <strong class="inpts">Total:</strong> ${{this.total}}
+    </li>
+    {{/each}}
+</ul>
+
+        <form action="/return-order/{{order._id}}" method="POST">
+            <div class="form-group">
+                <label for="returnReason" class="reason">Reason for Return:</label>
+                <div class="btns">
+                    <label>
+                        <input type="radio" name="returnReason" value="Product quality is poor" required> Product quality is poor
+                    </label>
+                </div>
+                <div class="btns">
+                    <label>
+                        <input type="radio" name="returnReason" value="Color is fade"> Color is fade
+                    </label>
+                </div>
+                <div class="btns">
+                    <label>
+                        <input type="radio" name="returnReason" value="Not like this product"> Not like this product
+                    </label>
+                </div>
+                <div class="btns">
+                    <label>
+                        <input type="radio" name="returnReason" value="Price is too much"> Price is too much
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary ml-5">Submit Return Request</button>
+        </form>
+    </div>
+         
+        </div>
+    </div>
+</body>
+</html>

@@ -1,12 +1,23 @@
+const Category = require('../models/categorySchema');
 const Product = require('../models/productSchema');
 
 const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 5; 
+
+        const skip = (page - 1) * limit;
+        const totalProducts = await Product.countDocuments();
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        const products = await Product.find().populate('category').skip(skip).limit(limit);
+
         res.render('admin/productList', {
             layout: 'adminLayout',
             title: "Product Management",
-            products
+            products,
+            currentPage: page,
+            totalPages,
         });
     } catch (error) {
         console.error('Error fetching products:', error.message);
@@ -14,25 +25,56 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-const getProductForm = (req, res) => {
-    res.render('admin/addProduct', {
-        layout: 'adminLayout',
-        title: "Add Product"
-    });
+
+const getProductForm = async (req, res) => {
+    try {
+        const categories = await Category.find(); // Fetch all categories
+        console.log('Categories fetched from database:', categories);
+        
+        res.render('admin/addProduct', {
+            layout: 'adminLayout',
+            title: "Add Product",
+            categories 
+        });
+    } catch (error) {
+        console.error('Error fetching categories:', error.message);
+        res.redirect('/admin/products');
+    }
 };
+
+
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category, mainImage, subImages } = req.body;
+        const { name, description, price, stock, category } = req.body;
+        const mainImage = req.files['mainImage'] ? `/uploads/products/${req.files['mainImage'][0].filename}` : '';
+        
+      
+        let subImages = [];
+        if (req.files['subImages']) {
+            subImages = req.files['subImages'].map(file => `/uploads/products/${file.filename}`);
+        }
+
+        console.log('Category Name from Request Body:', category);
+
+        const categoryDoc = await Category.findOne({ name: category });
+        console.log('Category Document from Database:', categoryDoc);
+
+        if (!categoryDoc) {
+            console.log('Category not found in the database');
+            return res.status(400).send('Category not found');
+        }
+
         const product = new Product({
             name,
             description,
             price,
             stock,
-            category,
+            category: categoryDoc._id,
             mainImage,
-            subImages: subImages.split(',')
+            subImages
         });
+
         await product.save();
         res.redirect('/admin/products');
     } catch (error) {
@@ -41,13 +83,16 @@ const addProduct = async (req, res) => {
     }
 };
 
+
 const getEditProductForm = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
+        const categories = await Category.find(); // Fetch all categories
         res.render('admin/editProduct', {
             layout: 'adminLayout',
             title: "Edit Product",
-            product
+            product,
+            categories 
         });
     } catch (error) {
         console.error('Error fetching product:', error.message);
@@ -55,19 +100,38 @@ const getEditProductForm = async (req, res) => {
     }
 };
 
+
 const editProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category, mainImage, subImages, status } = req.body;
-        await Product.findByIdAndUpdate(req.params.id, {
+        const { name, description, price, stock, category, status } = req.body;
+        let mainImage = req.body.existingMainImage;
+
+        // Handle main image update if a new file is uploaded
+        if (req.file && req.file.filename) {
+            mainImage = `/uploads/products/${req.file.filename}`;
+        }
+
+        const categoryDoc = await Category.findById(category);
+        if (!categoryDoc) {
+            console.error('Category not found');
+            return res.status(400).send('Category not found');
+        }
+
+        // Split and trim subImages URLs from the input
+        const subImages = req.body.existingSubImages.split(',').map(img => img.trim());
+
+        const updateData = {
             name,
             description,
             price,
             stock,
-            category,
-            mainImage,
-            subImages: subImages.split(','),
-            status
-        });
+            category: categoryDoc._id,
+            subImages,
+            status,
+            mainImage
+        };
+
+        await Product.findByIdAndUpdate(req.params.id, updateData);
         res.redirect('/admin/products');
     } catch (error) {
         console.error('Error editing product:', error.message);
@@ -75,12 +139,35 @@ const editProduct = async (req, res) => {
     }
 };
 
+
+
+
 const deleteProduct = async (req, res) => {
     try {
-        await Product.findByIdAndRemove(req.params.id);
+        await Product.findByIdAndDelete(req.params.id);
         res.redirect('/admin/products');
     } catch (error) {
         console.error('Error deleting product:', error.message);
+        res.redirect('/admin/products');
+    }
+};
+
+const listProduct = async (req, res) => {
+    try {
+        await Product.findByIdAndUpdate(req.params.id, { status: 'listed' });
+        res.redirect('/admin/products');
+    } catch (error) {
+        console.error('Error listing product:', error.message);
+        res.redirect('/admin/products');
+    }
+};
+
+const unlistProduct = async (req, res) => {
+    try {
+        await Product.findByIdAndUpdate(req.params.id, { status: 'unlisted' });
+        res.redirect('/admin/products');
+    } catch (error) {
+        console.error('Error unlisting product:', error.message);
         res.redirect('/admin/products');
     }
 };
@@ -91,5 +178,7 @@ module.exports = {
     addProduct,
     getEditProductForm,
     editProduct,
-    deleteProduct
+    deleteProduct,
+    listProduct,
+    unlistProduct,
 };

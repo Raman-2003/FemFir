@@ -1,0 +1,120 @@
+<style>
+.content-body{
+    background-color: #f4f7f6;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    max-width: 1400px;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    font-weight: 500;
+    border-bottom: 2px solid #27ae60;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    background-color: #ffffff;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+thead th {
+    padding: 15px;
+    background-color: rgb(215, 208, 198);
+    color:#2c3e50;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+tbody tr:hover {
+    background-color: #ecf0f1;
+}
+
+tbody td {
+    padding: 12px 15px;
+    color: #555;
+}
+
+.links {
+    display: inline-block;
+    margin: 10px;
+    padding: 12px 24px;
+    background-color: #2980b9;
+    color: #fff;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.links :hover {
+    background-color: #21618c;
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px){
+    .content-body {
+        padding: 20px;
+    }
+    h1 {
+        font-size: 20px;
+    }
+    table, th, td {
+        font-size: 0.9rem;
+    }
+
+    .links {
+        padding: 10px 20px;
+        margin: 8px;
+    }
+}
+
+
+</style>
+<div class="content-body">
+    <div class="container">
+        <h1>Sales Report</h1>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total Price</th>
+                    <th>Sale Date</th>
+                </tr>
+            </thead>
+            <tbody style="color: black;">
+                {{#each sales}}
+                <tr>
+                    <td>{{this.productName}}</td>
+                    <td>{{this.quantity}}</td>
+                    <td>{{this.price}}</td>
+                    <td>{{this.totalPrice}}</td>
+                    <td>{{formatDate this.saleDate}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <a class="links" href="/admin/report/pdf?reportType={{reportType}}&startDate={{startDate}}&endDate={{endDate}}">Download PDF</a>
+        <a class="links" href="/admin/report/excel?reportType={{reportType}}&startDate={{startDate}}&endDate={{endDate}}">Download Excel</a>
+
+    </div>
+</div>

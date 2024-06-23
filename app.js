@@ -1,103 +1,70 @@
-const express = require('express'); 
-
-const {engine} = require('express-handlebars');
+const express = require('express');
+const { engine } = require('express-handlebars');
 const path = require('path');
-const createError = require('http-errors');
-const logger = require('morgan')
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo');
 const nocache = require('nocache');
 const bodyParser = require('body-parser');
 const passport = require('./config/passport');
-const Handlebars = require('handlebars');
+const Handlebars = require('./helper'); // Correctly import the helper.js file
 
-
-Handlebars.registerHelper('eq', function (a, b) {
-    return a === b;
-});
-//Require the Routes
+// Require the Routes
 const authRouter = require('./routes/authRoutes');
 const adminRouter = require('./routes/adminRoutes');
 const app = express();
 
-//Configs
+// Configs
 require('dotenv').config();
-const PORT = process.env.APP_PORT || 8000 
-require('./config/dbConnect')  
+const PORT = process.env.APP_PORT || 8000;
+const MONGO_URL = process.env.MONGODB_URL;
+require('./config/dbConnect');
 
-// app.use(logger('dev'));
-app.use(express.json()); 
-app.use(express.urlencoded({extended:true}));
-
-
-
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({
     secret: 'key',
-    saveUninitialized:true,
-    cookie: {maxAge:72 * 60 * 60 * 10000, httpOnly: true },
-    resave: false 
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: MONGO_URL })
 }));
 app.use(nocache());
-
 app.use(passport.initialize());
 app.use(passport.session());
-
-
-app.set('view engine','hbs');
-app.set('views',path.join(__dirname,'views'));
-
-app.engine('hbs',engine({layoutsDir:__dirname+'/views/layout/',extname:'hbs',defaultLayout:'layout',partialsDir:__dirname+'/views/partials/', runtimeOptions: {
-    allowProtoPropertiesByDefault: true,
-    allowProtoMethodsByDefault: true,
-},}))
-
-
-//Body parser 
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-
-
-app.use('/',authRouter);
-app.use('/admin',adminRouter);
-app.use(express.static('public'))
-app.get('*', function (req, res) {
-    res.redirect("/404 page");
-});
-
-app.listen(8000, ()=>{
-    console.log('Server has started on Port 8000');
+app.use((req,res,next)=>{
+    res.locals.admin = req.session.admin || null
+    next()
 })
 
- 
+// Handlebars engine
+app.engine('hbs', engine({
+    layoutsDir: path.join(__dirname, 'views', 'layout'),
+    extname: 'hbs',
+    defaultLayout: 'layout',
+    partialsDir: path.join(__dirname, 'views', 'partials'),
+    handlebars: Handlebars,
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    }
+}));
 
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
 
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
 
+// Routes
+app.use('/', authRouter);
+app.use('/admin', adminRouter);
 
-
-
-
-
-
-
-
-
-
-
-
-
-// app.use(function(req,res,next){
-//     next(createError(404))
-// })
-
-
-// app.use(function(err,req,res,next){
-//     res.locals.message = err.message;
-//     res.locals.error = req.app.get('env') === 'development'? err:{};
-
-
-//     //render the error page
-//     res.status(err.status || 500);
-//     res.render('404 page');
-// })
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server has started on Port ${PORT}`);
+});

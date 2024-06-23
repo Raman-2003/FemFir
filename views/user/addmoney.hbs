@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Money to Wallet</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .dashboard-menu {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-menu li {
+            display: inline;
+            margin: 0 10px;
+        }
+
+        .dashboard-menu li a {
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .dashboard-menu li a:hover, .dashboard-menu li a.active {
+            background-color: #0056b3;
+        }
+
+        .dashboard-wrapper {
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .dashboard-wrapper h2 {
+            font-size: 2rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-group input {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            width: 100%;
+        }
+
+        .form-group .error-message {
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <section class="user-dashboard page-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="dashboard-wrapper user-dashboard">
+                        <h2>Add Money to Wallet</h2>
+                        <form id="addMoneyForm">
+                            <div class="form-group">
+                                <label for="amount">Amount</label>
+                                <input type="number" name="amount" class="form-control" required>
+                                <small class="error-message text-danger">Please enter a valid amount.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="note">Description</label>
+                                <input type="text" name="note" class="form-control" required>
+                                <small class="error-message text-danger">Please enter a description.</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Money</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.getElementById('addMoneyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const amount = document.querySelector('input[name="amount"]').value;
+            const note = document.querySelector('input[name="note"]').value;
+
+            fetch('/add-money', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ amount, note })
+            })
+            .then(response => response.json())
+            .then(order => {
+                if (order.id) {
+                    var options = {
+                        "key": "{{config.razorpay_key_id}}", 
+                        "amount": order.amount, 
+                        "currency": order.currency,
+                        "name": "Female First",
+                        "description": "Add Money to Wallet",
+                        "order_id": order.id, // Order ID
+                        "handler": function (response){
+                            fetch('/verify-payment', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    amount: order.amount,
+                                    note: order.notes.description
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if(data.success) {
+                                    Swal.fire(
+                                        'Payment Successful!',
+                                        'Your wallet has been credited.',
+                                        'success'
+                                    ).then(() => {
+                                        window.location.href = '/wallet';
+                                    });
+                                } else {
+                                    Swal.fire(
+                                        'Payment Failed',
+                                        'Verification failed, please try again.',
+                                        'error'
+                                    );
+                                }
+                            });
+                        },
+                        prefill : {
+                            "name": "Your Name",
+                            "email": "your.email@example.com"
+                        }
+                    };
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } else {
+                    Swal.fire(
+                        'Error',
+                        'Failed to create payment order. Please try again.',
+                        'error'
+                    );
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire(
+                    'Error',
+                    'Something went wrong. Please try again.',
+                    'error'
+                );
+            });
+        });
+    </script>
+</body>
+</html>

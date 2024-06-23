@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Return Order</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            {{!-- padding: 20px; --}}
+        }
+
+        /* Container styling */
+        .content-body {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        h2 {
+            color: #4A90E2;
+            border-bottom: 2px solid #4A90E2;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Details section */
+        .return-order-detail-container {
+            line-height: 1.6;
+        }
+
+        .return-order-detail-container div.one {
+            margin-bottom: 15px;
+        }
+
+        .return-order-detail-container strong {
+            color: #333;
+        }
+
+        .head {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+
+        /* List of items */
+        ul.table {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul.table li {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        ul.table li img {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Form for status update */
+        h3 {
+            color: #4A90E2;
+            margin-top: 30px;
+        }
+
+        form {
+            margin-top: 15px;
+        }
+
+        label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+
+        select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+
+        .btn {
+            background-color: #4A90E2;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #357ABD;
+        }
+
+        /* Back link */
+        .back-link {
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            text-decoration: none;
+            color: #4A90E2;
+            font-weight: bold;
+        }
+
+        .back-link a:hover {
+            color: #357ABD;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-body">
+        <div class="container">
+            <div class="return-order-detail-container">
+                <h2>Return Order Details</h2>
+                <div class="one">
+                    <strong class="head">Order ID:</strong> {{returnOrder.orderId._id}}
+                </div>
+                <div class="one">
+                    <strong>User:</strong> {{returnOrder.userId.name}} ({{returnOrder.userId.email}})
+                </div>
+                <div class="one">
+                    <strong>Reason:</strong> {{returnOrder.returnReason}}
+                </div>
+                <div class="one">
+                    <strong>Status:</strong> {{returnOrder.status}}
+                </div>
+                <div class="one">
+                    <strong>Requested At:</strong> {{formatDate returnOrder.createdAt}}
+                </div>
+                <div>
+                    <h3>Order Items</h3>
+                    <ul class="table">
+                        {{#each returnOrder.orderId.items}}
+                        <li>
+                            <strong>Product:</strong> {{this.product.name}}<br>
+                            <img src="{{this.product.mainImage}}" alt="{{this.product.name}}" style="width: 80px; height: 110px;">
+                            <strong>Quantity:</strong> {{this.quantity}}<br>
+                            <strong>Total:</strong> {{this.total}}
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+                <div>
+                    <h3>Update Status</h3>
+                    <form action="/admin/return-orders/{{returnOrder._id}}/status" method="POST">
+                        <label for="status">Change Status:</label>
+                        <select name="status" id="status">
+                            <option value="In Process" {{#if (eq returnOrder.status 'In Process')}}selected{{/if}}>In Process</option>
+                            <option value="Approved" {{#if (eq returnOrder.status 'Approved')}}selected{{/if}}>Approved</option>
+                            <option value="Rejected" {{#if (eq returnOrder.status 'Rejected')}}selected{{/if}}>Rejected</option>
+                            <option value="Canceled" {{#if (eq returnOrder.status 'Canceled')}}selected{{/if}}>Canceled</option>
+                        </select>
+                        <button type="submit" class="btn">Update</button>
+                    </form>
+                </div>
+                <div class="back-link">
+                    <a href="/admin/return-orders">Back to Return Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
