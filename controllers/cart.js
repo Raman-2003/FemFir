@@ -216,7 +216,7 @@ const checkoutFailure = async (req, res) => {
         res.status(500).render('error');
     }
 };
-
+ 
 
 const getCheckoutPage = async (req, res) => {
     try {
@@ -231,6 +231,16 @@ const getCheckoutPage = async (req, res) => {
         // Fetch user details including cart items
         const user = await User.findById(userId).populate('cart.product').lean();
         const cart = user.cart || [];
+
+        //check if any product in cart has zero stock
+        const promises = cart.map(async item => {
+            const product = await Product.findById(item.product._id);
+            if(!product || product.stcok === 0){
+                throw new Error(`Product ${item.product.name} is out of stock`);
+            }
+        })
+
+        await Promise.all(promises);
         
         // Fetch user's addresses
         const addresses = await Address.find({ userId }).lean();
@@ -241,7 +251,7 @@ const getCheckoutPage = async (req, res) => {
             subTotal += item.product.price * item.quantity;
         });
 
-        const shippingCost = 1; 
+        const shippingCost = 0; 
         const grandTotal = subTotal + shippingCost;
 
         // Render checkout view with necessary data

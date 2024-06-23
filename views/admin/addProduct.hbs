@@ -1,8 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
+    <style>
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .image-preview-item {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+        .image-preview img {
+            max-width: 130px;
+            max-height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .delete-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+        /* Style for the modal (cropper) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .cropper-container {
+            height: 400px;
+            width: 100%;
+        }
+        .cropper-view-box {
+            border-radius: 4px;
+        }
+        .cropper-face {
+            border-radius: 4px;
+        }
+        .btn-crop {
+            margin-top: 10px;
+            background: green;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .btn-close {
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>    
 <div class="content-body">
     <div class="container-fluid">
         <div class="container">
             <h2>Add Product</h2>
-            <form action="/admin/products/add" method="POST" enctype="multipart/form-data">
+            <form id="productForm" action="/admin/products/add" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name" class="form-control" required>
@@ -12,9 +98,11 @@
                     <textarea id="description" name="description" class="form-control" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="price">Price</label>
-                    <input type="number" id="price" name="price" class="form-control" required>
-                </div>
+                        <label for="price">Price</label>
+                        <input type="number" id="price" name="price" class="form-control" value="{{product.price}}" required min="0">
+                        <small id="priceError" class="form-text text-danger" style="display: none;">Price cannot be a negative
+                            value.</small>
+                    </div>
                 <div class="form-group">
                     <label for="stock">Stock</label>
                     <input type="number" id="stock" name="stock" class="form-control" required>
@@ -44,64 +132,92 @@
     </div>
 </div>
 
-<style>
-    .image-preview {
-        display: flex;
-        flex-wrap: wrap;
-        margin-top: 10px;
-    }
-    .image-preview-item {
-        position: relative;
-        display: inline-block;
-        margin: 5px;
-    }
-    .image-preview img {
-        max-width: 130px;
-        max-height: 150px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 5px;
-    }
-    .delete-button {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background: red;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 25px;
-        height: 25px;
-        cursor: pointer;
-    }
-</style>
+<!-- Modal for Cropping -->
+<div id="cropModal" class="modal">
+    <div class="modal-content">
+        <div class="cropper-container">
+            <img id="imageToCrop" src="" alt="Image for cropping">
+        </div>
+        <button class="btn-crop" id="cropButton">Crop</button>
+        <button class="btn-close" onclick="closeCropModal()">Cancel</button>
+    </div>
+</div>
 
-
+<script src="https://unpkg.com/cropperjs"></script>
 <script>
+    let cropper;  // To hold the Cropper instance
+    let croppingTarget;  // To determine which image is being cropped
+
+    function showCropModal(imageSrc, callback) {
+        const cropModal = document.getElementById('cropModal');
+        const imageToCrop = document.getElementById('imageToCrop');
+        imageToCrop.src = imageSrc;
+        cropModal.style.display = 'block';
+
+        // Destroy previous cropper instance if any
+        if (cropper) {
+            cropper.destroy();
+        }
+
+        cropper = new Cropper(imageToCrop, {
+            aspectRatio: NaN,  // Allow free ratio
+            viewMode: 1,
+            movable: true,
+            cropBoxResizable: true,
+            autoCropArea: 1,
+            ready() {
+                // Event listeners for crop button
+                document.getElementById('cropButton').onclick = function () {
+                    const canvas = cropper.getCroppedCanvas();
+                    canvas.toBlob((blob) => {
+                        const croppedImageUrl = URL.createObjectURL(blob);
+                        callback(croppedImageUrl, blob);
+                        cropper.destroy();
+                        cropModal.style.display = 'none';
+                    });
+                };
+            }
+        });
+    }
+
+    function closeCropModal() {
+        document.getElementById('cropModal').style.display = 'none';
+        if (cropper) {
+            cropper.destroy();
+        }
+    }
+
     document.getElementById('mainImage').addEventListener('change', function(event) {
-        const mainImagePreview = document.getElementById('mainImagePreview');
-        mainImagePreview.innerHTML = ''; // Clear previous previews
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const imgContainer = document.createElement('div');
-                imgContainer.className = 'image-preview-item';
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
+                showCropModal(e.target.result, function(croppedImageUrl, blob) {
+                    const mainImagePreview = document.getElementById('mainImagePreview');
+                    mainImagePreview.innerHTML = ''; // Clear previous previews
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'image-preview-item';
+                    
+                    const img = document.createElement('img');
+                    img.src = croppedImageUrl;
 
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-button';
-                deleteButton.innerHTML = '&times;';
-                deleteButton.addEventListener('click', function() {
-                    mainImagePreview.innerHTML = ''; // Remove the preview
-                    document.getElementById('mainImage').value = ''; // Clear the file input
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.innerHTML = '&times;';
+                    deleteButton.addEventListener('click', function() {
+                        mainImagePreview.innerHTML = ''; // Remove the preview
+                        document.getElementById('mainImage').value = ''; // Clear the file input
+                    });
+
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(deleteButton);
+                    mainImagePreview.appendChild(imgContainer);
+                    
+                    // Update the mainImage input with the cropped blob
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(new File([blob], file.name, { type: file.type }));
+                    document.getElementById('mainImage').files = dataTransfer.files;
                 });
-
-                imgContainer.appendChild(img);
-                imgContainer.appendChild(deleteButton);
-                mainImagePreview.appendChild(imgContainer);
             }
             reader.readAsDataURL(file);
         }
@@ -115,32 +231,75 @@
             for (let i = 0; i < files.length; i++) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.className = 'image-preview-item';
-                    
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
+                    showCropModal(e.target.result, function(croppedImageUrl, blob) {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'image-preview-item';
+                        
+                        const img = document.createElement('img');
+                        img.src = croppedImageUrl;
 
-                    const deleteButton = document.createElement('button');
-                    deleteButton.className = 'delete-button';
-                    deleteButton.innerHTML = '&times;';
-                    deleteButton.addEventListener('click', function() {
-                        imgContainer.remove(); 
-                        const dt = new DataTransfer(); 
-                        for (let j = 0; j < files.length; j++) {
-                            if (j !== i) {
-                                dt.items.add(files[j]);
+                        const deleteButton = document.createElement('button');
+                        deleteButton.className = 'delete-button';
+                        deleteButton.innerHTML = '&times;';
+                        deleteButton.addEventListener('click', function() {
+                            imgContainer.remove(); 
+                            const dt = new DataTransfer(); 
+                            for (let j = 0; j < files.length; j++) {
+                                if (j !== i) {
+                                    dt.items.add(files[j]);
+                                }
+                            }
+                            document.getElementById('subImages').files = dt.files; 
+                        });
+
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(deleteButton);
+                        subImagesPreview.appendChild(imgContainer);
+
+                        // Update the subImages input with the cropped blobs
+                        const dt = new DataTransfer();
+                        for (let k = 0; k < files.length; k++) {
+                            if (k === i) {
+                                dt.items.add(new File([blob], files[k].name, { type: files[k].type }));
+                            } else {
+                                dt.items.add(files[k]);
                             }
                         }
-                        document.getElementById('subImages').files = dt.files; 
+                        document.getElementById('subImages').files = dt.files;
                     });
-
-                    imgContainer.appendChild(img);
-                    imgContainer.appendChild(deleteButton);
-                    subImagesPreview.appendChild(imgContainer);
                 }
                 reader.readAsDataURL(files[i]);
             }
         }
     });
+
+        // Function to validate the price field
+    function validatePrice() {
+        const priceInput = document.getElementById('price');
+        const priceError = document.getElementById('priceError');
+        
+        // Check if the price is negative
+        if (priceInput.value < 0 || priceInput.value==0) {
+            priceError.style.display = 'block';
+            priceInput.setCustomValidity('Price cannot be negative');
+        } else {
+            priceError.style.display = 'none';
+            priceInput.setCustomValidity('');
+        }
+    }
+
+    // Attach event listener to validate price on input change
+    document.getElementById('price').addEventListener('input', validatePrice);
+
+    // Attach event listener to validate price before form submission
+    document.getElementById('productForm').addEventListener('submit', function(event) {
+        validatePrice();
+        const priceInput = document.getElementById('price');
+        if (!priceInput.checkValidity()) {
+            event.preventDefault(); // Prevent form submission if price is invalid
+        }
+    });
 </script>
+
+</body>
+</html>

@@ -87,7 +87,7 @@ const addProduct = async (req, res) => {
 const getEditProductForm = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
-        const categories = await Category.find(); // Fetch all categories
+        const categories = await Category.find(); // Fetch all categories 
         res.render('admin/editProduct', {
             layout: 'adminLayout',
             title: "Edit Product",
@@ -100,15 +100,14 @@ const getEditProductForm = async (req, res) => {
     }
 };
 
-
 const editProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category, status } = req.body;
+        const { name, description, price, stock, category, status } = req.body; 
         let mainImage = req.body.existingMainImage;
 
         // Handle main image update if a new file is uploaded
-        if (req.file && req.file.filename) {
-            mainImage = `/uploads/products/${req.file.filename}`;
+        if (req.files['mainImage'] && req.files['mainImage'][0].filename) {
+            mainImage = `/uploads/products/${req.files['mainImage'][0].filename}`;
         }
 
         const categoryDoc = await Category.findById(category);
@@ -117,8 +116,13 @@ const editProduct = async (req, res) => {
             return res.status(400).send('Category not found');
         }
 
-        // Split and trim subImages URLs from the input
-        const subImages = req.body.existingSubImages.split(',').map(img => img.trim());
+        // Handle sub-images update
+        let subImages = req.body.existingSubImages ? req.body.existingSubImages.split(',') : [];
+        if (req.files['subImages']) {
+            req.files['subImages'].forEach(file => {
+                subImages.push(`/uploads/products/${file.filename}`);
+            });
+        }
 
         const updateData = {
             name,
@@ -138,7 +142,6 @@ const editProduct = async (req, res) => {
         res.redirect('/admin/products');
     }
 };
-
 
 
 

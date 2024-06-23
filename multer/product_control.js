@@ -12,7 +12,7 @@ const categoryStorage = multer.diskStorage({
 });
 
 // Product storage engine
-const productStorage = multer.diskStorage({
+const productStorage = multer.diskStorage({ 
     destination: function (req, file, cb) {
         cb(null, 'public/uploads/products/');
     },

@@ -155,7 +155,23 @@
 
 <script>
 function goToCheckout() {
-    window.location.href = '/checkout';
+
+    //check if any product in the cart page has zero stock
+    const items = document.querySelectorAll('.cart-item');
+    let canProceed = true;
+
+    items.forEach(item => {
+        const stock = parseInt(item.getAttribute('data-stock'));
+        if(stock === 0){
+            canProceed = false;
+            swal.fire('Error', 'Once or more products in cart are out of stock', 'error');
+        }
+    })
+
+    if(canProceed){
+        window.location.href = '/checkout';
+    }
+   
 }
 
 function placeOrder() {
@@ -320,3 +336,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+ 

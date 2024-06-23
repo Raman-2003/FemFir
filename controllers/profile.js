@@ -24,6 +24,7 @@ module.exports = {
                 })
                 .populate('billingAddress')
                 .populate('shippingAddress')
+                .sort({createdAt: -1})
                 .lean();
 
             if (!userData) {

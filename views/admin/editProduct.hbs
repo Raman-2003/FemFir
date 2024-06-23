@@ -1,196 +1,377 @@
-<div class="content-body">
-    <div class="container-fluid">
-        <div class="container">
-            <h2>Edit Product</h2>
-            <form action="/admin/products/edit/{{product._id}}" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" class="form-control" value="{{product.name}}" required>
-                </div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" class="form-control" required>{{product.description}}</textarea>
-                </div>
-                <div class="form-group">
-                    <label for="price">Price</label>
-                    <input type="number" id="price" name="price" class="form-control" value="{{product.price}}" required>
-                </div>
-                <div class="form-group">
-                    <label for="stock">Stock</label>
-                    <input type="number" id="stock" name="stock" class="form-control" value="{{product.stock}}" required>
-                </div>
-                <div class="form-group">
-                    <label for="category">Category</label>
-                    <select id="category" name="category" class="form-control" required>
-                        {{#each categories}}
-                        <option value="{{this._id}}" {{#if (eq this._id ../product.category._id)}}selected{{/if}}>{{this.name}}</option>
-                        {{/each}}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="mainImage">Main Image</label>
-                    <input type="file" id="mainImage" name="mainImage" class="form-control">
-                    <input type="hidden" name="existingMainImage" value="{{product.mainImage}}">
-                    <div id="mainImagePreview" class="image-preview">
-                        {{#if product.mainImage}}
-                        <div class="image-preview-item">
-                            <img src="{{product.mainImage}}" alt="Main Image">
-                            <button type="button" class="delete-button" onclick="removeImage('mainImagePreview')">&times;</button>
-                        </div>
-                        {{/if}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <!-- Cropper.js CSS -->
+    <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
+    <!-- Custom CSS for image previews and delete functionality -->
+    <style>
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .image-preview-item {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+        .image-preview img {
+            max-width: 130px;
+            max-height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .delete-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+        /* Style for the modal (cropper) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .cropper-container {
+            height: 400px;
+            width: 100%;
+        }
+        .cropper-view-box {
+            border-radius: 4px;
+        }
+        .cropper-face {
+            border-radius: 4px;
+        }
+        .btn-crop {
+            margin-top: 10px;
+            background: green;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .btn-close {
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-body">
+        <div class="container-fluid">
+            <div class="container">
+                <h2>Edit Product</h2>
+                <form id="productForm" action="/admin/products/edit/{{product._id}}" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Name......</label>
+                        <input type="text" id="name" name="name" class="form-control" value="{{product.name}}" required>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="subImages">Sub Images</label>
-                    <input type="file" id="subImages" name="subImages" class="form-control" multiple>
-                    <input type="hidden" name="existingSubImages" value="{{product.subImages}}">
-                    <div id="subImagesPreview" class="image-preview">
-                        {{#each product.subImages}}
-                        <div class="image-preview-item">
-                            <img src="{{this}}" alt="Sub Image">
-                            <button type="button" class="delete-button" onclick="removeImage('subImagesPreview', '{{this}}')">&times;</button>
-                        </div>
-                        {{/each}}
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" class="form-control" required>{{product.description}}</textarea>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Update Product</button>
-            </form>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" id="price" name="price" class="form-control" value="{{product.price}}" required min="0">
+                        <small id="priceError" class="form-text text-danger" style="display: none;">Price cannot be a negative
+                            value.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock">Stock</label>
+                        <input type="number" id="stock" name="stock" class="form-control" value="{{product.stock}}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" class="form-control" required>
+                            {{#each categories}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../product.category._id)}}selected{{/if}}>{{this.name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mainImage">Main Image</label>
+                        <input type="file" id="mainImage" name="mainImage" class="form-control">
+                        <input type="hidden" name="existingMainImage" value="{{product.mainImage}}">
+                        <div id="mainImagePreview" class="image-preview">
+                            {{#if product.mainImage}}
+                                <div class="image-preview-item">
+                                    <img src="{{product.mainImage}}" alt="Main Image">
+                                    <button type="button" class="delete-button" onclick="removeImage('mainImagePreview')">&times;</button>
+                                </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="subImages">Sub Images</label>
+                        <input type="file" id="subImages" name="subImages" class="form-control" multiple>
+                        <input type="hidden" name="existingSubImages" value="{{product.subImages}}">
+                        <div id="subImagesPreview" class="image-preview">
+                            {{#each product.subImages}}
+                                <div class="image-preview-item">
+                                    <img src="{{this}}" alt="Sub Image">
+                                    <button type="button" class="delete-button" onclick="removeImage('subImagesPreview', '{{this}}')">&times;</button>
+                                </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Product</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Custom CSS and JavaScript for image previews and delete functionality -->
-<style>
-    .image-preview {
-        display: flex;
-        flex-wrap: wrap;
-        margin-top: 10px;
-    }
-    .image-preview-item {
-        position: relative;
-        display: inline-block;
-        margin: 5px;
-    }
-    .image-preview img {
-        max-width: 130px;
-        max-height: 150px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 5px;
-    }
-    .delete-button {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background: red;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 25px;
-        height: 25px;
-        cursor: pointer;
-    }
-</style>
+    <!-- Modal for Cropping -->
+    <div id="cropModal" class="modal">
+        <div class="modal-content">
+            <div class="cropper-container">
+                <img id="imageToCrop" src="" alt="Image for cropping">
+            </div>
+            <button class="btn-crop" id="cropButton">Crop</button>
+            <button class="btn-close" onclick="closeCropModal()">Cancel</button>
+        </div>
+    </div>
 
-<script>
-    function removeImage(previewId, url) {
-        const preview = document.getElementById(previewId);
-        if (url) {
-            const subImagesInput = document.getElementById('subImages');
-            const urls = subImagesInput.value.split(',');
-            subImagesInput.value = urls.filter(img => img !== url).join(',');
+    <!-- Cropper.js Library -->
+    <script src="https://unpkg.com/cropperjs"></script>
+    <script>
+        let cropper;  // To hold the Cropper instance
+        let croppingTarget;  // To determine which image is being cropped
+
+        function showCropModal(imageSrc, callback) {
+            const cropModal = document.getElementById('cropModal');
+            const imageToCrop = document.getElementById('imageToCrop');
+            imageToCrop.src = imageSrc;
+            cropModal.style.display = 'block';
+
+            // Destroy previous cropper instance if any
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            cropper = new Cropper(imageToCrop, {
+                aspectRatio: NaN,  // Allow free ratio
+                viewMode: 1,
+                movable: true,
+                cropBoxResizable: true,
+                autoCropArea: 1,
+                ready() {
+                    // Event listeners for crop button
+                    document.getElementById('cropButton').onclick = function () {
+                        const canvas = cropper.getCroppedCanvas();
+                        canvas.toBlob((blob) => {
+                            const croppedImageUrl = URL.createObjectURL(blob);
+                            callback(croppedImageUrl, blob);
+                            cropper.destroy();
+                            cropModal.style.display = 'none';
+                        });
+                    };
+                }
+            });
         }
-        preview.innerHTML = '';
-    }
 
-    document.getElementById('mainImage').addEventListener('change', function(event) {
-        const mainImagePreview = document.getElementById('mainImagePreview');
-        mainImagePreview.innerHTML = '';
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const imgContainer = document.createElement('div');
-                imgContainer.className = 'image-preview-item';
-
-                const img = document.createElement('img');
-                img.src = e.target.result;
-
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-button';
-                deleteButton.innerHTML = '&times;';
-                deleteButton.addEventListener('click', function() {
-                    mainImagePreview.innerHTML = '';
-                    document.getElementById('mainImage').value = '';
-                });
-
-                imgContainer.appendChild(img);
-                imgContainer.appendChild(deleteButton);
-                mainImagePreview.appendChild(imgContainer);
-            };
-            reader.readAsDataURL(file);
+        function closeCropModal() {
+            document.getElementById('cropModal').style.display = 'none';
+            if (cropper) {
+                cropper.destroy();
+            }
         }
-    });
 
-    document.getElementById('subImages').addEventListener('change', function(event) {
-        const subImagesPreview = document.getElementById('subImagesPreview');
-        subImagesPreview.innerHTML = '';
-        const files = event.target.files;
-        if (files) {
-            for (let i = 0; i < files.length; i++) {
+        function handleMainImageChange(event) {
+            const mainImagePreview = document.getElementById('mainImagePreview');
+            const file = event.target.files[0];
+            if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    showCropModal(e.target.result, function(croppedImageUrl, blob) {
+                        // Remove existing preview
+                        mainImagePreview.innerHTML = '';
+
+                        // Create new preview
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'image-preview-item';
+
+                        const img = document.createElement('img');
+                        img.src = croppedImageUrl;
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.className = 'delete-button';
+                        deleteButton.innerHTML = '&times;';
+                        deleteButton.addEventListener('click', function() {
+                            mainImagePreview.innerHTML = '';
+                            document.getElementById('mainImage').value = '';
+                        });
+
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(deleteButton);
+                        mainImagePreview.appendChild(imgContainer);
+
+                        // Convert the blob to a File and update the input
+                        const dataTransfer = new DataTransfer();
+                        const croppedFile = new File([blob], file.name, { type: file.type });
+                        dataTransfer.items.add(croppedFile);
+                        document.getElementById('mainImage').files = dataTransfer.files;
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleSubImagesChange(event) {
+            const subImagesPreview = document.getElementById('subImagesPreview');
+            subImagesPreview.innerHTML = '';
+            const files = event.target.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    showCropModal(e.target.result, function(croppedImageUrl, blob) {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'image-preview-item';
+
+                        const img = document.createElement('img');
+                        img.src = croppedImageUrl;
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.className = 'delete-button';
+                        deleteButton.innerHTML = '&times;';
+                        deleteButton.addEventListener('click', function() {
+                            imgContainer.remove();
+                            const dt = new DataTransfer();
+                            for (let j = 0; j < files.length; j++) {
+                                if (j !== i) {
+                                    dt.items.add(files[j]);
+                                }
+                            }
+                            document.getElementById('subImages').files = dt.files;
+                        });
+
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(deleteButton);
+                        subImagesPreview.appendChild(imgContainer);
+
+                        // Update the input with the cropped file
+                        const dataTransfer = new DataTransfer();
+                        const croppedFile = new File([blob], file.name, { type: file.type });
+                        for (let j = 0; j < files.length; j++) {
+                            if (j !== i) {
+                                dataTransfer.items.add(files[j]);
+                            }
+                        }
+                        dataTransfer.items.add(croppedFile);
+                        document.getElementById('subImages').files = dataTransfer.files;
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage(previewId, url) {
+            const preview = document.getElementById(previewId);
+
+            // If a URL is provided, we are deleting a sub-image
+            if (url) {
+                // Update the existingSubImages hidden input value by removing the URL
+                const existingSubImagesInput = document.querySelector('input[name="existingSubImages"]');
+                const existingUrls = existingSubImagesInput.value.split(',').filter(imgUrl => imgUrl !== url);
+                existingSubImagesInput.value = existingUrls.join(',');
+
+                // Remove the preview container of the image
+                const imgElement = document.querySelector(`img[src="${url}"]`);
+                if (imgElement && imgElement.parentNode) {
+                    imgElement.parentNode.remove();
+                }
+            } else {
+                // Remove the preview for main image or all sub-images if no URL is specified
+                preview.innerHTML = '';
+            }
+        }
+
+        document.getElementById('mainImage').addEventListener('change', handleMainImageChange);
+        document.getElementById('subImages').addEventListener('change', handleSubImagesChange);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const subImagesInput = document.getElementById('subImages');
+            const subImagesPreview = document.getElementById('subImagesPreview');
+            const urls = subImagesInput.value.split(',');
+            urls.forEach(url => {
+                if (url.trim() !== '') {
                     const imgContainer = document.createElement('div');
                     imgContainer.className = 'image-preview-item';
 
                     const img = document.createElement('img');
-                    img.src = e.target.result;
+                    img.src = url;
 
                     const deleteButton = document.createElement('button');
                     deleteButton.className = 'delete-button';
                     deleteButton.innerHTML = '&times;';
                     deleteButton.addEventListener('click', function() {
+                        removeImage('subImagesPreview', url);
                         imgContainer.remove();
-                        const dt = new DataTransfer();
-                        for (let j = 0; j < files.length; j++) {
-                            if (j !== i) {
-                                dt.items.add(files[j]);
-                            }
-                        }
-                        document.getElementById('subImages').files = dt.files;
                     });
 
                     imgContainer.appendChild(img);
                     imgContainer.appendChild(deleteButton);
                     subImagesPreview.appendChild(imgContainer);
-                };
-                reader.readAsDataURL(files[i]);
-            }
+                }
+            });
+        });
+
+         // Function to validate the price field
+    function validatePrice() {
+        const priceInput = document.getElementById('price');
+        const priceError = document.getElementById('priceError');
+        
+        // Check if the price is negative
+        if (priceInput.value < 0 || priceInput.value==0) {
+            priceError.style.display = 'block';
+            priceInput.setCustomValidity('Price cannot be negative');
+        } else {
+            priceError.style.display = 'none';
+            priceInput.setCustomValidity('');
+        }
+    }
+
+    // Attach event listener to validate price on input change
+    document.getElementById('price').addEventListener('input', validatePrice);
+
+    // Attach event listener to validate price before form submission
+    document.getElementById('productForm').addEventListener('submit', function(event) {
+        validatePrice();
+        const priceInput = document.getElementById('price');
+        if (!priceInput.checkValidity()) {
+            event.preventDefault(); // Prevent form submission if price is invalid
         }
     });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const subImagesInput = document.getElementById('subImages');
-        const subImagesPreview = document.getElementById('subImagesPreview');
-        const urls = subImagesInput.value.split(',');
-        urls.forEach(url => {
-            const imgContainer = document.createElement('div');
-            imgContainer.className = 'image-preview-item';
-
-            const img = document.createElement('img');
-            img.src = url;
-
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'delete-button';
-            deleteButton.innerHTML = '&times;';
-            deleteButton.addEventListener('click', function() {
-                removeImage('subImagesPreview', url);
-                imgContainer.remove();
-            });
-
-            imgContainer.appendChild(img);
-            imgContainer.appendChild(deleteButton);
-            subImagesPreview.appendChild(imgContainer);
-        });
-    });
-</script>
+    </script>
+</body>
+</html>

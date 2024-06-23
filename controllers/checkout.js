@@ -193,7 +193,7 @@ module.exports = {
             if (!order || order.userId.toString() !== user._id.toString()) {
                 return res.status(404).send('Order not found');
             }
-     
+         
             if (order.status === 'Delivered') {
                 const currentDate = new Date();
                 if (!order.deliveredAt) {
@@ -209,7 +209,7 @@ module.exports = {
                 // Update order status to 'Returned'
                 order.status = 'Returned';
                 await order.save();
-    
+     
                 res.redirect('/profile');
             } else {
                 res.status(400).send('Order cannot be returned at this stage');
