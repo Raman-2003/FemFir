@@ -1,110 +1,134 @@
 
-
 const Sale = require('../models/saleSchema');
 const moment = require('moment');
 const pdf = require('pdfkit');
 const excel = require('node-excel-export');
-const Order = require('../models/orderSchema')
+const User = require('../models/userSchema');
+const Address = require('../models/addressSchema');
 
 exports.getReportPage = (req, res) => {
   res.render('admin/reportForm', { layout: 'adminLayout'});
 };
 
 exports.generateReport = async (req, res) => {
-    const { startDate, endDate, reportType } = req.body;
-    const query = buildQuery(reportType, startDate, endDate);
-  
-    try {
-      const sales = await Sale.find(query);
-      console.log(sales); 
+  const { startDate, endDate, reportType } = req.body;
+  const query = buildQuery(reportType, startDate, endDate);
+
+  try {
+      // Fetch sales and populate user and address details
+      const sales = await Sale.find(query)
+          .populate('user', 'firstname lastname email') // Populate user details
+          .populate('address'); // Populate address details
+      
       res.render('admin/report', { sales, reportType, startDate, endDate, layout: 'adminLayout' });
-    } catch (err) {
+  } catch (err) {
       console.error(err);
       res.status(500).send('Server Error');
-    }
+  }
 };
 
-  exports.generatePDF = async (req, res) => {
-    const { reportType, startDate, endDate } = req.query;
-    const query = buildQuery(reportType, startDate, endDate);
-  
-    try {
-      const sales = await Sale.find(query);
+exports.generatePDF = async (req, res) => {
+  const { reportType, startDate, endDate } = req.query;
+  const query = buildQuery(reportType, startDate, endDate);
+
+  try {
+      // Fetch sales and populate user and address details
+      const sales = await Sale.find(query)
+          .populate('user', 'firstname lastname email') // Populate user details
+          .populate('address'); // Populate address details
+
       const doc = new pdf();
       let fileName = `Sales_Report_${reportType}_${Date.now()}.pdf`;
       res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
       res.setHeader('Content-type', 'application/pdf');
       doc.pipe(res);
-  
-      doc.text('Sales Report', { align: 'center' });
-      doc.moveDown();
-      sales.forEach(sale => {
-        doc.text(`Product: ${sale.productName}`);
-        doc.text(`Quantity: ${sale.quantity}`);
-        doc.text(`Price: $${sale.price}`);
-        doc.text(`Total Price: $${sale.totalPrice}`);
-        doc.text(`Date: ${moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss')}`);
-        doc.moveDown();
-      });
-      doc.end();
-    } catch (err) {
-      res.status(500).send('Server Error');
-    }
-  };
-  
 
-  exports.generateExcel = async (req, res) => {
-    const { reportType, startDate, endDate } = req.query;
-    const query = buildQuery(reportType, startDate, endDate);
-  
-    try {
-      const sales = await Sale.find(query);
-      const styles = {
-        headerDark: {
-          fill: {
-            fgColor: {
-              rgb: 'FF000000'
-            }
-          },
-          font: {
-            color: {
-              rgb: 'FFFFFFFF'
-            },
-            sz: 14,
-            bold: true
+      // Add styling to the PDF
+      doc.font('Helvetica-Bold').fontSize(20).text('Sales Report', { align: 'center' });
+      doc.moveDown();
+
+      sales.forEach(sale => {
+          doc.font('Helvetica-Bold').fontSize(12).text(`Product: ${sale.productName}`);
+          doc.font('Helvetica').text(`Quantity: ${sale.quantity}`);
+          doc.text(`Price: $${sale.price}`);
+          doc.text(`Total Price: $${sale.totalPrice}`);
+          doc.text(`Date: ${moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss')}`);
+
+          if (sale.user) {
+              doc.text(`Customer: ${sale.user.firstname} ${sale.user.lastname}`);
+              doc.text(`Email: ${sale.user.email}`);
           }
-        }
+
+          if (sale.address) {
+              doc.text(`Address: ${sale.address.name}, ${sale.address.addressLine1}, ${sale.address.locality}, ${sale.address.city}, ${sale.address.state}, ${sale.address.pin}`);
+          }
+
+          doc.moveDown();
+      });
+
+      doc.end();
+  } catch (err) {
+      res.status(500).send('Server Error');
+  }
+};
+
+
+exports.generateExcel = async (req, res) => {
+  const { reportType, startDate, endDate } = req.query;
+  const query = buildQuery(reportType, startDate, endDate);
+
+  try {
+      // Fetch sales and populate user and address details
+      const sales = await Sale.find(query)
+          .populate('user', 'firstname lastname email') // Populate user details
+          .populate('address'); // Populate address details
+
+      const styles = {
+          headerDark: {
+              fill: { fgColor: { rgb: 'FF000000' } },
+              font: { color: { rgb: 'FFFFFFFF' }, sz: 14, bold: true }
+          },
+          cellNormal: {
+              fill: { fgColor: { rgb: 'FFFFFFFF' } },
+              font: { color: { rgb: 'FF000000' }, sz: 12 }
+          }
       };
-  
+
       const specification = {
-        productName: { displayName: 'Product Name', headerStyle: styles.headerDark, width: 120 },
-        quantity: { displayName: 'Quantity', headerStyle: styles.headerDark, width: 100 },
-        price: { displayName: 'Price', headerStyle: styles.headerDark, width: 100 },
-        totalPrice: { displayName: 'Total Price', headerStyle: styles.headerDark, width: 100 },
-        saleDate: { displayName: 'Sale Date', headerStyle: styles.headerDark, width: 150 }
+          productName: { displayName: 'Product Name', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 120 },
+          quantity: { displayName: 'Quantity', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
+          price: { displayName: 'Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
+          totalPrice: { displayName: 'Total Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
+          saleDate: { displayName: 'Sale Date', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 },
+          customerName: { displayName: 'Customer Name', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 },
+          customerEmail: { displayName: 'Customer Email', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 200 },
+          address: { displayName: 'Address', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 300 }
       };
-  
+
       const dataset = sales.map(sale => ({
-        productName: sale.productName,
-        quantity: sale.quantity,
-        price: sale.price,
-        totalPrice: sale.totalPrice,
-        saleDate: moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss')
+          productName: sale.productName,
+          quantity: sale.quantity,
+          price: sale.price,
+          totalPrice: sale.totalPrice,
+          saleDate: moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss'),
+          customerName: sale.user ? `${sale.user.firstname} ${sale.user.lastname}` : '',
+          customerEmail: sale.user ? sale.user.email : '',
+          address: sale.address ? `${sale.address.name}, ${sale.address.addressLine1}, ${sale.address.locality}, ${sale.address.city}, ${sale.address.state}, ${sale.address.pin}` : ''
       }));
-  
+
       const report = excel.buildExport([
-        {
-          name: 'Sales Report',
-          specification,
-          data: dataset
-        }
+          {
+              name: 'Sales Report',
+              specification,
+              data: dataset
+          }
       ]);
-  
+
       res.attachment(`Sales_Report_${reportType}_${Date.now()}.xlsx`);
       return res.send(report);
-    } catch (err) {
+  } catch (err) {
       res.status(500).send('Server Error');
-    }
+  }
   };
 
   function buildQuery(reportType, startDate, endDate) {

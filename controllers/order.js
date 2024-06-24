@@ -40,24 +40,47 @@ const changeOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
 
+        // Find the order and populate necessary details
+        const order = await Order.findById(orderId)
+            .populate('items.product')
+            .populate('userId') // Populate user details
+            .populate('shippingAddress'); // Populate shipping address details
+
+        // Log the order to debug
+        console.log('Order:', order);
+
+        if (!order) {
+            console.error(`Order with ID ${orderId} not found`);
+            return res.status(404).send("Order not found");
+        }
+
+        if (!order.userId) {
+            console.error(`User not found for order ID ${orderId}`);
+            return res.status(400).send("User not found for this order");
+        }
+
+        if (!order.billingAddress) {
+            console.error(`Shipping address not found for order ID ${orderId}`);
+            return res.status(400).send("Shipping address not found for this order");
+        }
+
         // Update the order status
-        const order = await Order.findById(orderId).populate('items.product');
+        await Order.updateOne({ _id: orderId }, { status });
 
-        if (order) {
-            await Order.updateOne({ _id: orderId }, { status });
+        // If the status is 'Delivered', add to the sales collection
+        if (status === 'Delivered') {
+            const sales = order.items.map(item => ({
+                productName: item.product.name,
+                quantity: item.quantity,
+                price: item.product.price,
+                totalPrice: item.total,
+                saleDate: new Date(),
+                user: order.userId._id, // Add the user reference
+                address: order.billingAddress._id // Add the address reference
+            }));
 
-            // If the status is 'Delivered', add to the sales collection
-            if (status === 'Delivered') {
-                const sales = order.items.map(item => ({
-                    productName: item.product.name,
-                    quantity: item.quantity,
-                    price: item.product.price,
-                    totalPrice: item.total,
-                    saleDate: new Date(),
-                }));
-
-                await Sale.insertMany(sales);
-            }
+            // Insert sales records with user and address references
+            await Sale.insertMany(sales);
         }
 
         res.redirect('/admin/orders?page=' + req.query.page);

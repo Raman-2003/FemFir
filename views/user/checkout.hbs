@@ -9,9 +9,9 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 Library -->
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+  <!-- SweetAlert2 Library -->
+ 
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
     <style>
         .coupon-item {
             padding: 10px;
@@ -82,12 +82,11 @@
         .coupon-item:hover {
             background-color: #f9f9f9;
         }
-
-        #billingAddressSelect {
+        #billingAddressSelect{
             width: 500px;
         }
 
-        .order-summary {
+        .order-summary{
             position: absolute;
             bottom: 100px;
             left: 60px;
@@ -100,7 +99,7 @@
     <div class="checkout">
         <div class="container">
             <div class="row d-flex">
-                <div class="col-md-7">
+                <div class="col-md-7 col-lg-7">
                     <form id="checkoutForm" action="/checkout/placeOrder" method="POST">
                         <div class="billing-address">
                             <h2>Billing Address</h2>
@@ -134,37 +133,35 @@
                             </select>
                         </div>
 
-                        <div class="payment-method">
-                            <h2>Payment Method</h2>
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="cashOnDelivery"
-                                    name="paymentMethod" value="Cash on Delivery" checked>
-                                <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
-                            </div>
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="razorpay" name="paymentMethod"
-                                    value="Razorpay">
-                                <label class="custom-control-label" for="razorpay">Razorpay</label>
-                            </div>
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="wallet" name="paymentMethod"
-                                    value="Wallet">
-                                <label class="custom-control-label" for="wallet">Wallet</label>
-                            </div>
-                        </div>
+                       <div class="payment-method">
+    <h2>Payment Method</h2>
+    <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="cashOnDelivery"
+            name="paymentMethod" value="Cash on Delivery" checked>
+        <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
+    </div>
+    <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="razorpay" name="paymentMethod"
+            value="Razorpay">
+        <label class="custom-control-label" for="razorpay">Razorpay</label>
+    </div>
+    <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" id="wallet" name="paymentMethod"
+            value="Wallet" >
+        <label class="custom-control-label" for="wallet">Wallet</label>
+    </div>
+</div>
 
+                        
 
-
-                        <button type="submit" class="btn btn-primary mt-3" id="placeOrderButton"
-                            style="width: 127px;">Place Order</button>
+                        <button type="submit" class="btn btn-primary mt-3" id="placeOrderButton" style="width: 127px;">Place Order</button>
                     </form>
                 </div>
 
                 <div class="col-md-6">
                     <div class="coupons">
                         <!-- Button to trigger the modal -->
-                        <button id="view-coupons-btn" class="btn btn-primary"
-                            style="display: flex; margin-top:10px">View Coupons</button>
+                        <button id="view-coupons-btn" class="btn btn-primary" style="display: flex; margin-top:10px">View Coupons</button>
                     </div>
                 </div>
 
@@ -190,9 +187,8 @@
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-primary" id="apply-selected-coupon-btn">Apply
                                     Coupon</button>
-                                <!-- Add this button to the modal footer, next to the "Apply Coupon" button -->
-                                <button type="button" class="btn btn-danger" id="remove-coupon-btn" disabled
-                                    style="background-color: #375e87;">Remove Coupon</button>
+                                    <!-- Add this button to the modal footer, next to the "Apply Coupon" button -->
+                                <button type="button" class="btn btn-danger" id="remove-coupon-btn" disabled style="background-color: #375e87;">Remove Coupon</button>
                                 <input type="hidden" name="appliedCouponId" id="appliedCouponId">
 
                             </div>
@@ -200,7 +196,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-5">
+                <div class="col-md-5" >
                     <div class="order-summary">
                         <h2>Order Summary</h2>
                         <ul class="list-group">
@@ -229,113 +225,113 @@
         </div>
     </div>
     <!-- Checkout End -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function () {
-            $('#checkoutForm').submit(function (e) {
-                e.preventDefault();
+              $('#checkoutForm').submit(function (e) {
+        e.preventDefault();
 
-                const paymentMethod = $('input[name="paymentMethod"]:checked').val();
-                const amount = $('#amount').val();
-                const note = $('#note').val();
-                const items = $('#items').val();
+        const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+        const amount = $('#amount').val();
+        const note = $('#note').val();
+        const items = $('#items').val();
 
-                console.log('Amount:', amount);
-                console.log('Note:', note);
-                console.log('Items:', items);
+        console.log('Amount:', amount);
+        console.log('Note:', note);    
+        console.log('Items:', items);  
 
-                const data = {
-                    amount: amount,
-                    note: note,
-                    items: items
-                };
+        const data = {
+            amount: amount,
+            note: note,
+            items: items
+        };
 
-                if (paymentMethod === 'Razorpay') {
-                    $.ajax({
-                        url: $(this).attr('action'),
-                        type: 'POST',
-                        data: $(this).serialize(),
-                        success: function (response) {
-                            if (response.razorpayOrder) {
-                                var options = {
-                                    "key": "rzp_test_oO3a8uVtaGGjX8",
-                                    "amount": response.razorpayOrder.amount,
-                                    "currency": "INR",
-                                    "name": "FemaleFirst",
-                                    "description": "Test Transaction",
-                                    "order_id": response.razorpayOrder.id,
-                                    "handler": function (response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Payment successful!',
-                                            text: 'Your order ID is ' + response.razorpay_order_id,
-                                            confirmButtonText: 'OK'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = '/profile';
-                                            }
-                                        });
-                                    },
-                                    "prefill": {
-                                        "name": "Test User",
-                                        "email": "test.user@example.com",
-                                        "contact": "9999999999"
-                                    },
-                                    "theme": {
-                                        "color": "#3399cc"
-                                    }
-                                };
-
-                                var rzp1 = new Razorpay(options);
-                                rzp1.open();
-                            }
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            console.error('Error:', errorThrown);
-                        }
-                    });
-                } else if (paymentMethod === 'Wallet') {
-                    $.ajax({
-                        url: '/checkout/placeOrder',
-                        type: 'POST',
-                        data: $(this).serialize(),
-                        success: function (response) {
-                            if (response.success) {
+        if (paymentMethod === 'Razorpay') {
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.razorpayOrder) {
+                        var options = {
+                            "key": "rzp_test_oO3a8uVtaGGjX8",
+                            "amount": response.razorpayOrder.amount,
+                            "currency": "INR",
+                            "name": "FemaleFirst",
+                            "description": "Test Transaction",
+                            "order_id": response.razorpayOrder.id,
+                            "handler": function (response) {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Payment successful!',
-                                    text: 'Your order ID is ' + response.orderId,
+                                    text: 'Your order ID is ' + response.razorpay_order_id,
                                     confirmButtonText: 'OK'
                                 }).then((result) => {
                                     if (result.isConfirmed) {
                                         window.location.href = '/profile';
                                     }
                                 });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Payment failed',
-                                    text: response.message,
-                                    confirmButtonText: 'OK'
-                                });
+                            },
+                            "prefill": {
+                                "name": "Test User",
+                                "email": "test.user@example.com",
+                                "contact": "9999999999"
+                            },
+                            "theme": {
+                                "color": "#3399cc"
                             }
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            console.error('Error:', errorThrown);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Unable to process payment. Please try again later.',
-                                confirmButtonText: 'OK'
-                            });
+                        };
+
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error:', errorThrown);
+                }
+            });
+        } else if (paymentMethod === 'Wallet') {
+        $.ajax({
+            url: '/checkout/placeOrder',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment successful!',
+                        text: 'Your order ID is ' + response.orderId,
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/profile'; 
                         }
                     });
                 } else {
-                    // For Cash on Delivery 
-                    this.submit();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Payment failed',
+                        text: response.message,
+                        confirmButtonText: 'OK'
+                    });
                 }
-            });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Error:', errorThrown);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Unable to process payment. Please try again later.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    } else {
+                // For Cash on Delivery 
+                this.submit();
+            }
+    });
 
             $('#view-coupons-btn').click(function () {
                 $.ajax({
@@ -377,7 +373,7 @@
                 });
             });
 
-            $('#apply-selected-coupon-btn').click(function () {
+             $('#apply-selected-coupon-btn').click(function () {
                 const selectedCoupon = $('input[name="coupon"]:checked').val();
                 if (selectedCoupon) {
                     $.ajax({
@@ -422,50 +418,50 @@
                 }
             });
 
-            // Remove coupon functionality
-            $('#remove-coupon-btn').click(function () {
-                const appliedCouponId = $('#appliedCouponId').val();
-                if (appliedCouponId) {
-                    $.ajax({
-                        url: '/checkout/remove-coupon',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ couponId: appliedCouponId }),
-                        success: function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Coupon Removed',
-                                    text: 'The coupon has been successfully removed!',
-                                });
-                                $('#appliedCouponId').val(''); // Clear the applied coupon ID
-                                updateCartSummary(response.updatedCart);
-                                $('#remove-coupon-btn').prop('disabled', true); // Disable remove coupon button
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: response.message,
-                                });
-                            }
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            console.error('Error:', errorThrown);
+             // Remove coupon functionality
+        $('#remove-coupon-btn').click(function () {
+            const appliedCouponId = $('#appliedCouponId').val();
+            if (appliedCouponId) {
+                $.ajax({
+                    url: '/checkout/remove-coupon',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ couponId: appliedCouponId }),
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Coupon Removed',
+                                text: 'The coupon has been successfully removed!',
+                            });
+                            $('#appliedCouponId').val(''); // Clear the applied coupon ID
+                            updateCartSummary(response.updatedCart);
+                            $('#remove-coupon-btn').prop('disabled', true); // Disable remove coupon button
+                        } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: 'Unable to remove coupon. Please try again later.',
+                                text: response.message,
                             });
                         }
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'No Coupon Applied',
-                        text: 'No coupon is applied currently.',
-                    });
-                }
-            });
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('Error:', errorThrown);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Unable to remove coupon. Please try again later.',
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Coupon Applied',
+                    text: 'No coupon is applied currently.',
+                });
+            }
+        });
 
             function updateCartSummary(updatedCart) {
                 let cartSummaryHtml = '';
@@ -513,13 +509,13 @@
             });
         });
 
-        document.getElementById('placeOrderButton').addEventListener('click', function () {
+         document.getElementById('placeOrderButton').addEventListener('click', function () {
             placeOrder();
         });
 
         function placeOrder() {
             // Simulate order processing with a timeout
-            setTimeout(function () {
+            setTimeout(function() {
                 var selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
                 if (selectedPaymentMethod === 'Cash on Delivery') {
                     // Trigger SweetAlert
@@ -530,7 +526,7 @@
                         confirmButtonText: 'Okay'
                     });
                 }
-            }, 500);
+            }, 500); 
         }
     </script>
 </body>

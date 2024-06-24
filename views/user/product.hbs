@@ -99,7 +99,7 @@
                                 <!-- Product Sorting Dropdown -->
                                 <div class="product-short">
                                     <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product sort by</a>
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product by</a>
                                         <div class="dropdown-menu dropdown-menu-right">
                                             <a href="?sort=price_high"
                                                 class="dropdown-item {{#if (eq sortOption 'price_high')}}active{{/if}}">Price:
@@ -116,14 +116,20 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Category Dropdown and Apply Button -->
-                                <select name="category" class="category-dropdown">
-                                    <option value="">All Categories</option>
-                                    {{#each categories}}
-                                    <option value="{{this._id}}" {{#if (eq ../query.category this._id)}}selected{{/if}}>{{this.name}}</option>
-                                    {{/each}}
-                                </select>
-                                <button type="submit" class="apply-button">Apply</button>
+                                
+
+                                 <!-- Category Dropdown and Apply Button -->
+                                <form action="/product" method="GET" id="categoryForm">
+                                    <input type="hidden" name="search" value="{{query.search}}">
+                                    <input type="hidden" name="sort" value="{{sortOption}}">
+                                    <select name="category" class="category-dropdown">
+                                        <option value="">All Categories</option>
+                                        {{#each categories}}
+                                        <option value="{{this._id}}" {{#if (eq ../query.category this._id)}}selected{{/if}}>{{this.name}}</option>
+                                        {{/each}}
+                                    </select>
+                                    <button type="submit">Apply</button>
+                                </form>
                             </div>
                             <!-- Range helper usage -->
                             <ul>

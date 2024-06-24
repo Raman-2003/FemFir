@@ -354,7 +354,7 @@ applyCoupon: async (req, res) => {
 
         if (grandTotal < 5000) {
             return res.status(400).json({ success: false, message: 'Grand total must be at least 5000 to apply this coupon' });
-        }
+        } 
 
         if (subTotal < coupon.maxPrice) {
             return res.status(400).json({ success: false, message: `Subtotal must be at least ${coupon.maxPrice} to apply this coupon` });
