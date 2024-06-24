@@ -18,7 +18,7 @@ const cartController = require('../controllers/cart');
 
 const {
     getCheckoutPage, placeOrder, getOrderDetailsPage, cancelOrder, returnOrder, 
-    getCartCheckoutPage, getInvoice, setDefaultAddress, loadUserCoupons, applyCoupon
+    getCartCheckoutPage, getInvoice, setDefaultAddress, loadUserCoupons, applyCoupon, removeCoupon
 } = require('../controllers/checkout');
 
 const paymentCtrl = require('../controllers/paymentCtrl')
@@ -97,6 +97,7 @@ router.post('/cart/update', logedin, isBlocked, cartController.updateCartQuantit
 router.get('/coupons_list', logedin, isBlocked, loadUserCoupons);
 router.get('/apply_coupon', logedin, isBlocked, applyCoupon);
 router.post('/checkout/apply-coupon', logedin, isBlocked, applyCoupon);
+router.post('/checkout/remove-coupon',logedin, isBlocked, removeCoupon);
 
 // Checkout routes
 router.get('/checkout', logedin, isBlocked, cartController.getCheckoutPage);

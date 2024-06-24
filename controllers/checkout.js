@@ -387,6 +387,48 @@ applyCoupon: async (req, res) => {
     }
 },
 
+
+removeCoupon: async (req, res) => {
+    try {
+        const userData = req.session.user;
+        if (!userData) {
+            return res.status(401).json({ success: false, message: 'User not logged in' });
+        }
+        const userId = userData._id;
+        const { couponId } = req.body;
+
+        const user = await User.findById(userId).populate('cart.product').lean();
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Reset the coupon in session
+        req.session.coupon = null;
+
+        // Recalculate totals
+        let subTotal = 0;
+        user.cart.forEach(item => {
+            subTotal += item.product.price * item.quantity;
+        });
+
+        const grandTotal = subTotal; // No discount applied
+
+        // Respond with updated cart details
+        res.json({
+            success: true,
+            message: 'Coupon removed successfully',
+            updatedCart: {
+                cart: user.cart,
+                subTotal,
+                grandTotal
+            }
+        });
+    } catch (error) {
+        console.error('Error removing coupon:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+},
+
 };
 
 
