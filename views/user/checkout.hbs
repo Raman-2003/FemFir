@@ -209,7 +209,7 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Shipping cost</span>
-                                <span>1</span>
+                                <span>Free</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Total</span>
@@ -391,7 +391,7 @@
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Invalid Coupon',
-                                    text: 'The selected coupon is invalid or expired.',
+                                    text: response.message,
                                 });
                             }
                         },

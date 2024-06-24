@@ -350,7 +350,7 @@ applyCoupon: async (req, res) => {
         });
 
         const discountAmount = (subTotal * coupon.discount) / 100;
-        const grandTotal = subTotal - discountAmount + 1; 
+        const grandTotal = subTotal - discountAmount; 
 
         if (grandTotal < 5000) {
             return res.status(400).json({ success: false, message: 'Grand total must be at least 5000 to apply this coupon' });

@@ -205,12 +205,71 @@ const saveAdditionalInfo = async(req,res)=>{
 }
 
 
+// const getProducts = async (req, res) => {
+//     try {
+//         const perPage = 9;
+//         const page = parseInt(req.query.page) || 1;
+//         const sortOption = req.query.sort || 'default';
+//         const searchQuery = req.query.search || '';
+
+//         let sortCondition;
+//         switch (sortOption) {
+//             case 'price_high':
+//                 sortCondition = { price: -1 };
+//                 break;
+//             case 'price_low':
+//                 sortCondition = { price: 1 };
+//                 break;
+//             case 'name_asc':
+//                 sortCondition = { name: 1 };
+//                 break;
+//             case 'name_desc':
+//                 sortCondition = { name: -1 };
+//                 break;
+//             default:
+//                 sortCondition = {};
+//         }
+
+//         const listedCategories = await Category.find({ status: 'listed' }).select('_id');
+//         const listedCategoryIds = listedCategories.map(category => category._id);
+
+//         let query = {
+//             status: 'listed',
+//             category: { $in: listedCategoryIds }
+//         };
+
+//         if (searchQuery) {
+//             query.name = { $regex: searchQuery, $options: 'i' };
+//         }
+
+//         const products = await Product.find(query)
+//             .sort(sortCondition)
+//             .skip((perPage * page) - perPage)
+//             .limit(perPage);
+
+//         const count = await Product.countDocuments(query);
+
+//         res.render('user/product', {
+//             products,
+//             current: page,
+//             pages: Math.ceil(count / perPage),
+//             sortOption, 
+//             query: req.query
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('Something went wrong');
+//     }
+// };
+
+
 const getProducts = async (req, res) => {
     try {
         const perPage = 9;
         const page = parseInt(req.query.page) || 1;
         const sortOption = req.query.sort || 'default';
         const searchQuery = req.query.search || '';
+        const categoryFilter = req.query.category || '';
 
         let sortCondition;
         switch (sortOption) {
@@ -230,13 +289,17 @@ const getProducts = async (req, res) => {
                 sortCondition = {};
         }
 
-        const listedCategories = await Category.find({ status: 'listed' }).select('_id');
+        const listedCategories = await Category.find({ status: 'listed' }).select('_id name');
         const listedCategoryIds = listedCategories.map(category => category._id);
 
         let query = {
             status: 'listed',
             category: { $in: listedCategoryIds }
         };
+
+        if (categoryFilter) {
+            query.category = categoryFilter;
+        }
 
         if (searchQuery) {
             query.name = { $regex: searchQuery, $options: 'i' };
@@ -254,13 +317,17 @@ const getProducts = async (req, res) => {
             current: page,
             pages: Math.ceil(count / perPage),
             sortOption, 
-            query: req.query
+            query: req.query,
+            categories: listedCategories
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Something went wrong');
     }
 };
+
+
+
 const getProductDetails = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id).populate('category').lean();

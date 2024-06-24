@@ -1,14 +1,14 @@
 <!-- Inline Styles for Sorting Dropdown and Search Box -->
 <style>
     .product-short .dropdown {
-        display: inline-block;
+        display: flex;
         width: auto;
     }
 
     .product-short .dropdown-toggle {
         padding: 5px 10px;
         font-size: 14px;
-        border: 1px solid #ddd;
+        border: 6px solid #6c4444;
         border-radius: 5px;
         background-color: #f9f9f9;
     }
@@ -46,6 +46,38 @@
     .product-search button:hover {
         background-color: #218838;
     }
+
+    /* Style for the dropdown */
+.category-dropdown {
+    width: 42%;
+    padding: 10px;
+    border: 1px solid #3f4db6;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #333;
+    margin-right: 10px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+/* Style for the apply button */
+.apply-button {
+    padding: 5px 5px;
+    border: none;
+    border-radius: 4px;
+    background-color: #234366;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.apply-button:hover {
+    background-color: #566f89;
+}
+
+   
 </style>
 
 <!-- Product List Start -->
@@ -62,9 +94,36 @@
                                     <form method="GET" action="">
                                         <input type="text" id="search" name="search" placeholder="Search"
                                             value="{{query.search}}">
-                                        {{!-- <button type="submit">Search</button> --}}
                                     </form>
                                 </div>
+                                <!-- Product Sorting Dropdown -->
+                                <div class="product-short">
+                                    <div class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product sort by</a>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a href="?sort=price_high"
+                                                class="dropdown-item {{#if (eq sortOption 'price_high')}}active{{/if}}">Price:
+                                                High to Low</a>
+                                            <a href="?sort=price_low"
+                                                class="dropdown-item {{#if (eq sortOption 'price_low')}}active{{/if}}">Price:
+                                                Low to High</a>
+                                            <a href="?sort=name_asc"
+                                                class="dropdown-item {{#if (eq sortOption 'name_asc')}}active{{/if}}">Name:
+                                                A to Z</a>
+                                            <a href="?sort=name_desc"
+                                                class="dropdown-item {{#if (eq sortOption 'name_desc')}}active{{/if}}">Name:
+                                                Z to A</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Category Dropdown and Apply Button -->
+                                <select name="category" class="category-dropdown">
+                                    <option value="">All Categories</option>
+                                    {{#each categories}}
+                                    <option value="{{this._id}}" {{#if (eq ../query.category this._id)}}selected{{/if}}>{{this.name}}</option>
+                                    {{/each}}
+                                </select>
+                                <button type="submit" class="apply-button">Apply</button>
                             </div>
                             <!-- Range helper usage -->
                             <ul>
@@ -72,26 +131,7 @@
                                 {{/range}}
                             </ul>
 
-                            <!-- Product Sorting Dropdown -->
-                            <div class="product-short">
-                                <div class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product sort by</a>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a href="?sort=price_high"
-                                            class="dropdown-item {{#if (eq sortOption 'price_high')}}active{{/if}}">Price:
-                                            High to Low</a>
-                                        <a href="?sort=price_low"
-                                            class="dropdown-item {{#if (eq sortOption 'price_low')}}active{{/if}}">Price:
-                                            Low to High</a>
-                                        <a href="?sort=name_asc"
-                                            class="dropdown-item {{#if (eq sortOption 'name_asc')}}active{{/if}}">Name:
-                                            A to Z</a>
-                                        <a href="?sort=name_desc"
-                                            class="dropdown-item {{#if (eq sortOption 'name_desc')}}active{{/if}}">Name:
-                                            Z to A</a>
-                                    </div>
-                                </div>
-                            </div>
+
 
                         </div>
                     </div>
