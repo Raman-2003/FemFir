@@ -83,7 +83,7 @@
             padding: 10px 20px;
             cursor: pointer;
         }
-    </style>
+    </style> 
 </head>
 <body>
     <div class="content-body">
@@ -104,6 +104,11 @@
                         <input type="number" id="price" name="price" class="form-control" value="{{product.price}}" required min="0">
                         <small id="priceError" class="form-text text-danger" style="display: none;">Price cannot be a negative
                             value.</small>
+                    </div>
+                    <div class="form-group">
+                            <label for="mrp">MRP</label> <!-- MRP input -->
+                            <input type="number" id="mrp" name="mrp" class="form-control" value="{{product.mrp}}" required min="0">
+                            <small id="mrpError" class="form-text text-danger" style="display: none;">MRP cannot be a negative value.</small>
                     </div>
                     <div class="form-group">
                         <label for="stock">Stock</label>

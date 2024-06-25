@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const cartItemSchema = new Schema({
     product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     quantity: { type: Number, required: true, default: 1 },
-    total: { type: Number, required: true } 
+    total: { type: Number, required: true },
+    mrpTotal: { type: Number, required: true } // Add MRP total field 
 });
 
 const cartSchema = new Schema({

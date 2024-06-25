@@ -8,43 +8,42 @@
 
     <style>
         /* General button styles */
-.action button {
-    font-family: 'Arial', sans-serif;
-    font-size: 16px;
-    padding: 10px 20px;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .action button {
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-/* Add to Wishlist button */
-.add-to-wishlist {
-    background-color: #0c5d83;
-    color: #fffafa;
-}
+        /* Add to Wishlist button */
+        .add-to-wishlist {
+            background-color: #0c5d83;
+            color: #fffafa;
+        }
 
-.add-to-wishlist:hover {
-    background-color: #ecb939;
-}
+        .add-to-wishlist:hover {
+            background-color: #ecb939;
+        }
 
-/* Add to Cart button */
-.add-to-cart {
-    background-color: #155c83;
-    color: white;
-}
+        /* Add to Cart button */
+        .add-to-cart {
+            background-color: #155c83;
+            color: white;
+        }
 
-.add-to-cart:hover {
-    background-color: #e68a00;
-}
+        .add-to-cart:hover {
+            background-color: #e68a00;
+        }
 
-/* Additional styles for both buttons */
-.action button:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
-}
-
+        /* Additional styles for both buttons */
+        .action button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
+        }
     </style>
 </head>
 
@@ -75,7 +74,7 @@
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                 </div>
-                                <div class="price">${{product.price}} <span>${8999}</span></div>
+                                <div class="price">${{product.price}}  <span class="mrp">${{product.mrp}}</span> <!-- Display MRP --> </div>
                                 <div class="details">
                                     <p>{{product.description}}</p>
                                 </div>
@@ -91,18 +90,21 @@
                                 <div class="quantity">
                                     <h4>Quantity:</h4>
                                     <div class="qty">
-                                        <button class="btn-minus" data-product-id="{{product._id}}"><i class="fa fa-minus"></i></button>
+                                        <button class="btn-minus" data-product-id="{{product._id}}"><i
+                                                class="fa fa-minus"></i></button>
                                         <input type="text" value="1" data-product-id="{{product._id}}">
-                                        <button class="btn-plus" data-product-id="{{product._id}}"><i class="fa fa-plus"></i></button>
+                                        <button class="btn-plus" data-product-id="{{product._id}}"><i
+                                                class="fa fa-plus"></i></button>
                                     </div>
                                 </div>
 
-                              <div class="action">
-    <!-- Add to Wishlist Button -->
-    <button class="add-to-wishlist" data-product-id="{{product._id}}">Add to Wishlist</button>
-    <!-- Add to Cart Button -->
-    <button class="add-to-cart" data-product-id="{{product._id}}">Add to Cart</button>
-</div>
+                                <div class="action">
+                                    <!-- Add to Wishlist Button -->
+                                    <button class="add-to-wishlist" data-product-id="{{product._id}}">Add to
+                                        Wishlist</button>
+                                    <!-- Add to Cart Button -->
+                                    <button class="add-to-cart" data-product-id="{{product._id}}">Add to Cart</button>
+                                </div>
 
                             </div>
                         </div>
@@ -114,9 +116,6 @@
                                 <li class="nav-item">
                                     <a class="nav-link active" data-toggle="pill" href="#description">Description</a>
                                 </li>
-                                {{!-- <li class="nav-item">
-                                    <a class="nav-link" data-toggle="pill" href="#specification">Specification</a>
-                                </li> --}}
                                 <li class="nav-item">
                                     <a class="nav-link" data-toggle="pill" href="#reviews">Reviews (1)</a>
                                 </li>
@@ -127,14 +126,6 @@
                                     <h4>Product description</h4>
                                     <p>{{product.description}}</p>
                                 </div>
-                                {{!-- <div id="specification" class="container tab-pane fade"><br>
-                                    <h4>Product specification</h4>
-                                    <ul>
-                                        {{#each product.specifications}}
-                                        <li>{{this}}</li>
-                                        {{/each}}
-                                    </ul>
-                                </div> --}}
                                 <div id="reviews" class="container tab-pane fade"><br>
                                     <div class="reviews-submitted">
                                         {{#each product.reviews}}
@@ -183,7 +174,8 @@
                     <div class="container">
                         <div class="section-header">
                             <h3>Related Products</h3>
-                            <p>Made from 100% pure silk, this saree exudes luxury and sophistication. The vibrant colors and subtle sheen of the silk fabric will make you stand out at any occasion.</p>
+                            <p>Made from 100% pure silk, this saree exudes luxury and sophistication. The vibrant colors
+                                and subtle sheen of the silk fabric will make you stand out at any occasion.</p>
                         </div>
                     </div>
 
@@ -224,112 +216,112 @@
         new ImageZoom(document.getElementById('summasample'), options);
 
         document.addEventListener('DOMContentLoaded', () => {
-            const stock = {{product.stock}};
-            const addToWishlistButton = document.querySelector('.add-to-wishlist');
-            const quantityInputs = document.querySelectorAll('.quantity input');
+            const stock = {{ product.stock }};
+        const addToWishlistButton = document.querySelector('.add-to-wishlist');
+        const quantityInputs = document.querySelectorAll('.quantity input');
 
-            // Quantity minus button functionality
-            document.querySelectorAll('.btn-minus').forEach(button => {
-                button.addEventListener('click', () => {
-                    const productId = button.getAttribute('data-product-id');
-                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-                    let newQuantity = parseInt(quantityInput.value) - 1;
-                    if (newQuantity > 0) {
-                        quantityInput.value = newQuantity;
+        // Quantity minus button functionality
+        document.querySelectorAll('.btn-minus').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                let newQuantity = parseInt(quantityInput.value) - 1;
+                if (newQuantity > 0) {
+                    quantityInput.value = newQuantity;
+                } else {
+                    Swal.fire({
+                        title: 'Warning!',
+                        text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
+                        icon: 'warning',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    quantityInput.value = 1;
+                }
+            });
+        });
+
+        // Quantity plus button functionality
+        document.querySelectorAll('.btn-plus').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                let newQuantity = parseInt(quantityInput.value) + 1;
+                if (newQuantity <= stock) {
+                    quantityInput.value = newQuantity;
+                } else {
+                    Swal.fire({
+                        title: 'Stock Limit Reached!',
+                        text: `Stock is only available ${stock}.`,
+                        icon: 'info',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        if (addToWishlistButton) {
+            addToWishlistButton.addEventListener('click', async function () {
+                const productId = this.dataset.productId;
+                const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                const quantity = parseInt(quantityInput.value);
+
+                if (quantity < 1) {
+                    Swal.fire({
+                        title: 'Warning!',
+                        text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
+                        icon: 'warning',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/wishlist/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: productId, quantity: quantity })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        Swal.fire({
+                            title: 'Added!',
+                            text: 'Product has been added to your wishlist.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
                     } else {
                         Swal.fire({
-                            title: 'Warning!',
-                            text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
-                            icon: 'warning',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        quantityInput.value = 1;
-                    }
-                });
-            });
-
-            // Quantity plus button functionality
-            document.querySelectorAll('.btn-plus').forEach(button => {
-                button.addEventListener('click', () => {
-                    const productId = button.getAttribute('data-product-id');
-                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-                    let newQuantity = parseInt(quantityInput.value) + 1;
-                    if (newQuantity <= stock) {
-                        quantityInput.value = newQuantity;
-                    } else {
-                        Swal.fire({
-                            title: 'Stock Limit Reached!',
-                            text: `Stock is only available ${stock}.`,
-                            icon: 'info',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    }
-                });
-            });
-
-            if (addToWishlistButton) {
-                addToWishlistButton.addEventListener('click', async function () {
-                    const productId = this.dataset.productId;
-                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-                    const quantity = parseInt(quantityInput.value);
-
-                    if (quantity < 1) {
-                        Swal.fire({
-                            title: 'Warning!',
-                            text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
-                            icon: 'warning',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch('/wishlist/add', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ id: productId, quantity: quantity })
-                        });
-
-                        const result = await response.json();
-
-                        if (result.success) {
-                            Swal.fire({
-                                title: 'Added!',
-                                text: 'Product has been added to your wishlist.',
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Sorry!',
-                                text: 'Already added to wishlist',
-                                icon: 'error',
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        }
-                    } catch (error) {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'An error occurred while adding the product to the wishlist.',
+                            title: 'Sorry!',
+                            text: 'Already added to wishlist',
                             icon: 'error',
                             timer: 2000,
                             showConfirmButton: false
                         });
                     }
-                });
-            } else {
-                console.error('Add to Wishlist button not found.');
-            }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while adding the product to the wishlist.',
+                        icon: 'error',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        } else {
+            console.error('Add to Wishlist button not found.');
+        }
 
-          const addToCartButton = document.querySelector('.add-to-cart');
-            // Add to Cart functionality
+        const addToCartButton = document.querySelector('.add-to-cart');
+        // Add to Cart functionality
         if (addToCartButton) {
             addToCartButton.addEventListener('click', async function () {
                 const productId = this.dataset.productId;
@@ -391,4 +383,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -35,6 +35,7 @@ const addToCart = async (req, res) => {
         if (cartItem) {
             cartItem.quantity += quantity;
             cartItem.total = cartItem.quantity * product.price;
+            cartItem.mrpTotal = cartItem.quantity * product.mrp; // Update MRP total
         } else {
             user.cart.push({ product: productId, quantity: quantity, total: product.price * quantity });
         }
@@ -67,6 +68,7 @@ const loadCart = async (req, res) => {
         let subTotal = 0;
         cart.forEach(item => {
             item.total = item.product.price * item.quantity;
+            item.mrpTotal = item.product.mrp * item.quantity; // Calculate MRP total
             subTotal += item.total;
         });
 
@@ -180,7 +182,8 @@ const updateCartQuantity = async (req, res) => {
 
         cartItem.quantity = quantity;
         cartItem.total = quantity * cartItem.product.price;
-
+        cartItem.mrpTotal = quantity * cartItem.product.mrp; // Update MRP total
+        
         await user.save();
 
         let subTotal = 0;
@@ -235,7 +238,7 @@ const getCheckoutPage = async (req, res) => {
         //check if any product in cart has zero stock
         const promises = cart.map(async item => {
             const product = await Product.findById(item.product._id);
-            if(!product || product.stcok === 0){
+            if(!product || product.stock === 0){
                 throw new Error(`Product ${item.product.name} is out of stock`);
             }
         })
@@ -248,6 +251,7 @@ const getCheckoutPage = async (req, res) => {
         // Calculate cart totals
         let subTotal = 0;
         cart.forEach(item => {
+            item.mrpTotal = item.product.mrp * item.quantity; // Calculate MRP total
             subTotal += item.product.price * item.quantity;
         });
 

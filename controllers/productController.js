@@ -46,7 +46,7 @@ const getProductForm = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category } = req.body;
+        const { name, description, price,mrp, stock, category } = req.body;
         const mainImage = req.files['mainImage'] ? `/uploads/products/${req.files['mainImage'][0].filename}` : '';
         
       
@@ -69,6 +69,7 @@ const addProduct = async (req, res) => {
             name,
             description,
             price,
+            mrp,
             stock,
             category: categoryDoc._id,
             mainImage,
@@ -102,7 +103,7 @@ const getEditProductForm = async (req, res) => {
 
 const editProduct = async (req, res) => {
     try {
-        const { name, description, price, stock, category, status } = req.body; 
+        const { name, description, price, mrp, stock, category, status } = req.body; 
         let mainImage = req.body.existingMainImage;
 
         // Handle main image update if a new file is uploaded
@@ -128,6 +129,7 @@ const editProduct = async (req, res) => {
             name,
             description,
             price,
+            mrp,
             stock,
             category: categoryDoc._id,
             subImages,

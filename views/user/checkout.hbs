@@ -86,11 +86,7 @@
             width: 500px;
         }
 
-        .order-summary{
-            position: absolute;
-            bottom: 100px;
-            left: 60px;
-        }
+      
     </style>
 </head>
 
@@ -195,15 +191,16 @@
                         </div>
                     </div>
                 </div>
-
+ 
                 <div class="col-md-5" >
                     <div class="order-summary">
                         <h2>Order Summary</h2>
                         <ul class="list-group">
                             {{#each cart}}
                             <li class="list-group-item">
-                                <div>{{this.product.name}} x {{this.quantity}}</div>
-                                <div>{{this.total}}</div>
+                               <div>{{this.product.name}} x {{this.quantity}}</div>
+                                <div>Price: {{this.product.price}} x {{this.quantity}} = {{this.total}}</div>
+                                <div>MRP: {{this.product.mrp}} x {{this.quantity}} = {{this.mrpTotal}}</div> <!-- Display MRP total -->
                             </li>
                             {{/each}}
                             <li class="list-group-item d-flex justify-content-between">

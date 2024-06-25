@@ -203,7 +203,7 @@ const saveAdditionalInfo = async(req,res)=>{
             res.status(500).send('An error occured while saving additional information')
     }
 }
-
+ 
 
 const getProducts = async (req, res) => {
     try {
@@ -226,6 +226,9 @@ const getProducts = async (req, res) => {
                 break;
             case 'name_desc':
                 sortCondition = { name: -1 };
+                break;
+            case 'new_arrivals':
+                sortCondition = { createdAt: -1 };  
                 break;
             default:
                 sortCondition = {};
