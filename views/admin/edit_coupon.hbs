@@ -5,13 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Coupon</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-</head>
+    <style>
+        body {
+            background-color: #eceef1;
+        }
+        label{
+            font-family:serif;
+            color: #333;
+        }
+    </style>
+</head> 
 <body>
     <div class="content-body">
         <div class="container-fluid">
             <div class="container">
                 <h1>Edit Coupon</h1>
-                <form id="editCouponForm" action="/admin/edit_coupon" method="POST" onsubmit="return validateForm()">
+                <form id="editCouponForm" action="/admin/edit_coupon" method="POST" onsubmit="return validateForm()" style="margin-top: 20px;">
                     <input type="hidden" name="id" value="{{coupon._id}}">
                     <div class="form-group">
                         <label for="code">Coupon Code:</label>
@@ -37,7 +46,7 @@
                         <label for="description">Description:</label>
                         <textarea id="description" name="description" class="form-control" required>{{coupon.description}}</textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Update Coupon</button>
+                    <button type="submit" class="btn btn-primary" style="display: flex; width:100%; justify-content:center; margin:20px 0; padding:10px 0">Update Coupon</button>
                 </form>
             </div>
         </div>

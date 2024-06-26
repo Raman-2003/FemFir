@@ -5,16 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coupon Management</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        body {
+            background-color: #fffcfc;
+        }
+        .container {
+            
+        } 
+    </style>
 </head>
 <body>
     <div class="content-body">
         <div class="container-fluid">
-            <div class="container">
-                <h1>Coupon Management</h1>
-                <div class="mb-3">
-                    <a href="/admin/add_coupon" class="btn btn-primary">Add New Coupon</a>
+            <!-- Breadcrumbs -->
+            <div class="row">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-1">
+                            <li class="breadcrumb-item"><a href="/admin/" style="color: black;">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Coupons</li>
+                        </ol>
+                    </nav>
                 </div>
-                <table class="table table-bordered">
+            </div>
+            <div class="container mt-2">
+                <div  style="display: flex; justify-content:space-between; align-items:center; margin:20px 0">
+                <h1>Coupon Management</h1>
+                <a href="/admin/add_coupon" class="btn btn-primary">Add New Coupon</a>
+                </div>
+                <table class="table table-bordered" >
                     <thead>
                         <tr style="color: black;">
                             <th>Code</th>
@@ -27,7 +46,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style="color: rgb(62, 62, 58);">
                         {{#each couponData}} 
                         <tr>
                             <td>{{this.code}}</td>
@@ -42,8 +61,10 @@
                                 </button>
                             </td>
                             <td>
+                                <div style="display: flex; flex-direction:column">
                                 <a href="/admin/edit_coupon?id={{this._id}}" class="btn btn-warning btn-sm" style="width: 54px;">Edit</a>
                                 <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete('{{this._id}}'); return false;" style="margin-top: 5px;">Delete</a>
+                                </div>
                             </td>
                         </tr>
                         {{else}}

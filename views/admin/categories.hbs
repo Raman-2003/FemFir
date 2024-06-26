@@ -5,6 +5,17 @@
     <!-- Include SweetAlert CSS and JavaScript -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   <style>
+      .container-fluid {
+        background-color: azure;
+   }
+   .combinies{
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+   }
+   </style>
+ 
 </head>
 <body>
     <div class="content-body">
@@ -14,15 +25,16 @@
                 <div class="col-12">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/admin/">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="/admin/" style="color: black;">Dashboard</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Category Management</li>
                         </ol>
                     </nav>
                 </div>
             </div>
-
+            <div class="combinies">
             <h2>Category Management</h2>
             <a href="/admin/categories/add" class="btn btn-primary mb-3">Add Category</a>
+            </div>
             {{#if success_msg}}
             <div class="alert alert-success">{{success_msg}}</div>
             {{/if}}
@@ -30,7 +42,7 @@
             <div class="alert alert-danger">{{error_msg}}</div>
             {{/if}}
             <table class="table table-bordered">
-                <thead>
+                <thead style="color: #333;">
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
@@ -39,7 +51,7 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="color: rgb(127, 115, 115);">
                     {{#each categories}}
                     <tr>
                         <td>{{this.name}}</td>
@@ -47,6 +59,7 @@
                         <td><img src="/uploads/categories/{{this.image}}" alt="{{this.name}}" style="width: 100px;"></td>
                         <td>{{this.status}}</td>
                         <td>
+                            <div style="display: flex; flex-direction:column;  row-gap: 10px;">
                             <a href="/admin/categories/edit/{{this._id}}" class="btn btn-warning">Edit</a>
                             <a href="#" class="btn btn-danger" onclick="confirmDelete('{{this._id}}', '{{this.name}}')">Delete</a>
                             {{#ifCond this.status '===' 'listed'}}
@@ -54,6 +67,7 @@
                             {{else}}
                             <a href="/admin/categories/list/{{this._id}}" class="btn btn-success">List</a>
                             {{/ifCond}}
+                            </div>
                         </td>
                     </tr>
                     {{/each}}

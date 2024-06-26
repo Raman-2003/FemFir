@@ -5,7 +5,7 @@
    <style>
      body {
           font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-          background-color: rgb(245, 243, 241);
+          background-color: #e8ecf0;
           margin: 0;
           margin: 0;
     }
@@ -43,7 +43,7 @@
     }
 
     .return-orders-table tr:nth-child(even){
-        background-color: rgb(235, 229, 229);
+        background-color: rgb(248, 240, 240);
     }
     .view-btn {
         margin-top: 5px;
@@ -93,8 +93,7 @@
                                     <a href="/admin/return-orders/{{this._id}}" class="view-btn">View</a>
                                     {{#if (eq this.status 'Requested')}}
                                         <form action="/return-orders/{{this._id}}/status" method="POST" style="display: inline;">
-                                            <input type="hidden" name="status" value="Canceled">
-                                            <button type="submit">Cancel</button>
+                                           
                                         </form>
                                     {{/if}}
                                 </td>

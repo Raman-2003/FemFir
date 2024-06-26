@@ -4,6 +4,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        body{
+            color: #c8d2db;
+        } 
         .product-image {
             width: 150px;
             height: 180px;
@@ -41,15 +44,34 @@
             background-color: #007bff;
             color: #fff;
         }
+        .btn-primary{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+        }
     </style>
 </head>
 <body>
     <div class="content-body">
         <div class="container-fluid">
+             <!-- Breadcrumbs -->
+            <div class="row mb-2 mt-4">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/admin/" style="color: black;">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Product Management</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
             <div class="container">
+                <div style="display: flex; justify-content:space-between">
                 <h2>Product Management</h2>
                 <a href="/admin/products/add" class="btn btn-primary">Add Product</a>
-                <table class="table">
+                </div>
+                <table class="table" style="margin-top:30px">
                     <thead>
                         <tr style="color: black;">
                             <th>Image</th>
@@ -69,7 +91,7 @@
                             <td>{{this.name}}</td>
                             <td>{{this.description}}</td>
                             <td>{{this.price}}</td>
-                            <td>
+                            <td style="text-align: center;">
                                 {{#if (eq this.stock 0)}}
                                 <span style="color: red; font-weight: bold;">OUT OF STOCK</span>
                                 {{else}}
@@ -79,6 +101,7 @@
                             <td>{{this.category.name}}</td>
                             <td>{{this.status}}</td>
                             <td>
+                                <div style="display: flex; flex-direction:column; margin:15px; row-gap:5px">
                                 <a href="/admin/products/edit/{{this._id}}" class="btn btn-warning">Edit</a>
                                 <a href="#" class="btn btn-danger" onclick="confirmDelete('{{this._id}}', '{{this.name}}')">Delete</a>
                                 {{#ifCond this.status '===' 'listed'}}
@@ -86,6 +109,7 @@
                                 {{else}}
                                 <a href="/admin/products/list/{{this._id}}" class="btn btn-success">List</a>
                                 {{/ifCond}}
+                                </div>
                             </td>
                         </tr>
                         {{/each}}

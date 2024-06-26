@@ -6,6 +6,9 @@
     <title>Edit category</title>
     <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
     <style>
+        body {
+            background-color: #ecf1f6;
+        }
         .image-preview {
             display: flex;
             flex-wrap: wrap;
@@ -82,12 +85,26 @@
             padding: 10px 20px;
             cursor: pointer;
         }
+        label{
+             font-family:serif;
+        }
     </style>
 </head>
 <body>
     
 <div class="content-body">
     <div class="container-fluid">
+        <!-- Breadcrumbs -->
+            <div class="row mb-2 mt-4">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/admin/categories" style="color: black;">Category</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Add Category</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         <h2>Edit Category</h2>
         <form action="/admin/categories/edit/{{category._id}}" method="POST" enctype="multipart/form-data">
             <div class="form-group">
@@ -100,9 +117,9 @@
             </div>
             <div class="form-group">
                 <label for="mainImage">Image</label>
-                <input type="file" name="mainImage" id="mainImage" class="form-control">
+                <input type="file" name="mainImage" id="mainImage" class="form-control" style="margin-bottom: 10px; height:40px">
                 <input type="hidden" name="existingImage" value="{{category.image}}">
-                <img id="cropped-image" src="/uploads/categories/{{category.image}}" alt="Current Image" style="width: 100px;">
+                <img id="cropped-image" src="/uploads/categories/{{category.image}}" alt="Current Image" style="width: 100px; ">
                 <div id="mainImagePreview" class="image-preview">
                     {{#if product.mainImage}}
                         <div class="image-preview-item">

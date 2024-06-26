@@ -6,7 +6,11 @@
     <title>Add Product</title>
     <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
     <style>
-        .image-preview {
+        body {
+            background-color: #eff1f4;
+            height: 1100px;
+        }
+        .image-preview { 
             display: flex;
             flex-wrap: wrap;
             margin-top: 10px;
@@ -81,13 +85,28 @@
             padding: 10px 20px;
             cursor: pointer;
         }
+        label{
+             font-family:serif;
+            color: black;
+        }
     </style>
 </head>
 <body>    
 <div class="content-body">
     <div class="container-fluid">
+        <!-- Breadcrumbs -->
+            <div class="row mb-2 mt-2">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/admin/products" style="color: black;">Products</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Add Product</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         <div class="container">
-            <h2>Add Product</h2>
+            <h2 style="padding-bottom: 20px; text-align:center">Add Product</h2>
             <form id="productForm" action="/admin/products/add" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="name">Name</label>
@@ -123,15 +142,15 @@
                 </div>
                 <div class="form-group">
                     <label for="mainImage">Main Image</label>
-                    <input type="file" id="mainImage" name="mainImage" class="form-control" required>
+                    <input type="file" id="mainImage" name="mainImage" class="form-control" required style="height:40px">
                     <div id="mainImagePreview" class="image-preview"></div>
                 </div>
                 <div class="form-group">
                     <label for="subImages">Sub Images</label>
-                    <input type="file" id="subImages" name="subImages" class="form-control" multiple>
+                    <input type="file" id="subImages" name="subImages" class="form-control" multiple style="height:40px">
                     <div id="subImagesPreview" class="image-preview"></div>
                 </div>
-                <button type="submit" class="btn btn-primary">Add Product</button>
+                <button type="submit" class="btn btn-primary" style="display: block; width:100%">Add Product</button>
             </form>
         </div>
     </div>

@@ -28,7 +28,7 @@ const returnOrdersController  = require('../controllers/returnOrders');
 const salesController = require('../controllers/salesController');
 
 router.get('/', isLogin, adminHome);
-
+ 
 router.get(['/','/adminlogin'], isLogout, adminLogin);
 router.post('/adminlogin', isLogout, doadminLogin);
 router.get('/signup', isLogout, adminSignup);

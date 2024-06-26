@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #eceff2;
             margin: 0;
             padding: 0;
         }
@@ -20,7 +20,7 @@
         .container {
             max-width: 800px;
             margin: auto;
-            background: #fff;
+            background: #f8f5f5;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -39,9 +39,10 @@
         }
 
         .order-details h2 {
-            font-size: 20px;
+            font-size: 30px;
+            font-weight: bolder;
             margin-bottom: 10px;
-            color: #007bff;
+            color: #435f7e;
         }
 
         .order-details p {
@@ -66,7 +67,7 @@
         }
 
         .order-items th {
-            background-color: #007bff;
+            background-color: #496078;
             color: #fff;
             text-transform: uppercase;
             font-size: 14px;
@@ -86,7 +87,7 @@
         }
 
         .back-link a {
-            color: #007bff;
+            color: #468170;
             text-decoration: none;
             transition: color 0.3s ease;
         }
@@ -107,7 +108,7 @@
 
         .final{
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-            color:cadetblue
+            color:rgb(32, 48, 49)
         }
     </style>
 </head>
@@ -118,11 +119,13 @@
 
             <div class="order-details">
                 <h2>Order Information</h2>
+                <div style="display: flex; flex-direction:column;">
                 <p><strong>Order ID:</strong> {{order._id}}</p>
                 <p><strong>Order Date:</strong> {{formatDate order.createdAt}}</p>
                 <p><strong>Status:</strong> {{order.status}}</p>
                 <p><strong>Total Amount:</strong> ₹{{order.totalAmount}}</p>
                 <p><strong>Payment Method:</strong> {{order.paymentMethod}}</p>
+                </div>
             </div>
 
             <div class="user-details">

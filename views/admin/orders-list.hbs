@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #d1dae3;
             margin: 0;
             padding: 0;
         }
@@ -159,7 +159,7 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="color: #333;">
                     {{#each orders}}
                     <tr>
                         <td>{{this.userId.firstname}} {{this.userId.lastname}}</td>
@@ -173,7 +173,7 @@
                             {{this.product.name}} <br>
                             {{/each}}
                         </td>
-                        <td>${{this.totalAmount}}</td>
+                        <td>₹{{this.totalAmount}}</td>
                         <td>{{formatDate this.createdAt}}</td>
                         <td>
                             {{#each this.items}}
@@ -189,8 +189,6 @@
                                     <option value="Processed" {{#ifCond this.status '==' 'Processed'}}selected{{/ifCond}}>Processed</option>
                                     <option value="Shipped" {{#ifCond this.status '==' 'Shipped'}}selected{{/ifCond}}>Shipped</option>
                                     <option value="Delivered" {{#ifCond this.status '==' 'Delivered'}}selected{{/ifCond}}>Delivered</option>
-                                    <option value="Cancelled" {{#ifCond this.status '==' 'Cancelled'}}selected{{/ifCond}}>Cancelled</option>
-                                    <option value="Returned" {{#ifCond this.status '==' 'Returned'}}selected{{/ifCond}}>Returned</option>
                                 </select>
                                 <button type="submit" style="width: 145px;"><i class="fas fa-save"></i> Update</button>
                             </form>

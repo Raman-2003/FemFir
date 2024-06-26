@@ -6,10 +6,9 @@
         /* General body styling */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #f0f3f6;
             color: #333;
             margin: 0;
-            {{!-- padding: 20px; --}}
         }
 
         /* Container styling */
@@ -133,16 +132,16 @@
                     <strong class="head">Order ID:</strong> {{returnOrder.orderId._id}}
                 </div>
                 <div class="one">
-                    <strong>User:</strong> {{returnOrder.userId.name}} ({{returnOrder.userId.email}})
+                    <strong class="head">User:</strong> {{returnOrder.userId.firstname}} ,  {{ returnOrder.userId.email}}
                 </div>
                 <div class="one">
-                    <strong>Reason:</strong> {{returnOrder.returnReason}}
+                    <strong class="head">Reason:</strong> {{returnOrder.returnReason}}
                 </div>
                 <div class="one">
-                    <strong>Status:</strong> {{returnOrder.status}}
+                    <strong class="head">Status:</strong> {{returnOrder.status}}
                 </div>
                 <div class="one">
-                    <strong>Requested At:</strong> {{formatDate returnOrder.createdAt}}
+                    <strong class="head">Requested At:</strong> {{formatDate returnOrder.createdAt}}
                 </div>
                 <div>
                     <h3>Order Items</h3>

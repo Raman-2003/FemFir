@@ -180,7 +180,7 @@ editDetails: (req, res) => {
         }
     },
 
-    // Cancel order
+// Cancel order
 cancelOrder: async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -192,39 +192,44 @@ cancelOrder: async (req, res) => {
             return res.status(404).send('Order not found');
         }
 
-        // Update order status to 'Cancelled'
-        order.status = 'Cancelled';
-        await order.save();
+        // Allow cancellation for 'Pending', 'Processed', and 'Shipped' statuses
+        if (['Pending', 'Processed', 'Shipped'].includes(order.status)) {
+            // Update order status to 'Cancelled'
+            order.status = 'Cancelled';
+            await order.save();
 
-        // Handle refund based on payment method
-        if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay') {
-            const userId = order.userId;
-            let wallet = await Wallet.findOne({ userId });
+            // Handle refund based on payment method
+            if (['Wallet', 'Razorpay'].includes(order.paymentMethod)) {
+                const userId = order.userId;
+                let wallet = await Wallet.findOne({ userId });
 
-            if (!wallet) {
-                wallet = new Wallet({ userId, balance: 0, transactions: [] });
+                if (!wallet) {
+                    wallet = new Wallet({ userId, balance: 0, transactions: [] });
+                }
+
+                const productNames = order.items.map(item => item.product.name).join(', ');
+                const description = `Refund for cancelled order: ${productNames}`;
+
+                // Credit the order amount back to the wallet
+                wallet.balance += order.totalAmount;
+
+                const transaction = new Transaction({
+                    userId,
+                    amount: order.totalAmount,
+                    description: description,
+                    type: 'credit',
+                    status: 'completed'
+                });
+
+                await transaction.save();
+                wallet.transactions.push(transaction._id);
+                await wallet.save();
             }
 
-            const productNames = order.items.map(item => item.product.name).join(', ');
-            const description = `Refund for cancelled order: ${productNames}`;
-
-            // Credit the order amount back to the wallet
-            wallet.balance += order.totalAmount;
-
-            const transaction = new Transaction({
-                userId,
-                amount: order.totalAmount,
-                description: description,
-                type: 'credit',
-                status: 'completed'
-            });
-
-            await transaction.save();
-            wallet.transactions.push(transaction._id);
-            await wallet.save();
+            res.redirect('/profile#orders-tab');
+        } else {
+            return res.status(400).send('Order cannot be cancelled at this stage');
         }
-
-        res.redirect('/profile#orders-tab');
     } catch (error) {
         console.log(error);
         res.status(500).send('Internal Server Error');
@@ -315,32 +320,38 @@ cancelOrder: async (req, res) => {
         }
     },
 
-    processReturnOrder: async (req, res) => {
-        try {
-            const orderId = req.params.id;
-            const { returnReason } = req.body;
+    // Process return order
+processReturnOrder: async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const { returnReason } = req.body;
 
-            // Create a new ReturnOrder entry
-            const returnOrder = new ReturnOrder({
-                orderId,
-                userId: req.session.user._id, 
-                returnReason,
-                status: 'Requested'
-            });
-            await returnOrder.save();
+        // Find the order and check if it can be returned
+        const order = await Order.findById(orderId).populate('items.product');
 
-            // Update the order's status to 'Return Requested'
-            await Order.findByIdAndUpdate(orderId, {
-                returnStatus: 'Requested',
-                status: 'Request Processed'  
-            });
-
-            res.redirect('/profile#orders-tab');
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Internal Server Error');
+        if (!order || order.status !== 'Delivered') {
+            return res.status(404).send('Order not found or not eligible for return');
         }
-    },
+
+        // Create a new ReturnOrder entry
+        const returnOrder = new ReturnOrder({
+            orderId,
+            userId: req.session.user._id, 
+            returnReason,
+            status: 'Requested'
+        });
+        await returnOrder.save();
+
+        // Update the order's status to 'Request Processed'
+        order.status = 'Request Processed';
+        await order.save();
+
+        res.redirect('/profile#orders-tab');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+},
 
     // Cancel the return request
     cancelReturnOrder: async (req, res) => {

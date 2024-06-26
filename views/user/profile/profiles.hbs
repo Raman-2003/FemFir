@@ -60,7 +60,7 @@
             margin-top: 20px;
         }
 
-      
+
 
         @media (max-width: 600px) {
 
@@ -126,8 +126,6 @@
             border-radius: 4px;
             cursor: pointer;
         }
-
-       
     </style>
 </head>
 
@@ -136,9 +134,9 @@
     <div class="breadcrumb-wrap">
         <div class="container">
             <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item"><a href="#">User</a></li>
-                <li class="breadcrumb-item active">My Account</li>
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
+                <li class="breadcrumb-item active">My account</li>
             </ul>
         </div>
     </div>
@@ -148,61 +146,81 @@
     <div class="my-account">
         <div class="container">
             <div class="row">
-               <div class="col-md-3">
-                <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
-                    <a class="nav-link active" id="dashboard-nav" data-toggle="pill" href="#profile-tab" role="tab">Profile</a>
-                    <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab">Orders</a>
-                    <a class="nav-link" id="payment-nav" data-toggle="pill" href="#payment-tab" role="tab">Payment Method</a>
-                    <a class="nav-link" id="address-nav" data-toggle="pill" href="#address-tab" role="tab">Address</a>
-                    <a class="nav-link" id="account-nav" data-toggle="pill" href="#account-tab" role="tab">Account Details</a>
-                    <a class="nav-link" id="change-password-nav" data-toggle="pill" href="#change-password-tab" role="tab">Change Password</a>
-                    <a class="nav-link" href="/logout">Logout</a>
+                <div class="col-md-3">
+                    <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                        <a class="nav-link active" id="dashboard-nav" data-toggle="pill" href="#profile-tab"
+                            role="tab">Profile</a>
+                        <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab">Orders</a>
+                        <a class="nav-link" id="payment-nav" data-toggle="pill" href="#payment-tab" role="tab">Payment
+                            Method</a>
+                        <a class="nav-link" id="address-nav" data-toggle="pill" href="#address-tab"
+                            role="tab">Address</a>
+                        <a class="nav-link" id="account-nav" data-toggle="pill" href="#account-tab" role="tab">Account
+                            Details</a>
+                        <a class="nav-link" id="change-password-nav" data-toggle="pill" href="#change-password-tab"
+                            role="tab">Change Password</a>
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </div>
                 </div>
-            </div>
                 <div class="col-md-9">
                     <div class="tab-content">
 
                         <!-- Profile Details Tab -->
-                       <div class="tab-pane fade show active" id="profile-tab" role="tabpanel" aria-labelledby="profile-nav">
-                        <div class="profile-container">
-                            <h2>Profile Details</h2>
-                            <ul class="profile-details">
-                                <li><span>Full Name</span><span>{{userData.firstname}} {{userData.lastname}}</span></li>
-                                <li><span>Mobile Number</span><span>{{userData.mobile}}</span></li>
-                                <li><span>Email ID</span><span>{{userData.email}}</span></li>
-                                <li><span>Hint Name</span><span>{{userData.hintname}}</span></li>
-                                <li><span>Gender</span><span>{{userData.gender}}</span></li>
-                            </ul>
-                            <a href="/edit-details" class="edit-button">EDIT</a>
+                        <div class="tab-pane fade show active" id="profile-tab" role="tabpanel"
+                            aria-labelledby="profile-nav">
+                            <div class="profile-container">
+                                <h2>Profile Details</h2>
+                                <ul class="profile-details">
+                                    <li><span>Full Name</span><span>{{userData.firstname}} {{userData.lastname}}</span>
+                                    </li>
+                                    <li><span>Mobile Number</span><span>{{userData.mobile}}</span></li>
+                                    <li><span>Email ID</span><span>{{userData.email}}</span></li>
+                                    <li><span>Hint Name</span><span>{{userData.hintname}}</span></li>
+                                    <li><span>Gender</span><span>{{userData.gender}}</span></li>
+                                </ul>
+                                <a href="/edit-details" class="edit-button">EDIT</a>
+                            </div>
                         </div>
-                    </div>
 
-                      <div class="tab-pane fade" id="change-password-tab" role="tabpanel" aria-labelledby="change-password-nav">
-                        <div class="change-password-container">
-                            <h2>Change Password</h2>
-                            <form id="change-password-form" action="/profile/change-password" method="POST">
-                                <div class="form-group">
-                                    <label for="current-password">Current Password</label>
-                                    <input type="password" class="form-control" id="current-password" name="currentPassword" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="new-password">New Password</label>
-                                    <input type="password" class="form-control" id="new-password" name="newPassword" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="confirm-password">Confirm New Password</label>
-                                    <input type="password" class="form-control" id="confirm-password" name="confirmPassword" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Change Password</button>
-                            </form>
+                        <div class="tab-pane fade" id="change-password-tab" role="tabpanel"
+                            aria-labelledby="change-password-nav">
+                            <div class="change-password-container">
+                                <h2>Change Password</h2>
+                                <form id="change-password-form" action="/profile/change-password" method="POST">
+                                    <div class="form-group">
+                                        <label for="current-password">Current Password</label>
+                                        <div class="password-input-wrapper">
+                                            <input type="password" class="form-control" id="current-password"
+                                                name="currentPassword" required>
+                                            <span toggle="#current-password"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="new-password">New Password</label>
+                                        <div class="password-input-wrapper">
+                                            <input type="password" class="form-control" id="new-password"
+                                                name="newPassword" required>
+                                            <span toggle="#new-password"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirm-password">Confirm New Password</label>
+                                        <div class="password-input-wrapper">
+                                            <input type="password" class="form-control" id="confirm-password"
+                                                name="confirmPassword" required>
+                                            <span toggle="#confrim-password"></span>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Change Password</button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
 
 
 
-<!-- profiles.hbs -->
+                        <!-- profiles.hbs -->
 
-<!-- Orders Tab -->
+                        <!-- Orders Tab -->
 <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
     <div class="orders-container">
         <h4>Order Details</h4>
@@ -231,7 +249,8 @@
                         </td>
                         <td>
                             {{#each this.items}}
-                            <div><img src="{{this.product.mainImage}}" alt="{{this.product.name}}" style="width: 80px; height: 110px;"></div>
+                            <div><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"
+                                    style="width: 80px; height: 110px;"></div>
                             {{/each}}
                         </td>
                         <td>
@@ -244,19 +263,33 @@
                         <td>{{this.status}}</td>
                         <td>
                             <button onclick="location.href='/view-order/{{this._id}}'" style="width:90px;">View</button>
-                            {{#if (eq this.status 'Pending')}}
+                            
+                           
+                            <!-- Show Cancel button for 'Pending', 'Processed', and 'Shipped' statuses 
+                            {{#if (or (eq this.status 'Pending') (eq this.status 'Processed') (eq this.status 'Shipped'))}}
                             <form action="/cancel-order/{{this._id}}" method="POST" style="display:inline;">
                                 <button type="submit" style="background-color: red; color: white; width:90px;">Cancel</button>
                             </form>
                             {{/if}}
+                            -->
+                            {{#if (or (eq this.status 'Pending') (eq this.status 'Processed')  (eq this.status 'Shipped'))}}
+                            <form action="/cancel-order/{{this._id}}" method="POST" style="display:inline;">
+                                <button type="submit" style="background-color: red; color: white; width:90px;">Cancel</button>
+                            </form>
+                            {{/if}}
+
+                           
+
+                            <!-- Show Return button for 'Delivered' status -->
                             {{#if (eq this.status 'Delivered')}}
                             <form action="/return-order/{{this._id}}" method="GET" style="display:inline;">
                                 <button type="submit" style="background-color: orange; width:90px; color: white;">Return</button>
                             </form>
                             {{/if}}
+
+                            <!-- Show Cancel Return Request button if the return status is 'Requested' -->
                             {{#if (eq this.status 'Request Processed')}}
-                            {{!-- <span style="color: blue;">Return Requested</span> --}}
-                            <form action="/cancel-return/{{this._id}}" method="POST" >
+                            <form action="/cancel-return/{{this._id}}" method="POST" style="display:inline;">
                                 <button type="submit" style="background-color: grey; color: white; width:90px; height: 60px">Cancel Request</button>
                             </form>
                             {{/if}}
@@ -355,13 +388,16 @@
 </html>
 
 <script>
-document.getElementById('change-password-form').addEventListener('submit', function (event) {
-    const newPassword = document.getElementById('new-password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
+    document.getElementById('change-password-form').addEventListener('submit', function (event) {
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
 
-    if (newPassword !== confirmPassword) {
-        event.preventDefault();
-        alert('New password and confirm password do not match');
-    }
-});
+        if (newPassword !== confirmPassword) {
+            event.preventDefault();
+            alert('New password and confirm password do not match');
+        }
+    });
+
+
+
 </script>
