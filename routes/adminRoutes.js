@@ -26,8 +26,29 @@ const productController = require('../controllers/productController');
 const orderController = require('../controllers/order');
 const returnOrdersController  = require('../controllers/returnOrders');
 const salesController = require('../controllers/salesController');
+const Sale = require('../models/saleSchema');
+const Order = require('../models/orderSchema');
 
-router.get('/', isLogin, adminHome);
+
+// router.get('/', isLogin, adminHome);
+router.get('/', async (req, res) => {
+    try {
+      const overallSalesCount = await Sale.countDocuments({ status: 'Delivered' });
+      
+      const overallOrderAmountResult = await Order.aggregate([
+        { $match: { status: 'Delivered' } },
+        { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } }
+    ]);
+
+    // Extract the totalAmount value from the aggregation result
+    const overallOrderAmount = overallOrderAmountResult[0]?.totalAmount || 0;
+
+      res.render('admin/dashboard', { overallSalesCount,overallOrderAmount, layout: 'adminLayout' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    }
+  });
  
 router.get(['/','/adminlogin'], isLogout, adminLogin);
 router.post('/adminlogin', isLogout, doadminLogin);

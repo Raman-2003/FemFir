@@ -6,7 +6,7 @@ const excel = require('node-excel-export');
 const User = require('../models/userSchema');
 const Address = require('../models/addressSchema');
 const Product = require('../models/productSchema');
-
+ 
  
 exports.getReportPage = (req, res) => {
   res.render('admin/reportForm', { layout: 'adminLayout'});
@@ -22,8 +22,12 @@ exports.generateReport = async (req, res) => {
           .populate('user', 'firstname lastname email') // Populate user details
           .populate('address') // Populate address details
           .populate('product'); // Populate product details
+
+      // Update the sales count
+      const overallSalesCount = await Sale.countDocuments({ status: 'Delivered' });
+
       
-      res.render('admin/report', { sales, reportType, startDate, endDate, layout: 'adminLayout' });
+      res.render('admin/report', { sales, reportType, startDate, endDate, overallSalesCount, layout: 'adminLayout' });
   } catch (err) {
       console.error(err);
       res.status(500).send('Server Error');
@@ -53,8 +57,8 @@ exports.generatePDF = async (req, res) => {
 
       sales.forEach(sale => {
         const product = sale.product || {}; // Handle case where product might be null or undefined
-        const mrp = product.mrp !== undefined? `$${product.mrp}` : 'N/A'; // Provide default value for MRP
-        const discountedPrice = (product.mrp !== undefined && sale.price !== undefined) ? `$${(product.mrp - sale.price).toFixed(2)}` : 'N/A';
+        const mrp = product.mrp !== undefined? `${product.mrp}` : 'N/A'; // Provide default value for MRP
+        const discountedPrice = (product.mrp !== undefined && sale.price !== undefined) ? `${(sale.totalPrice * 10/100).toFixed(2)}` : 'N/A';
         console.log("DISCOUNT : ",discountedPrice);
 
         
@@ -62,7 +66,7 @@ exports.generatePDF = async (req, res) => {
           doc.font('Helvetica').text(`Quantity: ${sale.quantity}`);
           doc.text(`Price: $${sale.price}`);
           doc.text(`MRP: $${mrp}`);
-          doc.text(`Discounted Price: $${discountedPrice}`); 
+          doc.text(`Coupon discount : $${discountedPrice}`); 
           doc.text(`Total Price: $${sale.totalPrice}`);
           doc.text(`Date: ${moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss')}`);
           
@@ -179,4 +183,15 @@ exports.generateExcel = async (req, res) => {
         };
     }
     return query;
-}
+};
+
+exports.getSalesCount = async (req, res) => {
+    try {
+      const overallSalesCount = await Sale.countDocuments({ status: 'Delivered' });
+      res.json({ overallSalesCount });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    }
+  };
+  

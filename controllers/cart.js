@@ -105,7 +105,7 @@ const removeCart = async (req, res) => {
             subTotal += item.product.price * item.quantity;
         });
 
-        const shippingCost = 1;
+        const shippingCost = 0;
         const grandTotal = subTotal + shippingCost;
         res.json({ success: true, subTotal, grandTotal, message: 'Item removed from cart' });
     } catch (error) {

@@ -1,10 +1,20 @@
-// controllers/order.js
+const mongoose = require('mongoose');
 const User = require("../models/userSchema");
 const Product = require("../models/productSchema");
 const Address = require("../models/addressSchema");
 const Order = require("../models/orderSchema");
 const Sale = require("../models/saleSchema");
+const Statistics = require('../models/statisticsSchema');
 
+// Function to update the overall order amount
+async function updateOverallOrderAmount(changeAmount) {
+    const stats = await Statistics.findOneAndUpdate(
+        {},
+        { $inc: { overallOrderAmount: changeAmount } },
+        { new: true, upsert: true } // Upsert to create if it doesn't exist
+    );
+    return stats.overallOrderAmount;
+};
 
 const getOrderListPageAdmin = async (req, res) => {
     try {
@@ -64,14 +74,16 @@ const changeOrderStatus = async (req, res) => {
             return res.status(400).send("Shipping address not found for this order");
         }
 
+        const previousStatus = order.status;
+
         // Update the order status
         await Order.updateOne({ _id: orderId }, { status });
 
         // If the status is 'Delivered', add to the sales collection
-        if (status === 'Delivered') {
+        if (status === 'Delivered' && previousStatus !== 'Delivered') {
             const sales = order.items.map(item => ({
                 productName: item.product.name,
-                product: item.product._id, // Include the product reference
+                product: item.product._id, 
                 quantity: item.quantity,
                 price: item.product.price,
                 totalPrice: item.total,
@@ -82,6 +94,10 @@ const changeOrderStatus = async (req, res) => {
 
             // Insert sales records with user and address references
             await Sale.insertMany(sales);
+
+             // Update the overall order amount
+             const overallOrderAmount = await updateOverallOrderAmount(order.totalAmount);
+             console.log(`Overall Order Amount Updated: ${overallOrderAmount}`);
         }
 
         res.redirect('/admin/orders?page=' + req.query.page);
@@ -113,8 +129,46 @@ const getOrderDetailsPageAdmin = async (req, res) => {
     }
 };
 
+// Function to handle return approval
+const approveReturn = async (req, res) => {
+    try {
+        const { orderId, itemId } = req.body;
+
+        const order = await Order.findById(orderId)
+            .populate('items.product')
+            .populate('userId')
+            .populate('billingAddress');
+
+        if (!order) {
+            return res.status(404).send("Order not found");
+        }
+
+        const item = order.items.id(itemId);
+        if (!item) {
+            return res.status(404).send("Item not found in order");
+        }
+
+        if (order.returnStatus === 'Approved') {
+            return res.status(400).send("Return already approved for this item");
+        }
+
+        item.returnStatus = 'Approved';
+        await order.save();
+
+        // Update the overall order amount
+        const overallOrderAmount = await updateOverallOrderAmount(-item.total);
+        console.log(`Overall Order Amount Updated: ${overallOrderAmount}`);
+
+        res.redirect('/admin/orders?page=' + req.query.page);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
 module.exports = {
     getOrderListPageAdmin,
     changeOrderStatus,
     getOrderDetailsPageAdmin,
+    approveReturn
 };
