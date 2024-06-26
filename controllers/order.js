@@ -11,7 +11,7 @@ const getOrderListPageAdmin = async (req, res) => {
         const PAGE_SIZE = 10; // Number of orders per page
         const currentPage = parseInt(req.query.page) || 1;
         const skip = (currentPage - 1) * PAGE_SIZE;
-
+ 
         const orders = await Order.find({})
             .populate('userId')
             .populate('items.product')
@@ -71,6 +71,7 @@ const changeOrderStatus = async (req, res) => {
         if (status === 'Delivered') {
             const sales = order.items.map(item => ({
                 productName: item.product.name,
+                product: item.product._id, // Include the product reference
                 quantity: item.quantity,
                 price: item.product.price,
                 totalPrice: item.total,

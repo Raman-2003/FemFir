@@ -5,7 +5,9 @@ const pdf = require('pdfkit');
 const excel = require('node-excel-export');
 const User = require('../models/userSchema');
 const Address = require('../models/addressSchema');
+const Product = require('../models/productSchema');
 
+ 
 exports.getReportPage = (req, res) => {
   res.render('admin/reportForm', { layout: 'adminLayout'});
 };
@@ -18,7 +20,8 @@ exports.generateReport = async (req, res) => {
       // Fetch sales and populate user and address details
       const sales = await Sale.find(query)
           .populate('user', 'firstname lastname email') // Populate user details
-          .populate('address'); // Populate address details
+          .populate('address') // Populate address details
+          .populate('product'); // Populate product details
       
       res.render('admin/report', { sales, reportType, startDate, endDate, layout: 'adminLayout' });
   } catch (err) {
@@ -34,9 +37,10 @@ exports.generatePDF = async (req, res) => {
   try {
       // Fetch sales and populate user and address details
       const sales = await Sale.find(query)
+          .populate({path:'product', select:'name mrp',}) // Populate product details
           .populate('user', 'firstname lastname email') // Populate user details
-          .populate('address'); // Populate address details
-
+          .populate('address') // Populate address details
+         
       const doc = new pdf();
       let fileName = `Sales_Report_${reportType}_${Date.now()}.pdf`;
       res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
@@ -48,11 +52,24 @@ exports.generatePDF = async (req, res) => {
       doc.moveDown();
 
       sales.forEach(sale => {
-          doc.font('Helvetica-Bold').fontSize(12).text(`Product: ${sale.productName}`);
+        const product = sale.product || {}; // Handle case where product might be null or undefined
+        const mrp = product.mrp !== undefined? `$${product.mrp}` : 'N/A'; // Provide default value for MRP
+        const discountedPrice = (product.mrp !== undefined && sale.price !== undefined) ? `$${(product.mrp - sale.price).toFixed(2)}` : 'N/A';
+        console.log("DISCOUNT : ",discountedPrice);
+
+        
+          doc.font('Helvetica-Bold').fontSize(12).text(`Product: ${sale.productName || 'Unknown'}`);
           doc.font('Helvetica').text(`Quantity: ${sale.quantity}`);
           doc.text(`Price: $${sale.price}`);
+          doc.text(`MRP: $${mrp}`);
+          doc.text(`Discounted Price: $${discountedPrice}`); 
           doc.text(`Total Price: $${sale.totalPrice}`);
           doc.text(`Date: ${moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss')}`);
+          
+         if(sale.product){
+            doc.text(`MRPPP..: ${sale.product.mrp}`);
+            console.log(sale.product);
+         }
 
           if (sale.user) {
               doc.text(`Customer: ${sale.user.firstname} ${sale.user.lastname}`);
@@ -68,6 +85,7 @@ exports.generatePDF = async (req, res) => {
 
       doc.end();
   } catch (err) {
+    console.error('Error generating PDF:', err.message);
       res.status(500).send('Server Error');
   }
 };
@@ -81,7 +99,8 @@ exports.generateExcel = async (req, res) => {
       // Fetch sales and populate user and address details
       const sales = await Sale.find(query)
           .populate('user', 'firstname lastname email') // Populate user details
-          .populate('address'); // Populate address details
+          .populate('address') // Populate address details
+          .populate('product'); // Populate product details
 
       const styles = {
           headerDark: {
@@ -98,6 +117,8 @@ exports.generateExcel = async (req, res) => {
           productName: { displayName: 'Product Name', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 120 },
           quantity: { displayName: 'Quantity', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
           price: { displayName: 'Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
+          mrp: { displayName: 'MRP', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 }, // Add MRP
+          discountedPrice: { displayName: 'Discounted Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 }, // Add Discounted Price
           totalPrice: { displayName: 'Total Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
           saleDate: { displayName: 'Sale Date', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 },
           customerName: { displayName: 'Customer Name', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 },
@@ -109,6 +130,8 @@ exports.generateExcel = async (req, res) => {
           productName: sale.productName,
           quantity: sale.quantity,
           price: sale.price,
+          mrp: sale.product.mrp, // Add MRP
+          discountedPrice: sale.product.mrp - sale.price, // Calculate and add Discounted Price
           totalPrice: sale.totalPrice,
           saleDate: moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss'),
           customerName: sale.user ? `${sale.user.firstname} ${sale.user.lastname}` : '',

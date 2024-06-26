@@ -378,6 +378,7 @@ applyCoupon: async (req, res) => {
             updatedCart: {
                 cart: user.cart,
                 subTotal,
+                discountAmount, // Include discount amount  
                 grandTotal
             }
         });
@@ -402,16 +403,19 @@ removeCoupon: async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        // Reset the coupon in session
-        req.session.coupon = null;
 
         // Recalculate totals
         let subTotal = 0;
         user.cart.forEach(item => {
             subTotal += item.product.price * item.quantity;
         });
-
+        // Remove coupon discount by setting discountAmount to 0 and recalculate grandTotal
+        const discountAmount = 0;
         const grandTotal = subTotal; // No discount applied
+
+        
+        // Reset the coupon in session
+        req.session.coupon = null;
 
         // Respond with updated cart details
         res.json({
@@ -420,6 +424,7 @@ removeCoupon: async (req, res) => {
             updatedCart: {
                 cart: user.cart,
                 subTotal,
+                discountAmount, // No discount amount
                 grandTotal
             }
         });

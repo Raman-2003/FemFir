@@ -95,7 +95,7 @@
     <div class="checkout">
         <div class="container">
             <div class="row d-flex">
-                <div class="col-md-7 col-lg-7">
+                <div class="col-md-7 col-lg-7"> 
                     <form id="checkoutForm" action="/checkout/placeOrder" method="POST">
                         <div class="billing-address">
                             <h2>Billing Address</h2>
@@ -192,32 +192,37 @@
                     </div>
                 </div>
  
-                <div class="col-md-5" >
-                    <div class="order-summary">
-                        <h2>Order Summary</h2>
-                        <ul class="list-group">
-                            {{#each cart}}
-                            <li class="list-group-item">
-                               <div>{{this.product.name}} x {{this.quantity}}</div>
-                                <div>Price: {{this.product.price}} x {{this.quantity}} = {{this.total}}</div>
-                                <div>MRP: {{this.product.mrp}} x {{this.quantity}} = {{this.mrpTotal}}</div> <!-- Display MRP total -->
-                            </li>
-                            {{/each}}
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span>Subtotal</span>
-                                <span>{{subTotal}}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span>Shipping cost</span>
-                                <span>Free</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span>Total</span>
-                                <span>{{grandTotal}}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+             <div class="col-md-5">
+    <div class="order-summary">
+        <h2>Order Summary</h2>
+        <ul class="list-group">
+            {{#each cart}}
+            <li class="list-group-item">
+                <div>{{this.product.name}} x {{this.quantity}}</div>
+                <div>Price: {{this.product.price}} x {{this.quantity}} = {{this.total}}</div>
+                <div>MRP: {{this.product.mrp}} x {{this.quantity}} = {{this.mrpTotal}}</div> <!-- Display MRP total -->
+            </li>
+            {{/each}}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Subtotal</span>
+                <span>{{subTotal}}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between coupon-discount {{#unless discountAmount}}d-none{{/unless}}">
+                <span>Coupon Discount</span>
+                <span>-{{discountAmount}}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Shipping cost</span>
+                <span>Free</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Total</span>
+                <span>{{grandTotal}}</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
             </div>
         </div>
     </div>
@@ -477,9 +482,24 @@
                 <span>Subtotal</span>
                 <span>${updatedCart.subTotal}</span>
             </li>
+            `;
+
+             if (updatedCart.discountAmount) {
+                    cartSummaryHtml += `
+            <li class="list-group-item d-flex justify-content-between coupon-discount">
+                <span>Coupon Discount</span>
+                <span>-${updatedCart.discountAmount}</span>
+            </li>
+        `;
+                } else {
+                    // Hide coupon discount row if there's no discount
+                    $('.coupon-discount').addClass('d-none');
+                }
+
+             cartSummaryHtml += `
             <li class="list-group-item d-flex justify-content-between">
                 <span>Shipping cost</span>
-                <span>1</span>
+                <span>Free</span>
             </li>
             <li class="list-group-item d-flex justify-content-between">
                 <span>Total</span>
