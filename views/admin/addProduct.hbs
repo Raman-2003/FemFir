@@ -80,7 +80,7 @@
         }
         .btn-close {
             background: red;
-            color: white;
+            color: white; 
             border: none;
             padding: 10px 20px;
             cursor: pointer;
@@ -126,6 +126,14 @@
                     <label for="mrp">MRP</label> <!-- MRP input -->
                     <input type="number" id="mrp" name="mrp" class="form-control" required min="0">
                     <small id="mrpError" class="form-text text-danger" style="display: none;">MRP cannot be a negative value.</small>
+                </div>
+                <div class="form-group">
+                    <label for="discountPercentage">Discount Percentage (%)</label>
+                    <input type="number" id="discountPercentage" name="discountPercentage" class="form-control" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="expiryDate">Offer Expiry Date</label>
+                    <input type="date" id="expiryDate" name="expiryDate" class="form-control">
                 </div>
                 <div class="form-group">
                     <label for="stock">Stock</label>

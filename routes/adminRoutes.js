@@ -22,7 +22,7 @@ const {
     toggleStatusCoupon
 } = require('../controllers/adminCtrl');
 const categoryController = require('../controllers/categoryCtrl');
-const productController = require('../controllers/productController');
+const productController = require('../controllers/productController'); 
 const orderController = require('../controllers/order');
 const returnOrdersController  = require('../controllers/returnOrders');
 const salesController = require('../controllers/salesController');

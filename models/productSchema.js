@@ -11,9 +11,9 @@ const productSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true
+        required: true 
     },
-    mrp: {  // Add MRP field
+    mrp: {  
         type: Number,
         required: true
     },
@@ -42,6 +42,17 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    offer: {
+        discountPercentage: {
+            type: Number,
+            min: 0,
+            max: 100,
+            default: 0
+        },
+        expiryDate: {
+            type: Date
+        }
+    }   
 }, {
     timestamps: true
 });

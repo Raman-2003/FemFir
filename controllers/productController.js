@@ -5,7 +5,7 @@ const getAllProducts = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1; 
         const limit = parseInt(req.query.limit) || 5; 
-
+ 
         const skip = (page - 1) * limit;
         const totalProducts = await Product.countDocuments();
         const totalPages = Math.ceil(totalProducts / limit);
@@ -46,7 +46,7 @@ const getProductForm = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price,mrp, stock, category } = req.body;
+        const { name, description, price,mrp, stock, category, discountPercentage, expiryDate } = req.body;
         const mainImage = req.files['mainImage'] ? `/uploads/products/${req.files['mainImage'][0].filename}` : '';
         
       
@@ -73,7 +73,11 @@ const addProduct = async (req, res) => {
             stock,
             category: categoryDoc._id,
             mainImage,
-            subImages
+            subImages,
+            offer: {
+                discountPercentage,
+                expiryDate
+            }
         });
 
         await product.save();
@@ -103,7 +107,7 @@ const getEditProductForm = async (req, res) => {
 
 const editProduct = async (req, res) => {
     try {
-        const { name, description, price, mrp, stock, category, status } = req.body; 
+        const { name, description, price, mrp, stock, category,discountPercentage, expiryDate, status } = req.body; 
         let mainImage = req.body.existingMainImage;
 
         // Handle main image update if a new file is uploaded
@@ -134,7 +138,11 @@ const editProduct = async (req, res) => {
             category: categoryDoc._id,
             subImages,
             status,
-            mainImage
+            mainImage,
+            offer: {
+                discountPercentage,
+                expiryDate
+            }
         };
 
         await Product.findByIdAndUpdate(req.params.id, updateData);

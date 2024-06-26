@@ -79,4 +79,11 @@ Handlebars.registerHelper('formatDate', function (dateString) {
     return date.toDateString() + ' ' + date.toLocaleTimeString();
 });
 
+ // Helper function to calculate discounted price
+ Handlebars.registerHelper('calculateDiscountedPrice', function(price, discountPercentage) {
+    const discountedPrice = price - (price * (discountPercentage / 100));
+    return discountedPrice.toFixed(2); // Adjust decimals as needed
+});
+
+
 module.exports = Handlebars;

@@ -74,7 +74,18 @@
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                 </div>
-                                <div class="price">${{product.price}}  <span class="mrp">${{product.mrp}}</span> <!-- Display MRP --> </div>
+                                {{!-- <div class="price">${{product.price}}  <span class="mrp">${{product.mrp}}</span> <!-- Display MRP --> </div> --}}
+                                <div class="price">
+                                    {{#if product.offer.discountPercentage}}
+                                    <span class="discounted-price">${{calculateDiscountedPrice product.price product.offer.discountPercentage}}</span>
+                                    <span class="original-price">${{product.price}}</span>
+                                    {{else}}
+                                    <span>${{product.price}}</span>
+                                    {{/if}}
+                                    {{#if product.mrp}}
+                                    <span class="mrp">${{product.mrp}}</span>
+                                    {{/if}}
+                                </div>
                                 <div class="details">
                                     <p>{{product.description}}</p>
                                 </div>
@@ -381,6 +392,8 @@
             console.error('Add to Cart button not found.');
         }
         });
+
+       
     </script>
 </body>
 
