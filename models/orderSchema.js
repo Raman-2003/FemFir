@@ -20,6 +20,7 @@ const orderSchema = new Schema({
         type: Number,
         required: true
     },
+    
     billingAddress: {
         type: Schema.Types.ObjectId,
         ref: 'Address',

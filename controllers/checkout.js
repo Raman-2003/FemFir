@@ -370,6 +370,9 @@ applyCoupon: async (req, res) => {
         // Mark the coupon as used by the user
         await Coupon.updateOne({ _id: coupon._id }, { $addToSet: { usedBy: userId } });
 
+         // Update the user's total discount
+         await User.updateOne({ _id: userId }, { $inc: { totalDiscount: discountAmount } });
+
         // Respond with updated cart details
         res.json({
             success: true,

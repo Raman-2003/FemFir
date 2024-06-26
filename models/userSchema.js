@@ -64,6 +64,7 @@ const userSchema =new mongoose.Schema({
     wishlist:[
         { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
     ],
+    totalDiscount: { type: Number, default: 0 }  // Add this field to track total discount for the user
 
 },{
     timestamps:true
