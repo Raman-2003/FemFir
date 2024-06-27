@@ -65,6 +65,13 @@ const addProduct = async (req, res) => {
             return res.status(400).send('Category not found');
         }
 
+         // Check if category has a discount
+         if (categoryDoc.offer && categoryDoc.offer.discountPercentage > 0) {
+            if (discountPercentage && discountPercentage > 0) {
+                return res.status(400).send('Category already has a discount. Cannot apply another discount.');
+            }
+        }
+
         const product = new Product({
             name,
             description,
@@ -127,6 +134,19 @@ const editProduct = async (req, res) => {
             req.files['subImages'].forEach(file => {
                 subImages.push(`/uploads/products/${file.filename}`);
             });
+        }
+
+        const product = await Product.findById(req.params.id);
+        if (product.offer && product.offer.discountPercentage > 0) {
+            if (discountPercentage && discountPercentage > 0) {
+                return res.status(400).send('Product already has a discount. Cannot apply another discount.');
+            }
+        }
+
+        if (categoryDoc.offer && categoryDoc.offer.discountPercentage > 0) {
+            if (discountPercentage && discountPercentage > 0) {
+                return res.status(400).send('Category already has a discount. Cannot apply another discount.');
+            }
         }
 
         const updateData = {

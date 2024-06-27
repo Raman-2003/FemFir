@@ -117,7 +117,7 @@
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                 </div>
-                                <div class="price">
+                                {{!-- <div class="price">
                                     <div style="display: flex; flex-direction:row">
                                     {{#if product.offer.discountPercentage}}
                                     <h3 class="discounted-price">₹{{calculateDiscountedPrice product.price
@@ -130,8 +130,20 @@
                                     {{#if product.mrp}}
                                     <h4 class="mrp">MRP: ₹{{product.mrp}}</h4>
                                     {{/if}}
+                                </div> --}}
+                                <div class="price">
+                                    <div style="display: flex; flex-direction:row">
+                                        {{#if bestDiscount}}
+                                        <h3 class="discounted-price">₹{{calculateDiscountedPrice product.price bestDiscount}}</h3>
+                                        <span class="original-price">₹{{product.price}}</span>
+                                        {{else}}
+                                        <h3 class="current-price">₹{{product.price}}</h3>
+                                        {{/if}}
+                                    </div>
+                                    {{#if product.mrp}}
+                                    <h4 class="mrp">MRP: ₹{{product.mrp}}</h4>
+                                    {{/if}}
                                 </div>
-                        
                                 <div class="details">
                                     <p>{{product.description}}</p>
                                 </div>

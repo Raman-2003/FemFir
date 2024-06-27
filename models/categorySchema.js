@@ -16,7 +16,7 @@ const categorySchema = new mongoose.Schema({
         required: true
     },
     status: {
-        type: String,
+        type: String, 
         enum: ['listed', 'unlisted'],
         default: 'unlisted'
     },
@@ -24,6 +24,17 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true // Ensure uniqueness on the normalized name
+    },
+    offer:{
+        discountPercentage: {
+            type:Number,
+            min:0,
+            max:100,
+            default:0
+        },
+        expiryDate:{
+            type:Date
+        }
     }
 }, { timestamps: true });
 

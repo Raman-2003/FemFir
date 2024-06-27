@@ -290,10 +290,26 @@ const getProductDetails = async (req, res) => {
             relatedProducts = await Product.find({ _id: { $ne: product._id } }).limit(3).lean();
         }
 
+        // Determine if category offer is applicable
+        const currentDate = new Date();
+        const categoryOffer = product.category.offer;
+        let bestDiscount = 0;
+
+        if (categoryOffer && categoryOffer.expiryDate > currentDate) {
+            bestDiscount = categoryOffer.discountPercentage;
+        }
+
+        // Check if the product offer is better
+        if (product.offer && product.offer.discountPercentage > bestDiscount && product.offer.expiryDate > currentDate) {
+            bestDiscount = product.offer.discountPercentage;
+        }
+
+
         res.render('user/view', {
             title: product.name,
             product,
-            relatedProducts
+            relatedProducts,
+            bestDiscount
         });
 
     } catch (error) {

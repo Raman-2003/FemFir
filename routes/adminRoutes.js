@@ -92,7 +92,7 @@ router.get('/products/unlist/:id', isLogin, productController.unlistProduct);
 router.get('/coupons', loadCoupon);
 router.get('/add_coupon', addCoupon);
 router.post('/add_coupon', addCouponPost);
-router.get('/delete_coupon', deleteCoupon);
+router.get('/delete_coupon', deleteCoupon); 
 router.get('/edit_coupon', editCoupon);
 router.post('/edit_coupon', editCouponPost);
 router.get('/toggle_status_coupon', toggleStatusCoupon);

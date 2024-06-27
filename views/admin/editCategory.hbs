@@ -83,7 +83,7 @@
             color: white;
             border: none;
             padding: 10px 20px;
-            cursor: pointer;
+            cursor: pointer; 
         }
         label{
              font-family:serif;
@@ -129,6 +129,15 @@
                     {{/if}}
                 </div>
             </div>
+                <div class="form-group">
+                    <label for="discountPercentage">Discount Percentage</label>
+                    <input type="number" name="discountPercentage" class="form-control" min="0" max="100"
+                        value="{{category.offers.discountPercentage}}">
+                </div>
+                <div class="form-group">
+                    <label for="expiryDate">Offer Expiry Date</label>
+                    <input type="date" name="expiryDate" class="form-control" value="{{formatDate category.offers.expiryDate}}">
+                </div>
             <button type="submit" class="btn btn-primary">Update Category</button>
         </form>
     </div>

@@ -30,9 +30,8 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 });
 
 Handlebars.registerHelper('or', function () {
-    // Convert the arguments object to a real array and remove the last argument (options)
     const args = Array.from(arguments).slice(0, -1);
-    return args.some(Boolean); // Check if any argument is truthy
+    return args.some(Boolean);
 });
 
 Handlebars.registerHelper('range', function (from, to, options) {
@@ -74,15 +73,20 @@ Handlebars.registerHelper('lt', (a, b) => a < b);
 Handlebars.registerHelper(layouts(Handlebars));
 
 // Custom date formatting helper
-Handlebars.registerHelper('formatDate', function (dateString) {
-    const date = new Date(dateString);
-    return date.toDateString() + ' ' + date.toLocaleTimeString();
+Handlebars.registerHelper('formatDate', function (date) {
+    if (!date) return '';
+    return new Date(date).toISOString().split('T')[0];
 });
 
- // Helper function to calculate discounted price
- Handlebars.registerHelper('calculateDiscountedPrice', function(price, discountPercentage) {
+// Helper function to calculate discounted price
+Handlebars.registerHelper('calculateDiscountedPrice', function(price, discountPercentage) {
     const discountedPrice = price - (price * (discountPercentage / 100));
     return discountedPrice.toFixed(2); // Adjust decimals as needed
+});
+
+Handlebars.registerHelper('calculateDiscountedPrice', (price, discountPercentage) => {
+    const discountAmount = price * (discountPercentage / 100);
+    return (price - discountAmount).toFixed(2);
 });
 
 

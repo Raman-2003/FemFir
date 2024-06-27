@@ -9,7 +9,7 @@ const getCategories = async (req, res) => {
             res.render('admin/categories', { title: "Category List", categories, layout: 'adminLayout' });
         } else {
             res.redirect('/admin/login');
-        }
+        } 
     } catch (error) {
         console.error(error);
         res.status(500).send("Server Error");
@@ -24,7 +24,7 @@ const getAddCategoryPage = (req, res) => {
 // Add a new category
 const addCategory = async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description, discountPercentage, expiryDate } = req.body;
         const image = req.file ? req.file.filename : null;
 
         const normalizedName = name.toLowerCase();
@@ -39,7 +39,12 @@ const addCategory = async (req, res) => {
             });
         }
 
-        const newCategory = new Category({ name, description, image, nameLower: normalizedName });
+        const offer = {
+            discountPercentage : discountPercentage || 0,
+            expiryDate: expiryDate || null 
+        }
+
+        const newCategory = new Category({ name, description, image, nameLower: normalizedName, offer });
         await newCategory.save();
 
         res.redirect('/admin/categories');
@@ -63,7 +68,7 @@ const getEditCategoryPage = async (req, res) => {
 // Update an existing category
 const updateCategory = async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description, discountPercentage, expiryDate } = req.body;
         const image = req.file ? req.file.filename : req.body.existingImage;
 
         // Normalize the name for consistency
@@ -85,12 +90,18 @@ const updateCategory = async (req, res) => {
             });
         }
 
+        const offers = {
+            discountPercentage: discountPercentage || 0,
+            expiryDate: expiryDate || null
+        };
+
         // Update category with new details
         await Category.findByIdAndUpdate(req.params.id, { 
             name, 
             description, 
             image, 
-            nameLower: normalizedName 
+            nameLower: normalizedName,
+            offers 
         });
 
         res.redirect('/admin/categories');
@@ -99,6 +110,7 @@ const updateCategory = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
+
 
 // Delete a category
 const deleteCategory = async (req, res) => {
