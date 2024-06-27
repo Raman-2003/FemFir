@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
     <!-- Cropper.js CSS -->
-    <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
+   <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Custom CSS for image previews and delete functionality -->
     <style>
         body {
@@ -197,6 +199,7 @@
 
     <!-- Cropper.js Library -->
     <script src="https://unpkg.com/cropperjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let cropper;  // To hold the Cropper instance
         let croppingTarget;  // To determine which image is being cropped
@@ -407,6 +410,26 @@
             event.preventDefault(); // Prevent form submission if price is invalid
         }
     });
+
+      // Handle form submission
+        document.getElementById('productForm').addEventListener('submit', function(event) {
+            // Retrieve the form elements
+            const discountPercentage = document.getElementById('discountPercentage').value;
+            const productCategoryOffer = "{{#if product.category.offer}}true{{else}}false{{/if}}";
+
+            // Check if both product and category offers are applied
+            if (discountPercentage > 0 && productCategoryOffer === "true") {
+                event.preventDefault(); // Prevent form submission
+
+                // Display SweetAlert notification
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Submission',
+                    text: 'A product cannot have both a product offer and a category offer applied simultaneously.',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
     </script>
 </body>
 </html>

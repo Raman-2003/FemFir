@@ -95,7 +95,6 @@ const addProduct = async (req, res) => {
     }
 };
 
-
 const getEditProductForm = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
