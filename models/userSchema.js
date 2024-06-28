@@ -24,7 +24,7 @@ const userSchema =new mongoose.Schema({
         required:false, 
         unique:true
     },
-    email:{
+    email:{ 
         type:String,
         required:true,
         unique:true
@@ -64,7 +64,7 @@ const userSchema =new mongoose.Schema({
     wishlist:[
         { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
     ],
-    totalDiscount: { type: Number, default: 0 }  // Add this field to track total discount for the user
+    totalDiscount: { type: Number, default: 0 }  
 
 },{
     timestamps:true

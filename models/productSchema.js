@@ -52,7 +52,7 @@ const productSchema = new mongoose.Schema({
         expiryDate: {
             type: Date
         }
-    }   
+    }    
 }, {
     timestamps: true
 });

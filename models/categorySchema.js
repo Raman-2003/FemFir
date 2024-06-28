@@ -20,7 +20,7 @@ const categorySchema = new mongoose.Schema({
         enum: ['listed', 'unlisted'],
         default: 'unlisted'
     },
-    nameLower: {
+    nameLower: { 
         type: String,
         required: true,
         unique: true // Ensure uniqueness on the normalized name

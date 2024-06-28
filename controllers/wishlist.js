@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 const ObjectId = require('mongoose').Types.ObjectId;
 const swal = require('sweetalert');
-
+ 
 const showWishlistPage = async (req, res) => {
     const userData = req.session.user;
 
@@ -34,24 +34,51 @@ const showWishlistPage = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: 'categories',
+                    foreignField: '_id',
+                    localField: 'product.category',
+                    as: 'category'
+                }
+            },
+            {
                 $project: {
                     _id: 1,
                     productId: 1,
                     productName: { $arrayElemAt: ['$product.name', 0] },
                     productImage: { $arrayElemAt: ['$product.mainImage', 0] },
-                    productPrice: { $arrayElemAt: ['$product.price', 0] },
-                    productQuantity: { $arrayElemAt: ['$product.stock', 0] }
+                    originalPrice: { $arrayElemAt: ['$product.price', 0] },
+                    productQuantity: { $arrayElemAt: ['$product.stock', 0] },
+                    productOffer: { $arrayElemAt: ['$product.offer', 0] },
+                    categoryOffer: { $arrayElemAt: ['$category.offer', 0] }
                 }
             }
         ]);
 
-        res.render('user/wishlist', { userData, WishListProd });
+        const updatedWishListProd = WishListProd.map(product => {
+            let effectivePrice = product.originalPrice;
+
+            if (product.productOffer && product.productOffer.discountPercentage > 0) {
+                effectivePrice = product.originalPrice * (1 - product.productOffer.discountPercentage / 100);
+            } else if (product.categoryOffer && product.categoryOffer.discountPercentage > 0) {
+                effectivePrice = product.originalPrice * (1 - product.categoryOffer.discountPercentage / 100);
+            }
+
+            // Adding the effective price to the product object
+            return {
+                ...product,
+                effectivePrice: effectivePrice.toFixed(0) // toFixed(2) ensures two decimal points
+            };
+        });
+
+        res.render('user/wishlist', { userData, WishListProd: updatedWishListProd });
 
     } catch (error) {
         console.error("An error occurred while fetching the wishlist:", error);
         res.status(500).send('Internal Server Error');
     }
-}
+};
+
 
 const addToWishList = async (req, res) => {
     try {

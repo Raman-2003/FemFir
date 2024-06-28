@@ -14,9 +14,10 @@
                             <tr>
                                 <th>Image</th>
                                 <th>Name</th>
-                                <th>Price</th>
+                                <th>Original Price</th>
+                                <th>Discounted Price</th>
                                 <th>Quantity</th>
-                                <th>Add to Cart</th>
+                                <th>Add to Cart</th> 
                                 <th>Remove</th>
                             </tr>
                         </thead>
@@ -33,7 +34,15 @@
                                         {{this.productName}}
                                     </a>
                                 </td>
-                                <td>${{this.productPrice}}</td>
+                                <td>${{this.originalPrice}}</td>
+                                <td>
+                                    {{#if (eq this.effectivePrice this.originalPrice)}}
+                                        ${{this.originalPrice}}
+                                    {{else}}
+                                        <span style="text-decoration: line-through; color: red;">${{this.originalPrice}}</span> 
+                                        <span style="color: green;">${{this.effectivePrice}}</span>
+                                    {{/if}}
+                                </td>
                                 <td>{{this.productQuantity}}</td>
                                 <td>
                                     <button class="add-to-cart" data-product-id="{{this.productId}}" data-stock="{{this.productQuantity}}" {{#if (eq this.productQuantity 0)}}disabled{{/if}}>
@@ -54,6 +63,7 @@
         </div>
     </div>
 </div>
+
 <!-- Wishlist End -->
 
 <script>

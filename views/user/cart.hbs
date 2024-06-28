@@ -18,7 +18,7 @@
         margin-right: 10px;
     }
 
-    .coupon-item label {
+    .coupon-item label { 
         font-weight: bold;
         margin-right: 20px;
         transition: color 0.3s ease;
@@ -112,7 +112,15 @@
                             <tr data-product-id="{{this.product._id}}" class="cart-item" data-stock="{{this.product.stock}}">
                                 <td><a href="#"><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"></a></td>
                                 <td><a href="/viewone/{{this.product._id}}">{{this.product.name}}</a></td>
-                                <td class="item-price">${{this.product.price}}</td>
+                                <td class="item-price">
+                                    ${{this.product.price}}
+                                    {{#if this.product.offer.discountPercentage}}
+                                    <br><span class="text-danger">${{discountedPrice this.product.price this.product.offer.discountPercentage}}</span>
+                                    {{/if}}
+                                    {{#if this.product.category.offer.discountPercentage}}
+                                    <br><span class="text-danger">${{discountedPrice this.product.price this.product.category.offer.discountPercentage}}</span>
+                                    {{/if}}
+                                </td>
                                 <td>
                                     <div class="qty">
                                         <button class="btn-minus" data-product-id="{{this.product._id}}"><i class="fa fa-minus"></i></button>
@@ -130,8 +138,6 @@
             </div>
         </div>
 
-       
-
         <div class="row">
             <div class="col-md-6">
                 <div class="cart-summary">
@@ -141,16 +147,17 @@
                         <p>Shipping Cost<span>Free</span></p>
                         <h4>Grand Total<span id="grand-total">${{grandTotal}}</span></h4>
                     </div>
-                <div class="cart-btn">
-                    {{!-- <button id="update-cart-btn">Update Cart</button> --}}
-                    <button id="checkout-btn" onclick="goToCheckout()">Checkout</button>
-                </div>
+                    <div class="cart-btn">
+                        {{!-- <button id="update-cart-btn">Update Cart</button> --}}
+                        <button id="checkout-btn" onclick="goToCheckout()">Checkout</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <!-- Cart End -->
+
 
 
 <script>

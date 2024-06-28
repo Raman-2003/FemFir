@@ -81,12 +81,16 @@ Handlebars.registerHelper('formatDate', function (date) {
 // Helper function to calculate discounted price
 Handlebars.registerHelper('calculateDiscountedPrice', function(price, discountPercentage) {
     const discountedPrice = price - (price * (discountPercentage / 100));
-    return discountedPrice.toFixed(2); // Adjust decimals as needed
+    return discountedPrice.toFixed(0); // Adjust decimals as needed
 });
 
 Handlebars.registerHelper('calculateDiscountedPrice', (price, discountPercentage) => {
     const discountAmount = price * (discountPercentage / 100);
-    return (price - discountAmount).toFixed(2);
+    return (price - discountAmount).toFixed(0);
+});
+
+Handlebars.registerHelper('discountedPrice', (price, discount) => {
+    return (price - (price * discount / 100)).toFixed(0);
 });
 
 

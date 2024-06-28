@@ -25,31 +25,55 @@ const addToCart = async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        const product = await Product.findById(productId);
+        const product = await Product.findById(productId).populate('category');
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        // Calculate the effective price considering product and category offers
+        let effectivePrice = product.price;
+        
+        // Apply product-level discount
+        if (product.offer && product.offer.discountPercentage > 0) {
+            const currentDate = new Date();
+            if (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= currentDate) {
+                effectivePrice -= (product.offer.discountPercentage / 100) * product.price;
+            }
+        }
+
+        // Apply category-level discount if higher than product-level discount
+        if (product.category && product.category.offer && product.category.offer.discountPercentage > 0) {
+            const currentDate = new Date();
+            if (!product.category.offer.expiryDate || new Date(product.category.offer.expiryDate) >= currentDate) {
+                const categoryDiscount = (product.category.offer.discountPercentage / 100) * product.price;
+                if (categoryDiscount > (product.offer ? product.offer.discountPercentage : 0)) {
+                    effectivePrice = product.price - categoryDiscount;
+                }
+            }
         }
 
         const cartItem = user.cart.find(item => item.product.toString() === productId);
 
         if (cartItem) {
             cartItem.quantity += quantity;
-            cartItem.total = cartItem.quantity * product.price;
+            cartItem.total = cartItem.quantity * effectivePrice;
             cartItem.mrpTotal = cartItem.quantity * product.mrp; // Update MRP total
         } else {
-            user.cart.push({ product: productId, quantity: quantity, total: product.price * quantity });
+            user.cart.push({ 
+                product: productId, 
+                quantity: quantity, 
+                total: effectivePrice * quantity,
+                mrpTotal: product.mrp * quantity // Save MRP total
+            });
         }
 
         await user.save();
         res.json({ success: true, message: 'Item added to cart' });
     } catch (error) {
+        console.error('Error adding to cart:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
-
-
-
-
 
 const loadCart = async (req, res) => {
     try {
@@ -67,13 +91,35 @@ const loadCart = async (req, res) => {
         const cart = user.cart || [];
         let subTotal = 0;
         cart.forEach(item => {
-            item.total = item.product.price * item.quantity;
-            item.mrpTotal = item.product.mrp * item.quantity; // Calculate MRP total
+            let effectivePrice = item.product.price;
+            let originalPrice = item.product.price;
+
+            // Apply product-level discount
+            if (item.product.offer && item.product.offer.discountPercentage > 0) {
+                const currentDate = new Date();
+                if (!item.product.offer.expiryDate || new Date(item.product.offer.expiryDate) >= currentDate) {
+                    effectivePrice -= (item.product.offer.discountPercentage / 100) * item.product.price;
+                }
+            }
+
+            // Apply category-level discount if higher than product-level discount
+            if (item.product.category && item.product.category.offer && item.product.category.offer.discountPercentage > 0) {
+                const currentDate = new Date();
+                if (!item.product.category.offer.expiryDate || new Date(item.product.category.offer.expiryDate) >= currentDate) {
+                    const categoryDiscount = (item.product.category.offer.discountPercentage / 100) * item.product.price;
+                    if (categoryDiscount > (item.product.offer ? item.product.offer.discountPercentage : 0)) {
+                        effectivePrice = item.product.price - categoryDiscount;
+                    }
+                }
+            }
+
+            item.total = effectivePrice * item.quantity;
+            item.mrpTotal = item.product.mrp * item.quantity;
+            item.discountedPrice = effectivePrice; // Add this line
             subTotal += item.total;
         });
 
         const shippingCost = 0;
-        // const platformFee = 20;
         const grandTotal = subTotal + shippingCost;
 
         if (cart.length === 0) {
@@ -82,6 +128,7 @@ const loadCart = async (req, res) => {
             res.render('user/cart', { userData, cart, subTotal, grandTotal, shippingCost });
         }
     } catch (error) {
+        console.error('Error loading cart:', error);
         res.status(500).render('error');
     }
 };
@@ -266,7 +313,7 @@ const getCheckoutPage = async (req, res) => {
             grandTotal,
             shippingCost,
             addresses 
-        });
+        }); 
     } catch (error) {
         console.error('Error rendering checkout page:', error);
         res.status(500).render('error');

@@ -213,6 +213,7 @@ const getProducts = async (req, res) => {
         const searchQuery = req.query.search || '';
         const categoryFilter = req.query.category || ''; 
 
+        // Determine the sort condition based on the selected sort option
         let sortCondition;
         switch (sortOption) {
             case 'price_high':
@@ -234,9 +235,11 @@ const getProducts = async (req, res) => {
                 sortCondition = {};
         }
 
-        const listedCategories = await Category.find({ status: 'listed' }).select('_id name');
+        // Fetch the listed categories
+        const listedCategories = await Category.find({ status: 'listed' }).select('_id name offer');
         const listedCategoryIds = listedCategories.map(category => category._id);
 
+        // Build the query to fetch products
         let query = {
             status: 'listed',
             category: { $in: listedCategoryIds }
@@ -250,18 +253,50 @@ const getProducts = async (req, res) => {
             query.name = { $regex: searchQuery, $options: 'i' };
         }
 
+        // Fetch the products with pagination and sorting
         const products = await Product.find(query)
+            .populate('category')
             .sort(sortCondition)
             .skip((perPage * page) - perPage)
             .limit(perPage);
 
         const count = await Product.countDocuments(query);
 
+        // Calculate the effective price considering any offers
+        const productsWithEffectivePrice = products.map(product => {
+            let effectivePrice = product.price;
+
+            // Check for product-level offer
+            if (product.offer && product.offer.discountPercentage > 0) {
+                const currentDate = new Date();
+                if (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= currentDate) {
+                    effectivePrice = product.price - (product.price * product.offer.discountPercentage / 100);
+                }
+            }
+
+            // Check for category-level offer if no valid product-level offer
+            if (product.category.offer && product.category.offer.discountPercentage > 0) {
+                const currentDate = new Date();
+                if (!product.category.offer.expiryDate || new Date(product.category.offer.expiryDate) >= currentDate) {
+                    const categoryEffectivePrice = product.price - (product.price * product.category.offer.discountPercentage / 100);
+                    if (categoryEffectivePrice < effectivePrice) {
+                        effectivePrice = categoryEffectivePrice;
+                    }
+                }
+            }
+
+            return {
+                ...product.toObject(),
+                effectivePrice: effectivePrice.toFixed(0) // Convert to fixed two decimal places for consistent display
+            };
+        });
+
+        // Render the products page with the calculated effective prices
         res.render('user/product', {
-            products,
+            products: productsWithEffectivePrice,
             current: page,
             pages: Math.ceil(count / perPage),
-            sortOption,
+            sortOption, 
             query: req.query,
             categories: listedCategories
         });
@@ -272,43 +307,70 @@ const getProducts = async (req, res) => {
 };
 
 
-
 const getProductDetails = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id).populate('category').lean();
-
+ 
         if (!product) {
             return res.status(404).send('Product not found');
         }
 
+        // Fetch related products from the same category, excluding the current product
         let relatedProducts = await Product.find({
             category: product.category._id,
             _id: { $ne: product._id }
-        }).limit(3).lean();
+        }).limit(3).populate('category').lean();
 
+        // If no related products found, fetch any other products excluding the current product
         if (relatedProducts.length === 0) {
-            relatedProducts = await Product.find({ _id: { $ne: product._id } }).limit(3).lean();
+            relatedProducts = await Product.find({ _id: { $ne: product._id } }).limit(3).populate('category').lean();
         }
 
-        // Determine if category offer is applicable
+        // Calculate the effective price for the related products
         const currentDate = new Date();
-        const categoryOffer = product.category.offer;
-        let bestDiscount = 0;
+        const relatedProductsWithEffectivePrice = relatedProducts.map(relatedProduct => {
+            let effectivePrice = relatedProduct.price;
+            const categoryOffer = relatedProduct.category.offer;
 
+            // Check for product-level offer
+            if (relatedProduct.offer && relatedProduct.offer.discountPercentage > 0) {
+                if (!relatedProduct.offer.expiryDate || new Date(relatedProduct.offer.expiryDate) >= currentDate) {
+                    effectivePrice = relatedProduct.price - (relatedProduct.price * relatedProduct.offer.discountPercentage / 100);
+                }
+            }
+
+            // Check for category-level offer if no valid product-level offer
+            if (categoryOffer && categoryOffer.discountPercentage > 0) {
+                if (!categoryOffer.expiryDate || new Date(categoryOffer.expiryDate) >= currentDate) {
+                    const categoryEffectivePrice = relatedProduct.price - (relatedProduct.price * categoryOffer.discountPercentage / 100);
+                    if (categoryEffectivePrice < effectivePrice) {
+                        effectivePrice = categoryEffectivePrice;
+                    }
+                }
+            }
+
+            return {
+                ...relatedProduct,
+                effectivePrice: effectivePrice.toFixed(0) // Convert to fixed two decimal places for consistent display
+            };
+        });
+
+        // Determine the best discount for the main product
+        let bestDiscount = 0;
+        const categoryOffer = product.category.offer;
         if (categoryOffer && categoryOffer.expiryDate > currentDate) {
             bestDiscount = categoryOffer.discountPercentage;
         }
 
-        // Check if the product offer is better
         if (product.offer && product.offer.discountPercentage > bestDiscount && product.offer.expiryDate > currentDate) {
             bestDiscount = product.offer.discountPercentage;
         }
 
-
+        // Render the product details page with related products' effective prices
         res.render('user/view', {
             title: product.name,
             product,
-            relatedProducts,
+            relatedProducts: relatedProductsWithEffectivePrice,
             bestDiscount
         });
 

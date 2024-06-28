@@ -117,20 +117,7 @@
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                 </div>
-                                {{!-- <div class="price">
-                                    <div style="display: flex; flex-direction:row">
-                                    {{#if product.offer.discountPercentage}}
-                                    <h3 class="discounted-price">₹{{calculateDiscountedPrice product.price
-                                        product.offer.discountPercentage}}</h3>
-                                    <span class="original-price">₹{{product.price}}</span>
-                                    {{else}}
-                                    <h3 class="current-price">₹{{product.price}}</h3>
-                                    {{/if}}
-                                    </div>
-                                    {{#if product.mrp}}
-                                    <h4 class="mrp">MRP: ₹{{product.mrp}}</h4>
-                                    {{/if}}
-                                </div> --}}
+                               
                                 <div class="price">
                                     <div style="display: flex; flex-direction:row">
                                         {{#if bestDiscount}}
@@ -247,25 +234,36 @@
                         </div>
                         
                         <div class="row mt-5">
-                            <div class="col-12">
-                                <h3>Related Products</h3>
-                            </div>
-                            {{#each relatedProducts}}
-                            <div class="col-md-3">
-                                <div class="product-item">
-                                    <div class="product-thumb">
-                                        <img src="{{this.mainImage}}" class="img-fluid" alt="{{this.name}}">
-                                        <div class="preview-meta">
-                                            <ul></ul>
-                                        </div>
-                                    </div>
-                                    <div class="product-content">
-                                        <h4><a href="/viewone/{{this._id}}">{{this.name}}</a></h4>
-                                    </div>
-                                </div>
-                            </div>
-                            {{/each}}
-                        </div>
+    <div class="col-12">
+        <h3>Related Products</h3>
+    </div>
+    {{#each relatedProducts}}
+    <div class="col-md-3">
+        <div class="product-item">
+            <div class="product-thumb">
+                <img src="{{this.mainImage}}" class="img-fluid">  
+                <div class="preview-meta">
+                    <ul></ul>
+                </div>
+            </div>
+            <div class="product-content">
+                <h4 style="font-size: larger;"><a href="/viewone/{{this._id}}">{{this.name}}</a></h4>
+                <div class="price">
+                    {{#if (lt this.effectivePrice this.price)}}
+                    <div style="display: flex; column-gap:70px;">
+                    <h5 class="text-danger" style="margin-left: 30px;">${{this.effectivePrice}}</h5>
+                    <h5 class="text-muted" style="text-decoration: line-through;">${{this.price}}</h5>
+                    </div>
+                    {{else}}
+                    <span>${{this.price}}</span>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
+
                         </div>
                         </div>
                         </div>

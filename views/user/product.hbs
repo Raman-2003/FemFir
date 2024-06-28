@@ -96,7 +96,7 @@
                                     </form>
                                 </div>
 
-                                <!-- Product Sorting Dropdown -->
+                                <!-- Product Sorting Dropdown --> 
                                 <div class="product-short">
                                     <div class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product by</a>
@@ -132,15 +132,25 @@
                                 <a href="/viewone/{{this._id}}">
                                     <img src="{{this.mainImage}}" alt="Product Image">
                                 </a>
-                                <div class="product-action">
+                                {{!-- <div class="product-action">
                                     <a href="#"><i class="fa fa-cart-plus"></i></a>
                                     <a href="#"><i class="fa fa-heart"></i></a>
                                     <a href="/viewone/{{this._id}}"><i class="fa fa-search"></i></a>
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="product-content">
-                                <div class="title"><a href="/viewone/{{this._id}}">{{this.name}}</a></div>
-                                <div class="price">${{this.price}}</div>
+                                <div class="title"><a href="/viewone/{{this._id}}" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">{{this.name}}</a></div>
+                                {{!-- <div class="price">${{this.price}}</div> --}}
+                                <div class="price">
+                                    {{#if (lt this.effectivePrice this.price)}}
+                                    <div style="display: flex; justify-content:space-evenly; padding-top:7px;">
+                                    <h4 class="text-danger">₹{{this.effectivePrice}}</h4>
+                                    <br><h4 class="text-muted" style="text-decoration: line-through;">${{this.price}}</h4>
+                                    </div>
+                                    {{else}}
+                                    <h4 style="padding-top:5px">₹{{this.price}}</h4>
+                                    {{/if}}
+                                </div>
                                 {{#if (eq this.stock 0)}}
                                 <div style="color: red; font-weight: bold;">OUT OF STOCK</div>
                                 {{else}}

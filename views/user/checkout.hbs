@@ -92,7 +92,7 @@
 
 <body>
     <!-- Checkout Start -->
-    <div class="checkout">
+    <div class="checkout" style="background-color: #f8f2f2;">
         <div class="container">
             <div class="row d-flex">
                 <div class="col-md-7 col-lg-7"> 
@@ -197,14 +197,15 @@
         <h2>Order Summary</h2>
         <ul class="list-group">
             {{#each cart}}
-            <li class="list-group-item">
-                <div>{{this.product.name}} x {{this.quantity}}</div>
-                <div>Price: {{this.product.price}} x {{this.quantity}} = {{this.total}}</div>
-                <div>MRP: {{this.product.mrp}} x {{this.quantity}} = {{this.mrpTotal}}</div> <!-- Display MRP total -->
+            <li class="list-group-item" style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; background-color:#d4cece">
+                <div>{{this.product.name}}</div>
+                <div class="mt-3">Quantity = {{this.quantity}}</div>
+                <div style="padding-top:15px">Price : {{this.product.price}} x {{this.quantity}} = {{this.total}}</div>
+                <div class="mt-3">MRP = {{this.product.mrp}}</div> <!-- Display MRP total -->
             </li>
             {{/each}}
             <li class="list-group-item d-flex justify-content-between">
-                <span>Subtotal</span>
+                <span>Amount * Quantity</span>
                 <span>{{subTotal}}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between coupon-discount {{#unless discountAmount}}d-none{{/unless}}">
@@ -375,50 +376,74 @@
                 });
             });
 
-             $('#apply-selected-coupon-btn').click(function () {
-                const selectedCoupon = $('input[name="coupon"]:checked').val();
-                if (selectedCoupon) {
-                    $.ajax({
-                        url: '/checkout/apply-coupon',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ couponId: selectedCoupon }),
-                        success: function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Coupon Applied',
-                                    text: 'The coupon has been successfully applied!',
-                                });
-                                $('#couponsModal').modal('hide');
-                                updateCartSummary(response.updatedCart); // Call the function to update the cart summary
-                                $('#remove-coupon-btn').prop('disabled', false); // Enable remove coupon button
-                                $('#appliedCouponId').val(selectedCoupon); // Store the applied coupon ID
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Invalid Coupon',
-                                    text: response.message,
-                                });
-                            }
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            console.error('Error:', errorThrown);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Unable to apply coupon. Please try again later.',
-                            });
-                        }
-                    });
-                } else {
+           $('#apply-selected-coupon-btn').click(function () {
+    const selectedCoupon = $('input[name="coupon"]:checked').val();
+    if (selectedCoupon) {
+        $.ajax({
+            url: '/checkout/apply-coupon',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ couponId: selectedCoupon }),
+            success: function (response) {
+                if (response.success) {
                     Swal.fire({
-                        icon: 'warning',
-                        title: 'No Coupon Selected',
-                        text: 'Please select a coupon to apply.',
+                        icon: 'success',
+                        title: 'Coupon Applied',
+                        text: 'The coupon has been successfully applied!',
+                    });
+                    $('#couponsModal').modal('hide');
+                    updateCartSummary(response.updatedCart); // Call the function to update the cart summary
+                    $('#remove-coupon-btn').prop('disabled', false); // Enable remove coupon button
+                    $('#appliedCouponId').val(selectedCoupon); // Store the applied coupon ID
+                } else {
+                    // Handle specific validation messages
+                    let alertMessage = response.message;
+                    if (response.message.includes('Grand total must be at least')) {
+                        alertMessage = 'Your grand total must be at least $5000 to use this coupon.';
+                    } else if (response.message.includes('Subtotal must be at least')) {
+                        alertMessage = `Your subtotal must be at least ${response.message.split('at least ')[1]} to use this coupon.`;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Coupon Error',
+                        text: alertMessage,
                     });
                 }
-            });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Error:', errorThrown);
+
+                let errorMessage = 'Unable to apply coupon. Please try again later.';
+
+                // Parse specific error messages from the server
+                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    const serverMessage = jqXHR.responseJSON.message;
+                     if (serverMessage.includes('Grand total must be at least')) {
+                        errorMessage = 'Your grand total must be at least $5000 to use this coupon.';
+                    } else if (serverMessage.includes('Subtotal must be at least')) {
+                        errorMessage = `Your subtotal must be at least ${serverMessage.split('at least ')[1]} to use this coupon.`;
+                    } else if (jqXHR.status === 500) {
+                        errorMessage = 'Server error. Please try again later.';
+                    }
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage,
+                });
+            }
+        });
+    } else {
+        Swal.fire({
+            icon: 'warning',
+            title: 'No Coupon Selected',
+            text: 'Please select a coupon to apply.',
+        });
+    }
+});
+
 
              // Remove coupon functionality
         $('#remove-coupon-btn').click(function () {
@@ -470,9 +495,10 @@
 
                 updatedCart.cart.forEach(item => {
                     cartSummaryHtml += `
-                <li class="list-group-item d-flex justify-content-between">
-                    <div>${item.product.name} x ${item.quantity}</div>
-                    <div>${item.total}</div>
+                <li class="list-group-item">
+                    <div>${item.product.name}.......</div>
+                    <div class="mt-3">${item.quantity}</div>
+                    <div class="mt-3">${item.total}</div>
                 </li>
             `;
                 });
@@ -539,7 +565,7 @@
                     Swal.fire({
                         icon: 'success',
                         title: 'Order Placed!',
-                        text: 'Your order has been successfully placed and will be processed with Cash on Delivery.',
+                        text: 'Your order has been successfully placed with Cash on Delivery.',
                         confirmButtonText: 'Okay'
                     });
                 }

@@ -39,7 +39,7 @@ module.exports = {
                 cart.total = cart.subTotal + cart.shippingCost;
             }
 
-            res.render('user/checkout', { cart, addresses, defaultAddress });
+            res.render('user/checkout', { cart, addresses, defaultAddress }); 
         } catch (error) {
             console.error(error);
             res.status(500).send('Internal Server Error');
@@ -381,7 +381,7 @@ applyCoupon: async (req, res) => {
             updatedCart: {
                 cart: user.cart,
                 subTotal,
-                discountAmount, // Include discount amount  
+                discountAmount, 
                 grandTotal
             }
         });
@@ -424,7 +424,7 @@ removeCoupon: async (req, res) => {
         res.json({
             success: true,
             message: 'Coupon removed successfully',
-            updatedCart: {
+            updatedCart: { 
                 cart: user.cart,
                 subTotal,
                 discountAmount, // No discount amount
