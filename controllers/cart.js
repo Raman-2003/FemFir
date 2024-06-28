@@ -30,10 +30,10 @@ const addToCart = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        // Calculate the effective price considering product and category offers
+       
         let effectivePrice = product.price;
         
-        // Apply product-level discount
+      
         if (product.offer && product.offer.discountPercentage > 0) {
             const currentDate = new Date();
             if (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= currentDate) {
@@ -41,7 +41,7 @@ const addToCart = async (req, res) => {
             }
         }
 
-        // Apply category-level discount if higher than product-level discount
+       
         if (product.category && product.category.offer && product.category.offer.discountPercentage > 0) {
             const currentDate = new Date();
             if (!product.category.offer.expiryDate || new Date(product.category.offer.expiryDate) >= currentDate) {
@@ -57,13 +57,13 @@ const addToCart = async (req, res) => {
         if (cartItem) {
             cartItem.quantity += quantity;
             cartItem.total = cartItem.quantity * effectivePrice;
-            cartItem.mrpTotal = cartItem.quantity * product.mrp; // Update MRP total
+            cartItem.mrpTotal = cartItem.quantity * product.mrp; 
         } else {
             user.cart.push({ 
                 product: productId, 
                 quantity: quantity, 
                 total: effectivePrice * quantity,
-                mrpTotal: product.mrp * quantity // Save MRP total
+                mrpTotal: product.mrp * quantity 
             });
         }
 
@@ -94,7 +94,7 @@ const loadCart = async (req, res) => {
             let effectivePrice = item.product.price;
             let originalPrice = item.product.price;
 
-            // Apply product-level discount
+          
             if (item.product.offer && item.product.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!item.product.offer.expiryDate || new Date(item.product.offer.expiryDate) >= currentDate) {
@@ -102,7 +102,7 @@ const loadCart = async (req, res) => {
                 }
             }
 
-            // Apply category-level discount if higher than product-level discount
+            
             if (item.product.category && item.product.category.offer && item.product.category.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!item.product.category.offer.expiryDate || new Date(item.product.category.offer.expiryDate) >= currentDate) {
@@ -115,7 +115,7 @@ const loadCart = async (req, res) => {
 
             item.total = effectivePrice * item.quantity;
             item.mrpTotal = item.product.mrp * item.quantity;
-            item.discountedPrice = effectivePrice; // Add this line
+            item.discountedPrice = effectivePrice; 
             subTotal += item.total;
         });
 

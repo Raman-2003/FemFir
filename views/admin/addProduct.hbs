@@ -123,7 +123,7 @@
                             value.</small>
                 </div>
                  <div class="form-group">
-                    <label for="mrp">MRP</label> <!-- MRP input -->
+                    <label for="mrp">MRP</label> 
                     <input type="number" id="mrp" name="mrp" class="form-control" required min="0">
                     <small id="mrpError" class="form-text text-danger" style="display: none;">MRP cannot be a negative value.</small>
                 </div>
@@ -177,8 +177,8 @@
 
 <script src="https://unpkg.com/cropperjs"></script>
 <script>
-    let cropper;  // To hold the Cropper instance
-    let croppingTarget;  // To determine which image is being cropped
+    let cropper; 
+    let croppingTarget;  
 
     function showCropModal(imageSrc, callback) {
         const cropModal = document.getElementById('cropModal');
@@ -186,7 +186,7 @@
         imageToCrop.src = imageSrc;
         cropModal.style.display = 'block';
 
-        // Destroy previous cropper instance if any
+      
         if (cropper) {
             cropper.destroy();
         }
@@ -226,7 +226,7 @@
             reader.onload = function(e) {
                 showCropModal(e.target.result, function(croppedImageUrl, blob) {
                     const mainImagePreview = document.getElementById('mainImagePreview');
-                    mainImagePreview.innerHTML = ''; // Clear previous previews
+                    mainImagePreview.innerHTML = ''; 
                     const imgContainer = document.createElement('div');
                     imgContainer.className = 'image-preview-item';
                     
@@ -237,15 +237,15 @@
                     deleteButton.className = 'delete-button';
                     deleteButton.innerHTML = '&times;';
                     deleteButton.addEventListener('click', function() {
-                        mainImagePreview.innerHTML = ''; // Remove the preview
-                        document.getElementById('mainImage').value = ''; // Clear the file input
+                        mainImagePreview.innerHTML = ''; 
+                        document.getElementById('mainImage').value = ''; 
                     });
 
                     imgContainer.appendChild(img);
                     imgContainer.appendChild(deleteButton);
                     mainImagePreview.appendChild(imgContainer);
                     
-                    // Update the mainImage input with the cropped blob
+                 
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(new File([blob], file.name, { type: file.type }));
                     document.getElementById('mainImage').files = dataTransfer.files;
@@ -288,7 +288,7 @@
                         imgContainer.appendChild(deleteButton);
                         subImagesPreview.appendChild(imgContainer);
 
-                        // Update the subImages input with the cropped blobs
+                     
                         const dt = new DataTransfer();
                         for (let k = 0; k < files.length; k++) {
                             if (k === i) {
@@ -305,7 +305,7 @@
         }
     });
 
-        // Function to validate the price field
+      
     function validatePrice() {
         const priceInput = document.getElementById('price');
         const priceError = document.getElementById('priceError');
@@ -320,7 +320,7 @@
         }
     }
 
-    // Attach event listener to validate price on input change
+    
     document.getElementById('price').addEventListener('input', validatePrice);
 
     // Attach event listener to validate price before form submission

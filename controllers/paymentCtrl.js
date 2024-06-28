@@ -43,19 +43,19 @@ const getWallet = async (req, res) => {
         let sortOrder = {};
         switch (sort) {
             case 'maxAmount':
-                sortOrder.amount = -1; // amount descending
+                sortOrder.amount = -1; 
                 break;
             case 'minAmount':
-                sortOrder.amount = 1; // amount ascending
+                sortOrder.amount = 1; 
                 break;
             case 'oldDate':
-                sortOrder.createdAt = 1; // date ascending (oldest first)
+                sortOrder.createdAt = 1; 
                 break;
             case 'newDate':
-                sortOrder.createdAt = -1; // date descending (newest first)
+                sortOrder.createdAt = -1; 
                 break;
             default:
-                sortOrder.createdAt = -1; // Default newest first)
+                sortOrder.createdAt = -1; 
         }
 
         const transactions = await Transaction.find(query).sort(sortOrder);

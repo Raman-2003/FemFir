@@ -11,14 +11,14 @@ async function updateOverallOrderAmount(changeAmount) {
     const stats = await Statistics.findOneAndUpdate(
         {},
         { $inc: { overallOrderAmount: changeAmount } },
-        { new: true, upsert: true } // Upsert to create if it doesn't exist
+        { new: true, upsert: true } 
     );
     return stats.overallOrderAmount;
 };
 
 const getOrderListPageAdmin = async (req, res) => {
     try {
-        const PAGE_SIZE = 10; // Number of orders per page
+        const PAGE_SIZE = 10; 
         const currentPage = parseInt(req.query.page) || 1;
         const skip = (currentPage - 1) * PAGE_SIZE;
  
@@ -50,13 +50,12 @@ const changeOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
 
-        // Find the order and populate necessary details
         const order = await Order.findById(orderId)
             .populate('items.product')
-            .populate('userId') // Populate user details
-            .populate('shippingAddress'); // Populate shipping address details
+            .populate('userId') 
+            .populate('shippingAddress'); 
 
-        // Log the order to debug
+       
         console.log('Order:', order);
 
         if (!order) {
@@ -88,14 +87,14 @@ const changeOrderStatus = async (req, res) => {
                 price: item.product.price,
                 totalPrice: item.total,
                 saleDate: new Date(),
-                user: order.userId._id, // Add the user reference
-                address: order.billingAddress._id // Add the address reference
+                user: order.userId._id, 
+                address: order.billingAddress._id 
             }));
 
-            // Insert sales records with user and address references
+            
             await Sale.insertMany(sales);
 
-             // Update the overall order amount
+            
              const overallOrderAmount = await updateOverallOrderAmount(order.totalAmount);
              console.log(`Overall Order Amount Updated: ${overallOrderAmount}`);
         }

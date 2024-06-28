@@ -16,15 +16,15 @@ const SaleSchema = new mongoose.Schema({
         enum: ['Pending', 'Processed', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Request Processed'],
         default: 'Delivered'
     },
-    user: { // Reference to the User schema
+    user: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User',
-        required: true // Assuming a sale must have a user
+        required: true
     },
-    address: { // Reference to the Address schema
+    address: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Address',
-        required: false // Address is optional, based on your requirements
+        required: false 
     }
 });
 

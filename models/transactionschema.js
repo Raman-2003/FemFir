@@ -33,7 +33,7 @@ const TransactionSchema = new Schema({
         default: Date.now
     }
 }, {
-    timestamps: true // Automatically add createdAt and updatedAt timestamps
+    timestamps: true 
 });
 
 module.exports = mongoose.model('Transaction', TransactionSchema);

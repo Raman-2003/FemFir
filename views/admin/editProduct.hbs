@@ -128,7 +128,7 @@
                             value.</small>
                     </div>
                     <div class="form-group">
-                            <label for="mrp">MRP</label> <!-- MRP input -->
+                            <label for="mrp">MRP</label> 
                             <input type="number" id="mrp" name="mrp" class="form-control" value="{{product.mrp}}" required min="0">
                             <small id="mrpError" class="form-text text-danger" style="display: none;">MRP cannot be a negative value.</small>
                     </div>
@@ -201,8 +201,8 @@
     <script src="https://unpkg.com/cropperjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        let cropper;  // To hold the Cropper instance
-        let croppingTarget;  // To determine which image is being cropped
+        let cropper;  
+        let croppingTarget;  
 
         function showCropModal(imageSrc, callback) {
             const cropModal = document.getElementById('cropModal');
@@ -216,7 +216,7 @@
             }
 
             cropper = new Cropper(imageToCrop, {
-                aspectRatio: NaN,  // Allow free ratio
+                aspectRatio: NaN, 
                 viewMode: 1,
                 movable: true,
                 cropBoxResizable: true,
@@ -272,7 +272,7 @@
                         imgContainer.appendChild(deleteButton);
                         mainImagePreview.appendChild(imgContainer);
 
-                        // Convert the blob to a File and update the input
+                     
                         const dataTransfer = new DataTransfer();
                         const croppedFile = new File([blob], file.name, { type: file.type });
                         dataTransfer.items.add(croppedFile);
@@ -317,7 +317,7 @@
                         imgContainer.appendChild(deleteButton);
                         subImagesPreview.appendChild(imgContainer);
 
-                        // Update the input with the cropped file
+                    
                         const dataTransfer = new DataTransfer();
                         const croppedFile = new File([blob], file.name, { type: file.type });
                         for (let j = 0; j < files.length; j++) {
@@ -336,20 +336,19 @@
         function removeImage(previewId, url) {
             const preview = document.getElementById(previewId);
 
-            // If a URL is provided, we are deleting a sub-image
+           
             if (url) {
-                // Update the existingSubImages hidden input value by removing the URL
+             
                 const existingSubImagesInput = document.querySelector('input[name="existingSubImages"]');
                 const existingUrls = existingSubImagesInput.value.split(',').filter(imgUrl => imgUrl !== url);
                 existingSubImagesInput.value = existingUrls.join(',');
 
-                // Remove the preview container of the image
+                
                 const imgElement = document.querySelector(`img[src="${url}"]`);
                 if (imgElement && imgElement.parentNode) {
                     imgElement.parentNode.remove();
                 }
             } else {
-                // Remove the preview for main image or all sub-images if no URL is specified
                 preview.innerHTML = '';
             }
         }
@@ -384,7 +383,7 @@
             });
         });
 
-         // Function to validate the price field
+         
     function validatePrice() {
         const priceInput = document.getElementById('price');
         const priceError = document.getElementById('priceError');
@@ -399,7 +398,7 @@
         }
     }
 
-    // Attach event listener to validate price on input change
+    
     document.getElementById('price').addEventListener('input', validatePrice);
 
     // Attach event listener to validate price before form submission
@@ -407,13 +406,13 @@
         validatePrice();
         const priceInput = document.getElementById('price');
         if (!priceInput.checkValidity()) {
-            event.preventDefault(); // Prevent form submission if price is invalid
+            event.preventDefault(); 
         }
     });
 
-      // Handle form submission
+     
         document.getElementById('productForm').addEventListener('submit', function(event) {
-            // Retrieve the form elements
+           
             const discountPercentage = document.getElementById('discountPercentage').value;
             const productCategoryOffer = "{{#if product.category.offer}}true{{else}}false{{/if}}";
 
@@ -421,7 +420,7 @@
             if (discountPercentage > 0 && productCategoryOffer === "true") {
                 event.preventDefault(); // Prevent form submission
 
-                // Display SweetAlert notification
+               
                 Swal.fire({
                     icon: 'error',
                     title: 'Invalid Submission',

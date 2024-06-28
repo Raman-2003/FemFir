@@ -17,13 +17,13 @@ exports.generateReport = async (req, res) => {
   const query = buildQuery(reportType, startDate, endDate);
 
   try {
-      // Fetch sales and populate user and address details
+      
       const sales = await Sale.find(query)
-          .populate('user', 'firstname lastname email') // Populate user details
-          .populate('address') // Populate address details
-          .populate('product'); // Populate product details
+          .populate('user', 'firstname lastname email') 
+          .populate('address') 
+          .populate('product'); 
 
-      // Update the sales count
+      
       const overallSalesCount = await Sale.countDocuments({ status: 'Delivered' });
 
       
@@ -39,11 +39,11 @@ exports.generatePDF = async (req, res) => {
   const query = buildQuery(reportType, startDate, endDate);
 
   try {
-      // Fetch sales and populate user and address details
+     
       const sales = await Sale.find(query)
-          .populate({path:'product', select:'name mrp',}) // Populate product details
-          .populate('user', 'firstname lastname email') // Populate user details
-          .populate('address') // Populate address details
+          .populate({path:'product', select:'name mrp',}) 
+          .populate('user', 'firstname lastname email') 
+          .populate('address') 
          
       const doc = new pdf();
       let fileName = `Sales_Report_${reportType}_${Date.now()}.pdf`;
@@ -51,13 +51,13 @@ exports.generatePDF = async (req, res) => {
       res.setHeader('Content-type', 'application/pdf');
       doc.pipe(res);
 
-      // Add styling to the PDF
+      
       doc.font('Helvetica-Bold').fontSize(20).text('Sales Report', { align: 'center' });
       doc.moveDown();
 
       sales.forEach(sale => {
-        const product = sale.product || {}; // Handle case where product might be null or undefined
-        const mrp = product.mrp !== undefined? `${product.mrp}` : 'N/A'; // Provide default value for MRP
+        const product = sale.product || {}; 
+        const mrp = product.mrp !== undefined? `${product.mrp}` : 'N/A'; 
         const discountedPrice = (product.mrp !== undefined && sale.price !== undefined) ? `${(sale.totalPrice * 10/100).toFixed(2)}` : 'N/A';
         console.log("DISCOUNT : ",discountedPrice);
 
@@ -100,11 +100,11 @@ exports.generateExcel = async (req, res) => {
   const query = buildQuery(reportType, startDate, endDate);
 
   try {
-      // Fetch sales and populate user and address details
+      
       const sales = await Sale.find(query)
-          .populate('user', 'firstname lastname email') // Populate user details
-          .populate('address') // Populate address details
-          .populate('product'); // Populate product details
+          .populate('user', 'firstname lastname email')
+          .populate('address') 
+          .populate('product'); 
 
       const styles = {
           headerDark: {

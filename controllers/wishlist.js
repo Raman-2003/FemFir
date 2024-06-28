@@ -64,10 +64,10 @@ const showWishlistPage = async (req, res) => {
                 effectivePrice = product.originalPrice * (1 - product.categoryOffer.discountPercentage / 100);
             }
 
-            // Adding the effective price to the product object
+           
             return {
                 ...product,
-                effectivePrice: effectivePrice.toFixed(0) // toFixed(2) ensures two decimal points
+                effectivePrice: effectivePrice.toFixed(0)
             };
         });
 

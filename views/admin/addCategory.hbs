@@ -212,16 +212,16 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    // Show the cropping modal with the loaded image
+               
                     showCropModal(e.target.result, (croppedImageUrl, blob) => {
                         const mainImagePreview = document.getElementById('mainImagePreview');
-                        mainImagePreview.innerHTML = ''; // Clear previous previews
+                        mainImagePreview.innerHTML = ''; 
 
                         const imgContainer = document.createElement('div');
                         imgContainer.className = 'image-preview-item';
 
                         const img = document.createElement('img');
-                        img.src = croppedImageUrl; // Use the cropped image URL
+                        img.src = croppedImageUrl; 
 
                         const deleteButton = document.createElement('button');
                         deleteButton.className = 'delete-button';

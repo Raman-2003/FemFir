@@ -74,7 +74,7 @@ const updateCategory = async (req, res) => {
         // Normalize the name for consistency
         const normalizedName = name.toLowerCase();
 
-        // Check if another category with the same normalized name exists (excluding current)
+        // Check if another category with the same name exists
         const existingCategory = await Category.findOne({ 
             nameLower: normalizedName, 
             _id: { $ne: req.params.id } 

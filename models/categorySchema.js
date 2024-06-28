@@ -23,7 +23,7 @@ const categorySchema = new mongoose.Schema({
     nameLower: { 
         type: String,
         required: true,
-        unique: true // Ensure uniqueness on the normalized name
+        unique: true 
     },
     offer:{
         discountPercentage: {
