@@ -92,31 +92,33 @@ const loadCart = async (req, res) => {
         let subTotal = 0;
         cart.forEach(item => {
             let effectivePrice = item.product.price;
-            let originalPrice = item.product.price;
+            let appliedDiscount = 0;
 
-          
+            // Apply product discount if available
             if (item.product.offer && item.product.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!item.product.offer.expiryDate || new Date(item.product.offer.expiryDate) >= currentDate) {
-                    effectivePrice -= (item.product.offer.discountPercentage / 100) * item.product.price;
+                    appliedDiscount = (item.product.offer.discountPercentage / 100) * item.product.price;
+                    effectivePrice -= appliedDiscount;
                 }
             }
 
-            
+            // Apply category discount if available and it's higher than the product discount
             if (item.product.category && item.product.category.offer && item.product.category.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!item.product.category.offer.expiryDate || new Date(item.product.category.offer.expiryDate) >= currentDate) {
                     const categoryDiscount = (item.product.category.offer.discountPercentage / 100) * item.product.price;
-                    if (categoryDiscount > (item.product.offer ? item.product.offer.discountPercentage : 0)) {
+                    if (categoryDiscount > appliedDiscount) {
                         effectivePrice = item.product.price - categoryDiscount;
                     }
                 }
             }
 
-            item.total = effectivePrice * item.quantity;
-            item.mrpTotal = item.product.mrp * item.quantity;
-            item.discountedPrice = effectivePrice; 
-            subTotal += item.total;
+            item.discountedPrice = effectivePrice; // Store the discounted price for use in the frontend
+            item.total = effectivePrice * item.quantity; // Update total with the discounted price
+            subTotal += item.total; // Update the subtotal
+
+            item.mrpTotal = item.product.mrp * item.quantity; // Calculate MRP total
         });
 
         const shippingCost = 0;
@@ -134,9 +136,10 @@ const loadCart = async (req, res) => {
 };
 
 
+
 const removeCart = async (req, res) => {
     try {
-        const userData = req.session.user;
+        const userData = req.session.user; 
         if (!userData) {
             return res.status(401).json({ message: 'User not logged in' });
         }
@@ -227,8 +230,29 @@ const updateCartQuantity = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found in cart' });
         }
 
+        let effectivePrice = cartItem.product.price;
+
+        // Calculate effective price with product offer
+        if (cartItem.product.offer && cartItem.product.offer.discountPercentage > 0) {
+            const currentDate = new Date();
+            if (!cartItem.product.offer.expiryDate || new Date(cartItem.product.offer.expiryDate) >= currentDate) {
+                effectivePrice -= (cartItem.product.offer.discountPercentage / 100) * cartItem.product.price;
+            }
+        }
+
+        // Calculate effective price with category offer
+        if (cartItem.product.category && cartItem.product.category.offer && cartItem.product.category.offer.discountPercentage > 0) {
+            const currentDate = new Date();
+            if (!cartItem.product.category.offer.expiryDate || new Date(cartItem.product.category.offer.expiryDate) >= currentDate) {
+                const categoryDiscount = (cartItem.product.category.offer.discountPercentage / 100) * cartItem.product.price;
+                if (categoryDiscount > (cartItem.product.offer ? cartItem.product.offer.discountPercentage : 0)) {
+                    effectivePrice = cartItem.product.price - categoryDiscount;
+                }
+            }
+        }
+
         cartItem.quantity = quantity;
-        cartItem.total = quantity * cartItem.product.price;
+        cartItem.total = quantity * effectivePrice;
         cartItem.mrpTotal = quantity * cartItem.product.mrp; // Update MRP total
         
         await user.save();
@@ -237,14 +261,14 @@ const updateCartQuantity = async (req, res) => {
         user.cart.forEach(item => {
             subTotal += item.total;
         });
-        // const cartTotal = await user.cart.total
         const shippingCost = 0;
         const grandTotal = subTotal + shippingCost;
-        res.json({ success: true, subTotal, grandTotal });
+        res.json({ success: true, subTotal, grandTotal, cart: user.cart });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
 
 
 const checkoutSuccess = async (req, res) => {

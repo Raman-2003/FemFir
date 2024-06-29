@@ -94,4 +94,5 @@ Handlebars.registerHelper('discountedPrice', (price, discount) => {
 });
 
 
+
 module.exports = Handlebars;

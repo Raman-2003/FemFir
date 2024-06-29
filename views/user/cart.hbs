@@ -113,13 +113,13 @@
                                 <td><a href="#"><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"></a></td>
                                 <td><a href="/viewone/{{this.product._id}}">{{this.product.name}}</a></td>
                                 <td class="item-price">
-                                    ${{this.product.price}}
+                                  
                                     {{#if this.product.offer.discountPercentage}}
-                                    <br><span class="text-danger">${{discountedPrice this.product.price this.product.offer.discountPercentage}}</span>
+                                    <span >${{discountedPrice this.product.price this.product.offer.discountPercentage}}</span>
                                     {{/if}}
                                     {{#if this.product.category.offer.discountPercentage}}
-                                    <br><span class="text-danger">${{discountedPrice this.product.price this.product.category.offer.discountPercentage}}</span>
-                                    {{/if}}
+                                    <span >${{discountedPrice this.product.price this.product.category.offer.discountPercentage}}</span>
+                                    {{/if}} 
                                 </td>
                                 <td>
                                     <div class="qty">
@@ -209,20 +209,25 @@ function placeOrder() {
 document.addEventListener('DOMContentLoaded', () => {
     const handleResponse = (response, successMessage, errorMessage) => {
         if (response.success) {
-            Swal.fire('Successcccccccccccccccccc', successMessage, 'success');
+            Swal.fire('Success', successMessage, 'success');
         } else {
             Swal.fire('Error', errorMessage || response.message, 'error');
         }
     };
 
-    const updateCartSummary = (subTotal, grandTotal) => {
+      const updateCartSummary = (subTotal, grandTotal) => {
         document.getElementById('sub-total').innerText = `$${subTotal.toFixed(2)}`;
         document.getElementById('grand-total').innerText = `$${grandTotal.toFixed(2)}`;
     };
 
-    const totals = (subTotal) => {
-        document.getElementById('lasttotal').innerText = `$${subTotal.toFixed(2)}`
-    }
+    const updateCartItem = (productId, newTotal) => {
+        const cartItem = document.querySelector(`tr[data-product-id="${productId}"] .item-total`);
+        if (cartItem) {
+            cartItem.innerText = `$${newTotal.toFixed(2)}`;
+        }
+    };
+
+
 
     const updateCartOnServer = (productId, quantity) => {
         fetch('/cart/update', {
@@ -235,7 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                updateCartSummary(data.subTotal, data.grandTotal);
+                // Update each cart item total price and overall cart summary
+                data.cart.forEach(item => {
+                    updateCartItem(item.product._id, item.total);
+                });
+                updateCartSummary(data.subTotal, data.grandTotal, data.discountAmount);
             }
             handleResponse(data, 'Cart updated successfully', 'Failed to update cart');
         })
@@ -244,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire('Error', 'An error occurred while updating the cart', 'error');
         });
     };
+    
 
     const removeItem = (item) => {
         fetch(`/cart/remove?proId=${item.getAttribute('data-product-id')}`, {
@@ -315,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 e.currentTarget.value = stock;
                 Swal.fire('Warning', 'Exceeds available stock', 'warning');
-            }
+            } 
         });
     });
 

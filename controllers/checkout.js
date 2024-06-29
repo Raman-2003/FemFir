@@ -9,13 +9,28 @@ const razorpay = require('razorpay');
 const Wallet = require('../models/walletschema');
 const Transaction = require('../models/transactionschema');
 
+
 let instance = new razorpay({
     key_id: "rzp_test_oO3a8uVtaGGjX8",
     key_secret: "761oZRgwI2AxQwnGrp0NBJzt"
 
 })
 
+// Add this function to helpers.js if it isn't already there
+const calculateTotalWithOffers = (product, quantity) => {
+    let total = product.price * quantity;
+
+    if (product.offer && product.offer.discountPercentage > 0) {
+        const discount = (product.price * product.offer.discountPercentage) / 100;
+        total = (product.price - discount) * quantity;
+    }
+
+    return total;
+};
+
+
 module.exports = {
+  
     getCheckoutPage: async (req, res) => {
         try {
             const user = req.session.user;
@@ -343,10 +358,13 @@ applyCoupon: async (req, res) => {
         if (moment(coupon.expiryDate).isBefore(today)) {
             return res.status(400).json({ success: false, message: 'Coupon expired' });
         }
-
+       
+       
         let subTotal = 0;
         user.cart.forEach(item => {
-            subTotal += item.product.price * item.quantity;
+            const totalWithOffers = calculateTotalWithOffers(item.product, item.quantity);
+            item.total = totalWithOffers; // Update the total price for each item considering offers
+            subTotal += totalWithOffers;
         });
 
         const discountAmount = (subTotal * coupon.discount) / 100;
@@ -407,10 +425,11 @@ removeCoupon: async (req, res) => {
         }
 
 
-        // Recalculate totals
         let subTotal = 0;
         user.cart.forEach(item => {
-            subTotal += item.product.price * item.quantity;
+            const totalWithOffers = calculateTotalWithOffers(item.product, item.quantity);
+            item.total = totalWithOffers; // Update the total price for each item considering offers
+            subTotal += totalWithOffers;
         });
         // Remove coupon discount by setting discountAmount to 0 and recalculate grandTotal
         const discountAmount = 0;
@@ -441,3 +460,4 @@ removeCoupon: async (req, res) => {
 
 
 
+ 

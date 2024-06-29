@@ -113,10 +113,9 @@ const getEditProductForm = async (req, res) => {
 
 const editProduct = async (req, res) => {
     try {
-        const { name, description, price, mrp, stock, category,discountPercentage, expiryDate, status } = req.body; 
+        const { name, description, price, mrp, stock, category, discountPercentage, expiryDate, status } = req.body; 
         let mainImage = req.body.existingMainImage;
 
-        // Handle main image update if a new file is uploaded
         if (req.files['mainImage'] && req.files['mainImage'][0].filename) {
             mainImage = `/uploads/products/${req.files['mainImage'][0].filename}`;
         }
@@ -136,16 +135,21 @@ const editProduct = async (req, res) => {
         }
 
         const product = await Product.findById(req.params.id);
-        if (product.offer && product.offer.discountPercentage > 0) {
-            if (discountPercentage && discountPercentage > 0) {
-                return res.status(400).send('Product already has a discount. Cannot apply another discount.');
-            }
-        }
 
-        if (categoryDoc.offer && categoryDoc.offer.discountPercentage > 0) {
-            if (discountPercentage && discountPercentage > 0) {
+        // Allow updating expiry date and other details without blocking for existing discount
+        let updateOffer = product.offer || {}; // Use existing offer details if present
+
+        // Update only if there's a new valid discount percentage
+        if (discountPercentage && discountPercentage > 0) {
+            // Check for conflicting category discount
+            if (categoryDoc.offer && categoryDoc.offer.discountPercentage > 0) {
                 return res.status(400).send('Category already has a discount. Cannot apply another discount.');
             }
+            updateOffer.discountPercentage = discountPercentage;
+        }
+
+        if (expiryDate) {
+            updateOffer.expiryDate = expiryDate;
         }
 
         const updateData = {
@@ -158,11 +162,8 @@ const editProduct = async (req, res) => {
             subImages,
             status,
             mainImage,
-            offer: {
-                discountPercentage,
-                expiryDate
-            }
-        };
+            offer: updateOffer,
+        }; 
 
         await Product.findByIdAndUpdate(req.params.id, updateData);
         res.redirect('/admin/products');

@@ -39,7 +39,7 @@
                                     {{#if (eq this.effectivePrice this.originalPrice)}}
                                         ${{this.originalPrice}}
                                     {{else}}
-                                        <span style="text-decoration: line-through; color: red;">${{this.originalPrice}}</span> 
+                                        {{!-- <span style="text-decoration: line-through; color: red;">${{this.originalPrice}}</span>  --}}
                                         <span style="color: green;">${{this.effectivePrice}}</span>
                                     {{/if}}
                                 </td>
