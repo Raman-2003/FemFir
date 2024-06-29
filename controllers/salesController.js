@@ -6,7 +6,9 @@ const excel = require('node-excel-export');
 const User = require('../models/userSchema');
 const Address = require('../models/addressSchema');
 const Product = require('../models/productSchema');
- 
+// const { buildQuery } = require('../utils'); // Adjust the path as necessary
+const PDFDocument = require('pdfkit-table'); // Import pdfkit-table
+
  
 exports.getReportPage = (req, res) => {
   res.render('admin/reportForm', { layout: 'adminLayout'});
@@ -35,63 +37,85 @@ exports.generateReport = async (req, res) => {
 };
 
 exports.generatePDF = async (req, res) => {
-  const { reportType, startDate, endDate } = req.query;
-  const query = buildQuery(reportType, startDate, endDate);
+    const { reportType, startDate, endDate } = req.query;
+    const query = buildQuery(reportType, startDate, endDate);
 
-  try {
-     
-      const sales = await Sale.find(query)
-          .populate({path:'product', select:'name mrp',}) 
-          .populate('user', 'firstname lastname email') 
-          .populate('address') 
-         
-      const doc = new pdf();
-      let fileName = `Sales_Report_${reportType}_${Date.now()}.pdf`;
-      res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
-      res.setHeader('Content-type', 'application/pdf');
-      doc.pipe(res);
+    try {
+        const sales = await Sale.find(query)
+            .populate({ path: 'product', select: 'name mrp' })
+            .populate('user', 'firstname lastname email')
+            .populate('address');
 
-      
-      doc.font('Helvetica-Bold').fontSize(20).text('Sales Report', { align: 'center' });
-      doc.moveDown();
+        const doc = new PDFDocument({ size: 'A3', layout: 'landscape', margin: 30 }); // Set landscape orientation
+        let fileName = `Sales_Report_${reportType}_${Date.now()}.pdf`;
+        res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
+        res.setHeader('Content-type', 'application/pdf');
+        doc.pipe(res);
 
-      sales.forEach(sale => {
-        const product = sale.product || {}; 
-        const mrp = product.mrp !== undefined? `${product.mrp}` : 'N/A'; 
-        const discountedPrice = (product.mrp !== undefined && sale.price !== undefined) ? `${(sale.totalPrice * 10/100).toFixed(2)}` : 'N/A';
-        console.log("DISCOUNT : ",discountedPrice);
+        // Document title
+        doc.font('Helvetica-Bold').fontSize(20).text('Sales Report', { align: 'center' });
+        doc.moveDown(2);
 
-        
-          doc.font('Helvetica-Bold').fontSize(12).text(`Product: ${sale.productName || 'Unknown'}`);
-          doc.font('Helvetica').text(`Quantity: ${sale.quantity}`);
-          doc.text(`Price: $${sale.price}`);
-          doc.text(`MRP: $${mrp}`);
-          doc.text(`Coupon discount : $${discountedPrice}`); 
-          doc.text(`Total Price: $${sale.totalPrice}`);
-          doc.text(`Date: ${moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss')}`);
-          
-         if(sale.product){
-            doc.text(`MRPPP..: ${sale.product.mrp}`);
-            console.log(sale.product);
-         }
+        // Prepare table headers and rows
+        const tableHeaders = [
+            { label: "Product", property: 'product', width: 100, renderer: (value, indexColumn, indexRow, row, rectRow, rectCell) => {
+                return row.product ? row.product.name : 'Unknown';
+            }},
+            { label: "Quantity", property: 'quantity', width: 50, align: 'center' },
+            { label: "Price ($)", property: 'price', width: 60, align: 'center' },
+            { label: "MRP ($)", property: 'mrp', width: 60, align: 'center' },
+            { label: "Discount ($)", property: 'discount', width: 60, align: 'center' },
+            { label: "Total Price ($)", property: 'totalPrice', width: 70, align: 'center' },
+            { label: "Date", property: 'date', width: 100, align: 'center' },
+            { label: "Customer", property: 'customer', width: 100 },
+            { label: "Email", property: 'email', width: 120 },
+            { label: "Address", property: 'address', width: 200 } // Increase width for the address column
+        ];
 
-          if (sale.user) {
-              doc.text(`Customer: ${sale.user.firstname} ${sale.user.lastname}`);
-              doc.text(`Email: ${sale.user.email}`);
-          }
+        const tableRows = sales.map(sale => ({
+            product: sale.product,
+            quantity: sale.quantity,
+            price: sale.price,
+            mrp: sale.product ? sale.product.mrp : 'N/A',
+            discount: (sale.product && sale.price) ? (sale.totalPrice * 10 / 100).toFixed(2) : 'N/A',
+            totalPrice: sale.totalPrice,
+            date: moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss'),
+            customer: sale.user ? `${sale.user.firstname} ${sale.user.lastname}` : 'N/A',
+            email: sale.user ? sale.user.email : 'N/A',
+            address: sale.address ? `${sale.address.name}, ${sale.address.addressLine1}, ${sale.address.locality}, ${sale.address.city}, ${sale.address.state}, ${sale.address.pin}` : 'N/A'
+        }));
 
-          if (sale.address) {
-              doc.text(`Address: ${sale.address.name}, ${sale.address.addressLine1}, ${sale.address.locality}, ${sale.address.city}, ${sale.address.state}, ${sale.address.pin}`);
-          }
+        // Calculate the total width of the table
+        const tableWidth = tableHeaders.reduce((sum, header) => sum + header.width, 0) + (tableHeaders.length - 1) * 5; // Total width plus spacing
 
-          doc.moveDown();
-      });
+        // Calculate the start position to center the table on the page
+        const startX = (doc.page.width - tableWidth) / 2;
 
-      doc.end();
-  } catch (err) {
-    console.error('Error generating PDF:', err.message);
-      res.status(500).send('Server Error');
-  }
+        // Define table options
+        const tableOptions = {
+            headers: tableHeaders,
+            datas: tableRows,
+            options: {
+                columnSpacing: 5, // Adjust spacing for better fit
+                padding: 5,
+                x: startX, // Set the starting position to center the table
+                width: tableWidth, // Use calculated table width
+                prepareHeader: () => doc.font('Helvetica-Bold').fontSize(9),
+                prepareRow: (row, i) => doc.font('Helvetica').fontSize(8),
+                rowHeight: 20, // Adjust row height to ensure content fits better
+                columnSpacing: 20, // Adjust row height to ensure content fits better
+                headerHeight: 25 // Adjust header height for better appearance
+            }
+        };
+
+        // Add table to the document
+        await doc.table(tableOptions);
+
+        doc.end();
+    } catch (err) {
+        console.error('Error generating PDF:', err.message);
+        res.status(500).send('Server Error');
+    }
 };
 
 
