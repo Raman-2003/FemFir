@@ -34,13 +34,13 @@
                                         {{this.productName}}
                                     </a>
                                 </td>
-                                <td>${{this.originalPrice}}</td>
+                                <td>₹{{this.originalPrice}}</td>
                                 <td>
                                     {{#if (eq this.effectivePrice this.originalPrice)}}
-                                        ${{this.originalPrice}}
+                                        ₹{{this.originalPrice}}
                                     {{else}}
                                         {{!-- <span style="text-decoration: line-through; color: red;">${{this.originalPrice}}</span>  --}}
-                                        <span style="color: green;">${{this.effectivePrice}}</span>
+                                        <span style="color: green;">₹{{this.effectivePrice}}</span>
                                     {{/if}}
                                 </td>
                                 <td>{{this.productQuantity}}</td>

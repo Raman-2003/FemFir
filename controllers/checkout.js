@@ -18,7 +18,7 @@ let instance = new razorpay({
 
 // Add this function to helpers.js if it isn't already there
 const calculateTotalWithOffers = (product, quantity) => {
-    let total = product.price * quantity;
+    let total = product.price * quantity; 
 
     if (product.offer && product.offer.discountPercentage > 0) {
         const discount = (product.price * product.offer.discountPercentage) / 100;
@@ -368,11 +368,19 @@ applyCoupon: async (req, res) => {
         });
 
         const discountAmount = (subTotal * coupon.discount) / 100;
-        const grandTotal = subTotal - discountAmount; 
+        let grandTotal = subTotal - discountAmount; 
+ 
+        // Apply referral discount if it’s the first purchase
+        let referralDiscountAmount = 0;
+        if (user.hasUsedReferral) {
+                referralDiscountAmount = (grandTotal * 25) / 100;
+                grandTotal -= referralDiscountAmount;
 
+             // Ensure grand total doesn't drop below the required minimum
         if (grandTotal < 5000) {
-            return res.status(400).json({ success: false, message: 'Grand total must be at least 5000 to apply this coupon' });
-        } 
+             return res.status(400).json({ success: false, message: 'Grand total must be at least 5000 to apply this coupon' });
+        }
+    }
 
         if (subTotal < coupon.maxPrice) {
             return res.status(400).json({ success: false, message: `Subtotal must be at least ${coupon.maxPrice} to apply this coupon` });
@@ -388,18 +396,25 @@ applyCoupon: async (req, res) => {
         // Mark the coupon as used by the user
         await Coupon.updateOne({ _id: coupon._id }, { $addToSet: { usedBy: userId } });
 
+         // Mark the referral discount as used
+         if (user.hasUsedReferral) {
+            await User.updateOne({ _id: userId }, { $set: { hasUsedReferral: false } });
+        }
+
          // Update the user's total discount
-         await User.updateOne({ _id: userId }, { $inc: { totalDiscount: discountAmount } });
+         await User.updateOne({ _id: userId }, { $inc: { totalDiscount: discountAmount+referralDiscountAmount  } });
 
         // Respond with updated cart details
         res.json({
             success: true,
             message: 'Coupon applied successfully',
             discountAmount,
+            referralDiscountAmount, // Include the referral discount
             updatedCart: {
                 cart: user.cart,
                 subTotal,
-                discountAmount, 
+                discountAmount,
+                referralDiscountAmount, // Include the referral discount 
                 grandTotal
             }
         });

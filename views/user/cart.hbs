@@ -115,10 +115,10 @@
                                 <td class="item-price">
                                   
                                     {{#if this.product.offer.discountPercentage}}
-                                    <span >${{discountedPrice this.product.price this.product.offer.discountPercentage}}</span>
+                                    <span >₹{{discountedPrice this.product.price this.product.offer.discountPercentage}}</span>
                                     {{/if}}
                                     {{#if this.product.category.offer.discountPercentage}}
-                                    <span >${{discountedPrice this.product.price this.product.category.offer.discountPercentage}}</span>
+                                    <span >₹{{discountedPrice this.product.price this.product.category.offer.discountPercentage}}</span>
                                     {{/if}} 
                                 </td>
                                 <td>
@@ -128,7 +128,7 @@
                                         <button class="btn-plus" data-product-id="{{this.product._id}}"><i class="fa fa-plus"></i></button>
                                     </div>
                                 </td>
-                                <td class="item-total" id="lasttotal">${{this.total}}</td>
+                                <td class="item-total" id="lasttotal">₹{{this.total}}</td>
                                 <td><button class="btn-remove" data-product-id="{{this.product._id}}"><i class="fa fa-trash"></i></button></td>
                             </tr>
                             {{/each}}
@@ -143,9 +143,9 @@
                 <div class="cart-summary">
                     <div class="cart-content">
                         <h3>Cart Summary</h3>
-                        <p>Sub Total<span id="sub-total">${{subTotal}}</span></p>
+                        <p>Sub Total<span id="sub-total">₹{{subTotal}}</span></p>
                         <p>Shipping Cost<span>Free</span></p>
-                        <h4>Grand Total<span id="grand-total">${{grandTotal}}</span></h4>
+                        <h4>Grand Total<span id="grand-total">₹{{grandTotal}}</span></h4>
                     </div>
                     <div class="cart-btn">
                         {{!-- <button id="update-cart-btn">Update Cart</button> --}}

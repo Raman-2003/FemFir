@@ -52,7 +52,7 @@ const userSchema =new mongoose.Schema({
    
     hintname:{
         type:String,
-        required:false
+        required:false 
     },
     gender:{
         type:String,
@@ -64,8 +64,10 @@ const userSchema =new mongoose.Schema({
     wishlist:[
         { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
     ],
-    totalDiscount: { type: Number, default: 0 }  
-
+    totalDiscount: { type: Number, default: 0 },
+    referralCode: { type: String, unique: true }, 
+    hasUsedReferral: { type: Boolean, default: false }
+ 
 },{
     timestamps:true
 })

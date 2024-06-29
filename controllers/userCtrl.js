@@ -110,6 +110,10 @@ const dosignup = async (req, res) => {
         const userExist = await User.findOne({ email: usermail }).lean();
         if (!userExist) {
             otp = await userHelper.verifyEmail(usermail);
+            // Save referral code if provided
+            if (req.body.referralCode) {
+                userRegesterData.referralCode = req.body.referralCode;
+            }
             res.render('user/otp');
         } else {
             res.render('user/login', { msg });
@@ -118,6 +122,11 @@ const dosignup = async (req, res) => {
         console.log(error);
     }
 };
+
+// Generate a unique referral code
+function generateReferralCode() {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
 
 
 // get otp page
@@ -139,6 +148,7 @@ const submitotp = async (req, res) => {
     try {
         userotp = req.body.otp;
         if (userotp == otp) {
+            const referralCode = generateReferralCode();
             const user = new User({
                 firstname: userRegesterData.firstname,
                 lastname: userRegesterData.lastname,
@@ -147,8 +157,20 @@ const submitotp = async (req, res) => {
                 password: hashedPassword,
                 isVerified: true,
                 is_blocked: false,
-                isAdmin: false
-            });
+                isAdmin: false,
+                referralCode: referralCode, // Save the generated referral code
+                hasUsedReferral: false
+            }); 
+
+             // Check if a referral code was used and validate it
+             if (userRegesterData.referralCode) {
+                const referringUser = await User.findOne({ referralCode: userRegesterData.referralCode });
+                if (referringUser) {
+                    user.hasUsedReferral = true; // Mark that the user has used a referral code
+                } else {
+                    console.log('Invalid referral code');
+                }
+            }
 
             await user.save();
             res.redirect('/login');
@@ -174,7 +196,7 @@ const resendOtp = async (req, res) => {
 
 const getAdditionalInfoPage = async(req,res)=>{
     res.render('user/additionalinfo', {title: 'Additional Information'})
-}
+} 
 
 
 //during google authentication, we want additional informations

@@ -23,7 +23,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100vh; 
         }
 
         .signup-card {
@@ -105,6 +105,10 @@
                 <div class="form-group">
                     <input type="password" class="form-control" onchange="validateConfirmPassword()" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
                 </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="referralCode" name="referralCode"
+                        placeholder="Referral Code (optional)"> 
+                </div>
                 <button type="submit" class="signup-btn">Sign Up</button>
 
                 <div class="text-muted text-center mt-2">Already have an account? <a href="/login">Sign in now</a></div>
@@ -116,6 +120,7 @@
         </div>
     </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
         /* firstname Validation */
@@ -216,6 +221,26 @@
 
             return true;
           }
+
+          // Example of showing a SweetAlert error
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: message,
+        });
+    }
+
+    // Modify the form submission to check for own referral code
+    document.getElementById('signupForm').addEventListener('submit', function (event) {
+        var referralCode = document.getElementById('referralCode').value.trim();
+        var email = document.getElementById('email').value.trim();
+
+        if (referralCode === email) {
+            event.preventDefault();
+            showError('You cannot use your own referral code!');
+        }
+    });
           
     </script>
 

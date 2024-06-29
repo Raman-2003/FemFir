@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const CheckoutSchema = new Schema({
     userId: {
-        type: Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId, 
         ref: 'User',
         required: true
     },
