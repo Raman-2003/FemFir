@@ -341,7 +341,7 @@ const getProductDetails = async (req, res) => {
         let relatedProducts = await Product.find({
             category: product.category._id,
             _id: { $ne: product._id }
-        }).limit(3).populate('category').lean();
+        }).limit(4).populate('category').lean();
 
      
         if (relatedProducts.length === 0) {

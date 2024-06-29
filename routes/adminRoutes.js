@@ -29,33 +29,92 @@ const salesController = require('../controllers/salesController');
 const Sale = require('../models/saleSchema');
 const Order = require('../models/orderSchema');
 const User = require('../models/userSchema');
+const mongoose = require('mongoose');
+const moment = require('moment'); // Ensure moment is required
 
-// router.get('/', isLogin, adminHome);
+
 router.get('/', async (req, res) => {
-    try {
-      const overallSalesCount = await Sale.countDocuments({ status: 'Delivered' });
-      
+  try {
+      const overallSalesCount = await Order.countDocuments({ status: 'Delivered' });
+
       const overallOrderAmountResult = await Order.aggregate([
-        { $match: { status: 'Delivered' } },
-        { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } }
-    ]);
+          { $match: { status: 'Delivered' } },
+          { $unwind: '$items' },
+          {
+              $lookup: {
+                  from: 'products',
+                  localField: 'items.product',
+                  foreignField: '_id',
+                  as: 'productDetails'
+              }
+          },
+          { $unwind: '$productDetails' },
+          {
+              $lookup: {
+                  from: 'categories',
+                  localField: 'productDetails.category',
+                  foreignField: '_id',
+                  as: 'categoryDetails'
+              }
+          },
+          {
+              $unwind: {
+                  path: '$categoryDetails',
+                  preserveNullAndEmptyArrays: true
+              }
+          },
+          {
+              $project: {
+                  _id: 0,
+                  quantity: '$items.quantity',
+                  price: {
+                      $cond: {
+                          if: {
+                              $gt: ['$productDetails.offer.discountPercentage', 0]
+                          },
+                          then: {
+                              $multiply: ['$productDetails.price', { $divide: [{ $subtract: [100, '$productDetails.offer.discountPercentage'] }, 100] }]
+                          },
+                          else: {
+                              $cond: {
+                                  if: {
+                                      $gt: ['$categoryDetails.offer.discountPercentage', 0]
+                                  },
+                                  then: {
+                                      $multiply: ['$productDetails.price', { $divide: [{ $subtract: [100, '$categoryDetails.offer.discountPercentage'] }, 100] }]
+                                  },
+                                  else: '$productDetails.price'
+                              }
+                          }
+                      }
+                  }
+              }
+          },
+          {
+              $group: {
+                  _id: null,
+                  totalAmount: { $sum: { $multiply: ['$quantity', '$price'] } }
+              }
+          }
+      ]);
 
-    // Extract the totalAmount value from the aggregation result
-    const overallOrderAmount = overallOrderAmountResult[0]?.totalAmount || 0;
+      const overallOrderAmount = overallOrderAmountResult[0]?.totalAmount?.toFixed(0) || '0';
 
-    const totalDiscountResult = await User.aggregate([
-      { $group: { _id: null, totalDiscount: { $sum: '$totalDiscount' } } }
-  ]);
+      const totalDiscountResult = await User.aggregate([
+          { $group: { _id: null, totalDiscount: { $sum: '$totalDiscount' } } }
+      ]);
 
-  const totalDiscount = totalDiscountResult[0]?.totalDiscount || 0;
+      const totalDiscount = totalDiscountResult[0]?.totalDiscount?.toFixed(0) || '0';
 
-      res.render('admin/dashboard', { overallSalesCount,overallOrderAmount, totalDiscount, layout: 'adminLayout' });
-    } catch (err) {
+      const totalUserCount = await User.countDocuments();
+
+      res.render('admin/dashboard', { overallSalesCount, overallOrderAmount, totalDiscount,totalUserCount, layout: 'adminLayout' });
+  } catch (err) {
       console.error(err);
       res.status(500).send('Server Error');
-    }
-  });
- 
+  }
+});
+
 router.get(['/','/adminlogin'], isLogout, adminLogin);
 router.post('/adminlogin', isLogout, doadminLogin);
 router.get('/signup', isLogout, adminSignup);
