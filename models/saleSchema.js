@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const SaleSchema = new mongoose.Schema({
     productName: String,
-    product: { // Reference to the Product schema
+    product: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
-        required: true // Assuming a sale must have a product
+        required: true 
     },
     quantity: Number,
     price: Number,
@@ -22,7 +22,7 @@ const SaleSchema = new mongoose.Schema({
         required: true
     },
     address: { 
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId, 
         ref: 'Address',
         required: false 
     }

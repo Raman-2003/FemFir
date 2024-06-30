@@ -17,9 +17,9 @@ const orderSchema = new Schema({
         }
     ],
     totalAmount: { 
-        type: Number,
+        type: Number,   
         required: true
-    },
+    }, 
     
     billingAddress: {
         type: Schema.Types.ObjectId,

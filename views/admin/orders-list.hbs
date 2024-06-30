@@ -142,8 +142,9 @@
         }
     </style>
 </head>
+
 <body>
-     <div class="content-body">
+    <div class="content-body">
         <div class="container">
             <h1>Order List</h1>
             <table class="order-table">
@@ -152,7 +153,9 @@
                         <th>Username</th>
                         <th>Product Image</th>
                         <th>Product Name</th>
-                        <th>Price</th>
+                        <th>Original Price</th>
+                        <th>Discounted Price</th>
+                        <th>Total Price</th>
                         <th>Order Date</th>
                         <th>Quantity</th>
                         <th>Status</th>
@@ -173,7 +176,19 @@
                             {{this.product.name}} <br>
                             {{/each}}
                         </td>
-                        <td>₹{{this.totalAmount}}</td>
+                        <td>
+                            {{#each this.items}}
+                            ₹{{this.product.price}} <br>
+                            {{/each}}
+                        </td>
+                        <td>
+                            {{#each this.items}}
+                            ₹{{this.product.discountedPrice}} <br>
+                            {{/each}}
+                        </td>
+                        <td>
+                            ₹{{this.totalAmount}} <br>
+                        </td>
                         <td>{{formatDate this.createdAt}}</td>
                         <td>
                             {{#each this.items}}
@@ -207,13 +222,14 @@
         </div>
     </div>
 </body>
+
 </html>
 
 <script>
     Handlebars.registerHelper('formatDate', function(date) {
         return new Date(date).toLocaleDateString();
     });
-
+ 
     Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
         switch (operator) {
             case '==':

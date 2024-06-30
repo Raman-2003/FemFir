@@ -1,9 +1,9 @@
 <style>
     body {
-        color: #d1dae3;
+        color: #22282e;
     }
 .content-body{
-    background-color: #f4f7f6;
+    background-color: #cfe0d9;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
@@ -38,7 +38,7 @@ table {
 
 thead th {
     padding: 15px;
-    background-color: rgb(215, 208, 198);
+    background-color: rgb(234, 231, 227);
     color:#2c3e50;
     text-align: center;
     font-weight: 600;
@@ -90,6 +90,7 @@ tbody td {
 
 
 </style>
+
 <div class="content-body">
     <div class="container">
         <h1>Sales Report</h1>
@@ -98,17 +99,21 @@ tbody td {
                 <tr>
                     <th>Product Name</th>
                     <th>Quantity</th>
-                    <th>Price</th>
+                    <th>Original Price</th>
+                    <th>Discount</th>
+                    <th>Final Price</th>
                     <th>Total Price</th>
                     <th>Sale Date</th>
                 </tr>
             </thead>
             <tbody style="color: black;">
                 {{#each sales}}
-                <tr> 
+                <tr>
                     <td>{{this.productName}}</td>
                     <td>{{this.quantity}}</td>
                     <td>{{this.price}}</td>
+                    <td>{{this.discount}}</td>
+                    <td>{{this.finalPrice}}</td>
                     <td>{{this.totalPrice}}</td>
                     <td>{{formatDate this.saleDate}}</td>
                 </tr>
@@ -118,6 +123,5 @@ tbody td {
 
         <a class="links" href="/admin/report/pdf?reportType={{reportType}}&startDate={{startDate}}&endDate={{endDate}}">Download PDF</a>
         <a class="links" href="/admin/report/excel?reportType={{reportType}}&startDate={{startDate}}&endDate={{endDate}}">Download Excel</a>
-
     </div>
 </div>

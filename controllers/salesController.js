@@ -6,8 +6,8 @@ const excel = require('node-excel-export');
 const User = require('../models/userSchema');
 const Address = require('../models/addressSchema');
 const Product = require('../models/productSchema');
-// const { buildQuery } = require('../utils'); // Adjust the path as necessary
-const PDFDocument = require('pdfkit-table'); // Import pdfkit-table
+const Category = require('../models/categorySchema');
+const PDFDocument = require('pdfkit-table'); 
 
  
 exports.getReportPage = (req, res) => {
@@ -15,28 +15,45 @@ exports.getReportPage = (req, res) => {
 };
 
 exports.generateReport = async (req, res) => {
-  const { startDate, endDate, reportType } = req.body;
-  const query = buildQuery(reportType, startDate, endDate);
-
-  try {
-      
+    const { startDate, endDate, reportType } = req.body;
+    const query = buildQuery(reportType, startDate, endDate);
+  
+    try {
       const sales = await Sale.find(query)
-          .populate('user', 'firstname lastname email') 
-          .populate('address') 
-          .populate('product'); 
-
-      
+        .populate('user', 'firstname lastname email')
+        .populate('address')
+        .populate('product');
+  
       const overallSalesCount = await Sale.countDocuments({ status: 'Delivered' });
-
-      
-      res.render('admin/report', { sales, reportType, startDate, endDate, overallSalesCount, layout: 'adminLayout' });
-  } catch (err) {
+  
+      const formattedSales = await Promise.all(sales.map(async (sale) => {
+        const product = await Product.findById(sale.product).populate('category');
+        let finalPrice = product.price;
+        let discount = 0;
+  
+        if (product.offer && product.offer.discountPercentage > 0) {
+          discount = product.price * (product.offer.discountPercentage / 100);
+          finalPrice = product.price - discount;
+        } else if (product.category && product.category.offer && product.category.offer.discountPercentage > 0) {
+          discount = product.price * (product.category.offer.discountPercentage / 100);
+          finalPrice = product.price - discount;
+        }
+  
+        return { 
+          ...sale._doc,
+          finalPrice: finalPrice.toFixed(2),
+          discount: discount.toFixed(2)
+        };
+      }));
+  
+      res.render('admin/report', { sales: formattedSales, reportType, startDate, endDate, overallSalesCount, layout: 'adminLayout' });
+    } catch (err) {
       console.error(err);
       res.status(500).send('Server Error');
-  }
-};
+    }
+  };
 
-exports.generatePDF = async (req, res) => {
+exports.generatePDF = async (req, res) => { 
     const { reportType, startDate, endDate } = req.query;
     const query = buildQuery(reportType, startDate, endDate);
 

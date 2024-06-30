@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema({
         required: true
     },
     description: { 
-        type: String,
+        type: String, 
         required: true
     },
     price: {
@@ -56,5 +56,15 @@ const productSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+
+// Static method to calculate discounted price
+productSchema.statics.getDiscountedPrice = function(price, discountPercentage, expiryDate) {
+    const now = new Date();
+    if (discountPercentage > 0 && expiryDate > now) {
+        return price - (price * (discountPercentage / 100));
+    }
+    return price;
+};
 
 module.exports = mongoose.model('Product', productSchema);

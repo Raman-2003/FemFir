@@ -327,7 +327,14 @@ const getCheckoutPage = async (req, res) => {
         });
 
         const shippingCost = 0; 
-        const grandTotal = subTotal + shippingCost;
+        let grandTotal = subTotal + shippingCost;
+
+        // Calculate referral discount
+        let referralDiscountAmount = 0;
+        if (user.hasUsedReferral) {
+            referralDiscountAmount = (grandTotal * 25) / 100;
+            grandTotal -= referralDiscountAmount;
+        }
 
         // Render checkout view with necessary data
         res.render('user/checkout', {
@@ -336,7 +343,9 @@ const getCheckoutPage = async (req, res) => {
             subTotal,
             grandTotal,
             shippingCost,
-            addresses 
+            referralDiscountAmount, // Pass referral discount amount to the template
+            addresses,
+           
         }); 
     } catch (error) {
         console.error('Error rendering checkout page:', error);
@@ -347,7 +356,7 @@ const getCheckoutPage = async (req, res) => {
 module.exports = {
     addToCart,
     loadCart,
-    removeCart,
+    removeCart, 
     updateCart,
     updateCartQuantity,
     checkoutSuccess,

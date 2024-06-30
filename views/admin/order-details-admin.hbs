@@ -99,7 +99,7 @@
         .hans {
               font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
             color: #333;
-        }
+        } 
         
         .user-details {
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -112,6 +112,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="content-body">
         <div class="container">
@@ -119,12 +120,12 @@
 
             <div class="order-details">
                 <h2>Order Information</h2>
-                <div style="display: flex; flex-direction:column;">
-                <p><strong>Order ID:</strong> {{order._id}}</p>
-                <p><strong>Order Date:</strong> {{formatDate order.createdAt}}</p>
-                <p><strong>Status:</strong> {{order.status}}</p>
-                <p><strong>Total Amount:</strong> ₹{{order.totalAmount}}</p>
-                <p><strong>Payment Method:</strong> {{order.paymentMethod}}</p>
+                <div style="display: flex; flex-direction: column;">
+                    <p><strong>Order ID:</strong> {{order._id}}</p>
+                    <p><strong>Order Date:</strong> {{formatDate order.createdAt}}</p>
+                    <p><strong>Status:</strong> {{order.status}}</p>
+                    <p><strong>Total Amount:</strong> ₹{{order.totalAmount}}</p>
+                    <p><strong>Payment Method:</strong> {{order.paymentMethod}}</p>
                 </div>
             </div>
 
@@ -136,48 +137,75 @@
                 <p><strong>Return Status:</strong> {{order.returnStatus}}</p>
             </div>
 
-             <div class="shipping-details">
+            <div class="shipping-details">
                 <h2>Shipping Address</h2>
                 {{#if order.billingAddress}}
-                    <p class="hans"><strong>Street:</strong> {{order.billingAddress.locality}}</p>
-                    <p class="hans"><strong>City:</strong> {{order.billingAddress.city}}</p>
-                    <p class="hans"><strong>State:</strong> {{order.billingAddress.state}}</p>
-                    <p class="hans"><strong>Postal Code:</strong> {{order.billingAddress.pin}}</p>
+                <p class="hans"><strong>Street:</strong> {{order.billingAddress.locality}}</p>
+                <p class="hans"><strong>City:</strong> {{order.billingAddress.city}}</p>
+                <p class="hans"><strong>State:</strong> {{order.billingAddress.state}}</p>
+                <p class="hans"><strong>Postal Code:</strong> {{order.billingAddress.pin}}</p>
                 {{else}}
-                    <p>No shipping address provided.</p>
+                <p>Billing address not available</p>
                 {{/if}}
             </div>
 
-            <div class="order-items">
-                <h2>Items Ordered</h2>
-                <table>
+            <div class="product-details">
+                <h2>Product Information</h2>
+                <table class="order-table">
                     <thead>
-                        <tr>
-                            <th>Product Image</th>
+                        <tr style="color: black;">
                             <th>Product Name</th>
+                            <th>Original Price</th>
+                            <th>Discounted Price</th>
                             <th>Quantity</th>
-                            <th>Price</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style="color: #333;">
                         {{#each order.items}}
-                        <tr class="final">
-                            <td><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"></td>
+                        <tr>
                             <td>{{this.product.name}}</td>
-                            <td>{{this.quantity}}</td>
                             <td>₹{{this.product.price}}</td>
+                            <td>₹{{this.product.discountedPrice}}</td>
+                            <td>{{this.quantity}}</td>
+                            <td>₹{{this.total}}</td>
                         </tr>
                         {{/each}}
                     </tbody>
                 </table>
             </div>
 
-            <div class="back-link">
-                <a href="/admin/orders">Back to Order List</a>
+            <div class="admin-action-buttons">
+                <form action="/admin/orders/status" method="POST">
+                    <input type="hidden" name="orderId" value="{{order._id}}">
+                    <label for="status">Update Order Status:</label>
+                    <select name="status">
+                        <option value="Pending" {{#ifCond order.status '==' 'Pending'}}selected{{/ifCond}}>Pending</option>
+                        <option value="Processed" {{#ifCond order.status '==' 'Processed'}}selected{{/ifCond}}>Processed</option>
+                        <option value="Shipped" {{#ifCond order.status '==' 'Shipped'}}selected{{/ifCond}}>Shipped</option>
+                        <option value="Delivered" {{#ifCond order.status '==' 'Delivered'}}selected{{/ifCond}}>Delivered</option>
+                    </select>
+                    <button type="submit"><i class="fas fa-save"></i> Update Status</button>
+                </form>
+
+                <form action="/admin/orders/return" method="POST">
+                    <input type="hidden" name="orderId" value="{{order._id}}">
+                    <label for="returnStatus">Update Return Status:</label>
+                    <select name="returnStatus">
+                        <option value="Pending" {{#ifCond order.returnStatus '==' 'Pending'}}selected{{/ifCond}}>Pending</option>
+                        <option value="Return Approved" {{#ifCond order.returnStatus '==' 'Return Approved'}}selected{{/ifCond}}>Return Approved</option>
+                        <option value="Return Rejected" {{#ifCond order.returnStatus '==' 'Return Rejected'}}selected{{/ifCond}}>Return Rejected</option>
+                    </select>
+                    <button type="submit"><i class="fas fa-save"></i> Update Return Status</button>
+                </form>
             </div>
+
+            <a href="/admin/orders" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Orders</a>
         </div>
     </div>
 </body>
+
+
 </html>
 
 <script>

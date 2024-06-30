@@ -53,6 +53,7 @@ module.exports = {
                 cart.shippingCost = 10; 
                 cart.total = cart.subTotal + cart.shippingCost;
             }
+            
 
             res.render('user/checkout', { cart, addresses, defaultAddress }); 
         } catch (error) {
@@ -83,12 +84,29 @@ module.exports = {
                 return res.status(400).json({ message: 'Payment method and billing address are required' });
             }
     
-            const totalAmount = user.cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
-            const items = user.cart.map(item => ({
-                product: item.product._id,
-                quantity: item.quantity,
-                total: item.product.price * item.quantity
-            }));
+            // const totalAmount = user.cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
+            const totalAmount = user.cart.reduce((total, item) => {
+                const discount = item.product.offer?.discountPercentage || 0;
+                const discountedPrice = item.product.price * (1 - discount / 100);
+                return total + discountedPrice * item.quantity;
+            }, 0);
+
+            // const items = user.cart.map(item => ({
+            //     product: item.product._id,
+            //     quantity: item.quantity,
+            //     total: item.product.price * item.quantity
+            // }));
+            const items = user.cart.map(item => {
+                const discount = item.product.offer?.discountPercentage || 0;
+                const discountedPrice = item.product.price * (1 - discount / 100);
+                return {
+                    product: item.product._id,
+                    quantity: item.quantity,
+                    total: discountedPrice * item.quantity,
+                    originalPrice: item.product.price,
+                    discountedPrice: discountedPrice
+                };
+            });
     
             const orderDetails = {
                 userId: userId,
@@ -332,7 +350,7 @@ module.exports = {
     } catch (error) {
         console.error('Error loading coupons:', error);
         res.status(500).json({ success: false, message: 'Failed to load coupons' });
-    }
+    } 
 },
 
 applyCoupon: async (req, res) => {
@@ -399,7 +417,7 @@ applyCoupon: async (req, res) => {
          // Mark the referral discount as used
          if (user.hasUsedReferral) {
             await User.updateOne({ _id: userId }, { $set: { hasUsedReferral: false } });
-        }
+        } 
 
          // Update the user's total discount
          await User.updateOne({ _id: userId }, { $inc: { totalDiscount: discountAmount+referralDiscountAmount  } });

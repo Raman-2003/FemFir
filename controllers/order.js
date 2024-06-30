@@ -14,7 +14,7 @@ async function updateOverallOrderAmount(changeAmount) {
         { new: true, upsert: true } 
     );
     return stats.overallOrderAmount;
-};
+}
 
 const getOrderListPageAdmin = async (req, res) => {
     try {
@@ -29,6 +29,13 @@ const getOrderListPageAdmin = async (req, res) => {
             .skip(skip)
             .limit(PAGE_SIZE)
             .lean();
+
+        // Calculate the discounted price for each item
+        orders.forEach(order => {
+            order.items.forEach(item => {
+                item.product.discountedPrice = Product.getDiscountedPrice(item.product.price, item.product.offer.discountPercentage, item.product.offer.expiryDate);
+            });
+        });
 
         const totalOrders = await Order.countDocuments({});
         const totalPages = Math.ceil(totalOrders / PAGE_SIZE);
@@ -45,18 +52,14 @@ const getOrderListPageAdmin = async (req, res) => {
     }
 };
 
-
 const changeOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
 
         const order = await Order.findById(orderId)
             .populate('items.product')
-            .populate('userId') 
-            .populate('shippingAddress'); 
-
-       
-        console.log('Order:', order);
+            .populate('userId')
+            .populate('billingAddress'); 
 
         if (!order) {
             console.error(`Order with ID ${orderId} not found`);
@@ -82,21 +85,19 @@ const changeOrderStatus = async (req, res) => {
         if (status === 'Delivered' && previousStatus !== 'Delivered') {
             const sales = order.items.map(item => ({
                 productName: item.product.name,
-                product: item.product._id, 
+                product: item.product._id,
                 quantity: item.quantity,
                 price: item.product.price,
                 totalPrice: item.total,
                 saleDate: new Date(),
-                user: order.userId._id, 
-                address: order.billingAddress._id 
+                user: order.userId._id,
+                address: order.billingAddress._id
             }));
 
-            
             await Sale.insertMany(sales);
 
-            
-             const overallOrderAmount = await updateOverallOrderAmount(order.totalAmount);
-             console.log(`Overall Order Amount Updated: ${overallOrderAmount}`);
+            const overallOrderAmount = await updateOverallOrderAmount(order.totalAmount);
+            console.log(`Overall Order Amount Updated: ${overallOrderAmount}`);
         }
 
         res.redirect('/admin/orders?page=' + req.query.page);
@@ -105,7 +106,6 @@ const changeOrderStatus = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
-
 
 const getOrderDetailsPageAdmin = async (req, res) => {
     try {
@@ -117,6 +117,11 @@ const getOrderDetailsPageAdmin = async (req, res) => {
             .populate('billingAddress')
             .populate('shippingAddress')
             .lean();
+
+        // Calculate the discounted price for each item
+        order.items.forEach(item => {
+            item.product.discountedPrice = Product.getDiscountedPrice(item.product.price, item.product.offer.discountPercentage, item.product.offer.expiryDate);
+        });
 
         res.render("admin/order-details-admin", {
             order,
@@ -154,7 +159,6 @@ const approveReturn = async (req, res) => {
         item.returnStatus = 'Approved';
         await order.save();
 
-        // Update the overall order amount
         const overallOrderAmount = await updateOverallOrderAmount(-item.total);
         console.log(`Overall Order Amount Updated: ${overallOrderAmount}`);
 
