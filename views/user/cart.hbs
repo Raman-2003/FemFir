@@ -216,14 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
       const updateCartSummary = (subTotal, grandTotal) => {
-        document.getElementById('sub-total').innerText = `$${subTotal.toFixed(2)}`;
-        document.getElementById('grand-total').innerText = `$${grandTotal.toFixed(2)}`;
+        document.getElementById('sub-total').innerText = `$${subTotal.toFixed(0)}`;
+        document.getElementById('grand-total').innerText = `$${grandTotal.toFixed(0)}`;
     };
 
     const updateCartItem = (productId, newTotal) => {
         const cartItem = document.querySelector(`tr[data-product-id="${productId}"] .item-total`);
         if (cartItem) {
-            cartItem.innerText = `$${newTotal.toFixed(2)}`;
+            cartItem.innerText = `$${newTotal.toFixed(0)}`;
         }
     };
 

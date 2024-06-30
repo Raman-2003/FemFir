@@ -20,7 +20,7 @@
             .then(data => {
                 if (data.success) {
                     Swal.fire('Coupon Applied', `Discount of $500 applied`, 'success');
-                    document.getElementById('grand-total').innerText = `$${data.newGrandTotal.toFixed(2)}`;
+                    document.getElementById('grand-total').innerText = `$${data.newGrandTotal.toFixed(0)}`;
                 } else {
                     Swal.fire('Error', data.message, 'error');
                 }

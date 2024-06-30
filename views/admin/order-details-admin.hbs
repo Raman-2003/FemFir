@@ -11,6 +11,7 @@
             background-color: #eceff2;
             margin: 0;
             padding: 0;
+            height: 1200px;
         }
 
         .content-body {
@@ -149,57 +150,35 @@
                 {{/if}}
             </div>
 
-            <div class="product-details">
-                <h2>Product Information</h2>
-                <table class="order-table">
-                    <thead>
+            <div class="product-details" style="margin-bottom:20px;">
+                <h2 style="margin-bottom: 10px;">Product Information</h2>
+                <table class="order-table" style="width: 100%; border-collapse:collapse; margin-bottom:20px">
+                    <thead >
+                     
                         <tr style="color: black;">
-                            <th>Product Name</th>
-                            <th>Original Price</th>
-                            <th>Discounted Price</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
+                            <div >
+                            <th style="padding: 10px; border: 1px solid #ddd;">Product Name</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Original Price</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Discounted Price</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Quantity</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">Total</th>
+                            </div>
                         </tr>
+                      
                     </thead>
                     <tbody style="color: #333;">
                         {{#each order.items}}
                         <tr>
-                            <td>{{this.product.name}}</td>
-                            <td>₹{{this.product.price}}</td>
-                            <td>₹{{this.product.discountedPrice}}</td>
-                            <td>{{this.quantity}}</td>
-                            <td>₹{{this.total}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{this.product.name}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">₹{{this.product.price}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">₹{{this.product.discountedPrice}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{this.quantity}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">₹{{this.total}}</td>
                         </tr>
                         {{/each}}
                     </tbody>
                 </table>
             </div>
-
-            <div class="admin-action-buttons">
-                <form action="/admin/orders/status" method="POST">
-                    <input type="hidden" name="orderId" value="{{order._id}}">
-                    <label for="status">Update Order Status:</label>
-                    <select name="status">
-                        <option value="Pending" {{#ifCond order.status '==' 'Pending'}}selected{{/ifCond}}>Pending</option>
-                        <option value="Processed" {{#ifCond order.status '==' 'Processed'}}selected{{/ifCond}}>Processed</option>
-                        <option value="Shipped" {{#ifCond order.status '==' 'Shipped'}}selected{{/ifCond}}>Shipped</option>
-                        <option value="Delivered" {{#ifCond order.status '==' 'Delivered'}}selected{{/ifCond}}>Delivered</option>
-                    </select>
-                    <button type="submit"><i class="fas fa-save"></i> Update Status</button>
-                </form>
-
-                <form action="/admin/orders/return" method="POST">
-                    <input type="hidden" name="orderId" value="{{order._id}}">
-                    <label for="returnStatus">Update Return Status:</label>
-                    <select name="returnStatus">
-                        <option value="Pending" {{#ifCond order.returnStatus '==' 'Pending'}}selected{{/ifCond}}>Pending</option>
-                        <option value="Return Approved" {{#ifCond order.returnStatus '==' 'Return Approved'}}selected{{/ifCond}}>Return Approved</option>
-                        <option value="Return Rejected" {{#ifCond order.returnStatus '==' 'Return Rejected'}}selected{{/ifCond}}>Return Rejected</option>
-                    </select>
-                    <button type="submit"><i class="fas fa-save"></i> Update Return Status</button>
-                </form>
-            </div>
-
             <a href="/admin/orders" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Orders</a>
         </div>
     </div>

@@ -41,8 +41,8 @@ exports.generateReport = async (req, res) => {
   
         return { 
           ...sale._doc,
-          finalPrice: finalPrice.toFixed(2),
-          discount: discount.toFixed(2)
+          finalPrice: finalPrice.toFixed(0),
+          discount: discount.toFixed(0)
         };
       }));
   
@@ -94,7 +94,7 @@ exports.generatePDF = async (req, res) => {
             quantity: sale.quantity,
             price: sale.price,
             mrp: sale.product ? sale.product.mrp : 'N/A',
-            discount: (sale.product && sale.price) ? (sale.totalPrice * 10 / 100).toFixed(2) : 'N/A',
+            discount: (sale.product && sale.price) ? (sale.totalPrice * 10 / 100).toFixed(0) : 'N/A',
             totalPrice: sale.totalPrice,
             date: moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss'),
             customer: sale.user ? `${sale.user.firstname} ${sale.user.lastname}` : 'N/A',
