@@ -1,4 +1,3 @@
-
 const Sale = require('../models/saleSchema');
 const moment = require('moment');
 const pdf = require('pdfkit');
@@ -9,7 +8,6 @@ const Product = require('../models/productSchema');
 const Category = require('../models/categorySchema');
 const PDFDocument = require('pdfkit-table'); 
 
- 
 exports.getReportPage = (req, res) => {
   res.render('admin/reportForm', { layout: 'adminLayout'});
 };
@@ -51,7 +49,7 @@ exports.generateReport = async (req, res) => {
       console.error(err);
       res.status(500).send('Server Error');
     }
-  };
+};
 
 exports.generatePDF = async (req, res) => { 
     const { reportType, startDate, endDate } = req.query;
@@ -63,7 +61,10 @@ exports.generatePDF = async (req, res) => {
             .populate('user', 'firstname lastname email')
             .populate('address');
 
-        const doc = new PDFDocument({ size: 'A3', layout: 'landscape', margin: 30 }); // we can set landscape orientation
+        const totalOrdersCount = sales.length;
+        const totalOrderedAmount = sales.reduce((sum, sale) => sum + sale.totalPrice, 0);
+
+        const doc = new PDFDocument({ size: 'A3', layout: 'landscape', margin: 30 });
         let fileName = `Sales_Report_${reportType}_${Date.now()}.pdf`;
         res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
         res.setHeader('Content-type', 'application/pdf');
@@ -73,7 +74,11 @@ exports.generatePDF = async (req, res) => {
         doc.font('Helvetica-Bold').fontSize(20).text('Sales Report', { align: 'center' });
         doc.moveDown(2);
 
-        
+        // Total orders and amount
+        doc.font('Helvetica').fontSize(12).text(`Total Orders: ${totalOrdersCount}`, { align: 'left' });
+        doc.text(`Total Ordered Amount:  ${totalOrderedAmount.toFixed(0)}`, { align: 'left' });
+        doc.moveDown(2);
+
         const tableHeaders = [
             { label: "Product", property: 'product', width: 100, renderer: (value, indexColumn, indexRow, row, rectRow, rectCell) => {
                 return row.product ? row.product.name : 'Unknown';
@@ -102,13 +107,9 @@ exports.generatePDF = async (req, res) => {
             address: sale.address ? `${sale.address.name}, ${sale.address.addressLine1}, ${sale.address.locality}, ${sale.address.city}, ${sale.address.state}, ${sale.address.pin}` : 'N/A'
         }));
 
-        
         const tableWidth = tableHeaders.reduce((sum, header) => sum + header.width, 0) + (tableHeaders.length - 1) * 5; 
-
-        
         const startX = (doc.page.width - tableWidth) / 2;
 
-        
         const tableOptions = {
             headers: tableHeaders,
             datas: tableRows,
@@ -125,7 +126,6 @@ exports.generatePDF = async (req, res) => {
             }
         };
 
-        
         await doc.table(tableOptions);
 
         doc.end();
@@ -135,13 +135,11 @@ exports.generatePDF = async (req, res) => {
     }
 };
 
-
 exports.generateExcel = async (req, res) => {
   const { reportType, startDate, endDate } = req.query;
   const query = buildQuery(reportType, startDate, endDate);
 
   try {
-      
       const sales = await Sale.find(query)
           .populate('user', 'firstname lastname email')
           .populate('address') 
@@ -197,11 +195,10 @@ exports.generateExcel = async (req, res) => {
   } catch (err) {
       res.status(500).send('Server Error');
   }
-  };
+};
 
-  function buildQuery(reportType, startDate, endDate) {
+function buildQuery(reportType, startDate, endDate) {
     let query = { status: 'Delivered' };
-    console.log(query); 
     if (reportType === 'daily') {
         query.saleDate = {
             $gte: moment().startOf('day').toDate(),
@@ -234,5 +231,4 @@ exports.getSalesCount = async (req, res) => {
       console.error(err);
       res.status(500).send('Server Error');
     }
-  };
-  
+};
