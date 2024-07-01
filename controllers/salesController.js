@@ -63,7 +63,7 @@ exports.generatePDF = async (req, res) => {
             .populate('user', 'firstname lastname email')
             .populate('address');
 
-        const doc = new PDFDocument({ size: 'A3', layout: 'landscape', margin: 30 }); // Set landscape orientation
+        const doc = new PDFDocument({ size: 'A3', layout: 'landscape', margin: 30 }); // we can set landscape orientation
         let fileName = `Sales_Report_${reportType}_${Date.now()}.pdf`;
         res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
         res.setHeader('Content-type', 'application/pdf');
@@ -73,20 +73,20 @@ exports.generatePDF = async (req, res) => {
         doc.font('Helvetica-Bold').fontSize(20).text('Sales Report', { align: 'center' });
         doc.moveDown(2);
 
-        // Prepare table headers and rows
+        
         const tableHeaders = [
             { label: "Product", property: 'product', width: 100, renderer: (value, indexColumn, indexRow, row, rectRow, rectCell) => {
                 return row.product ? row.product.name : 'Unknown';
             }},
             { label: "Quantity", property: 'quantity', width: 50, align: 'center' },
-            { label: "Price (₹)", property: 'price', width: 60, align: 'center' },
-            { label: "MRP (₹)", property: 'mrp', width: 60, align: 'center' },
-            { label: "Discount (₹)", property: 'discount', width: 60, align: 'center' }, 
-            { label: "Total Price (₹)", property: 'totalPrice', width: 70, align: 'center' },
+            { label: "Price", property: 'price', width: 60, align: 'center' },
+            { label: "MRP ", property: 'mrp', width: 60, align: 'center' },
+            { label: "Discount", property: 'discount', width: 60, align: 'center' }, 
+            { label: "Total Price", property: 'totalPrice', width: 70, align: 'center' },
             { label: "Date", property: 'date', width: 100, align: 'center' },
             { label: "Customer", property: 'customer', width: 100 },
             { label: "Email", property: 'email', width: 120 },
-            { label: "Address", property: 'address', width: 200 } // Increase width for the address column
+            { label: "Address", property: 'address', width: 200 } 
         ];
 
         const tableRows = sales.map(sale => ({
@@ -102,30 +102,30 @@ exports.generatePDF = async (req, res) => {
             address: sale.address ? `${sale.address.name}, ${sale.address.addressLine1}, ${sale.address.locality}, ${sale.address.city}, ${sale.address.state}, ${sale.address.pin}` : 'N/A'
         }));
 
-        // Calculate the total width of the table
-        const tableWidth = tableHeaders.reduce((sum, header) => sum + header.width, 0) + (tableHeaders.length - 1) * 5; // Total width plus spacing
+        
+        const tableWidth = tableHeaders.reduce((sum, header) => sum + header.width, 0) + (tableHeaders.length - 1) * 5; 
 
-        // Calculate the start position to center the table on the page
+        
         const startX = (doc.page.width - tableWidth) / 2;
 
-        // Define table options
+        
         const tableOptions = {
             headers: tableHeaders,
             datas: tableRows,
             options: {
-                columnSpacing: 5, // Adjust spacing for better fit
+                columnSpacing: 5, 
                 padding: 5,
-                x: startX, // Set the starting position to center the table
-                width: tableWidth, // Use calculated table width
+                x: startX, 
+                width: tableWidth, 
                 prepareHeader: () => doc.font('Helvetica-Bold').fontSize(9),
                 prepareRow: (row, i) => doc.font('Helvetica').fontSize(8),
-                rowHeight: 20, // Adjust row height to ensure content fits better
-                columnSpacing: 20, // Adjust row height to ensure content fits better
-                headerHeight: 25 // Adjust header height for better appearance
+                rowHeight: 20, 
+                columnSpacing: 20,
+                headerHeight: 25 
             }
         };
 
-        // Add table to the document
+        
         await doc.table(tableOptions);
 
         doc.end();
@@ -162,8 +162,8 @@ exports.generateExcel = async (req, res) => {
           productName: { displayName: 'Product Name', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 120 },
           quantity: { displayName: 'Quantity', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
           price: { displayName: 'Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
-          mrp: { displayName: 'MRP', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 }, // Add MRP
-          discountedPrice: { displayName: 'Discounted Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 }, // Add Discounted Price
+          mrp: { displayName: 'MRP', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 }, 
+          discountedPrice: { displayName: 'Discounted Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 }, 
           totalPrice: { displayName: 'Total Price', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 100 },
           saleDate: { displayName: 'Sale Date', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 },
           customerName: { displayName: 'Customer Name', headerStyle: styles.headerDark, cellStyle: styles.cellNormal, width: 150 },
@@ -175,8 +175,8 @@ exports.generateExcel = async (req, res) => {
           productName: sale.productName,
           quantity: sale.quantity,
           price: sale.price,
-          mrp: sale.product.mrp, // Add MRP
-          discountedPrice: sale.product.mrp - sale.price, // Calculate and add Discounted Price
+          mrp: sale.product.mrp, 
+          discountedPrice: sale.product.mrp - sale.price, 
           totalPrice: sale.totalPrice,
           saleDate: moment(sale.saleDate).format('YYYY-MM-DD HH:mm:ss'),
           customerName: sale.user ? `${sale.user.firstname} ${sale.user.lastname}` : '',

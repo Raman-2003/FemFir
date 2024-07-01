@@ -94,7 +94,7 @@ const loadCart = async (req, res) => {
             let effectivePrice = item.product.price;
             let appliedDiscount = 0;
 
-            // Apply product discount if available
+          
             if (item.product.offer && item.product.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!item.product.offer.expiryDate || new Date(item.product.offer.expiryDate) >= currentDate) {
@@ -103,7 +103,7 @@ const loadCart = async (req, res) => {
                 }
             }
 
-            // Apply category discount if available and it's higher than the product discount
+       
             if (item.product.category && item.product.category.offer && item.product.category.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!item.product.category.offer.expiryDate || new Date(item.product.category.offer.expiryDate) >= currentDate) {
@@ -114,11 +114,11 @@ const loadCart = async (req, res) => {
                 }
             }
 
-            item.discountedPrice = effectivePrice; // Store the discounted price for use in the frontend
-            item.total = effectivePrice * item.quantity; // Update total with the discounted price
-            subTotal += item.total; // Update the subtotal
+            item.discountedPrice = effectivePrice; 
+            item.total = effectivePrice * item.quantity; 
+            subTotal += item.total; 
 
-            item.mrpTotal = item.product.mrp * item.quantity; // Calculate MRP total
+            item.mrpTotal = item.product.mrp * item.quantity; 
         });
 
         const shippingCost = 0;
@@ -253,7 +253,7 @@ const updateCartQuantity = async (req, res) => {
 
         cartItem.quantity = quantity;
         cartItem.total = quantity * effectivePrice;
-        cartItem.mrpTotal = quantity * cartItem.product.mrp; // Update MRP total
+        cartItem.mrpTotal = quantity * cartItem.product.mrp; 
         
         await user.save();
 
@@ -306,7 +306,7 @@ const getCheckoutPage = async (req, res) => {
         const user = await User.findById(userId).populate('cart.product').lean();
         const cart = user.cart || [];
 
-        //check if any product in cart has zero stock
+       
         const promises = cart.map(async item => {
             const product = await Product.findById(item.product._id);
             if(!product || product.stock === 0){
@@ -316,13 +316,13 @@ const getCheckoutPage = async (req, res) => {
 
         await Promise.all(promises);
         
-        // Fetch user's addresses
+       
         const addresses = await Address.find({ userId }).lean();
 
         // Calculate cart totals
         let subTotal = 0;
         cart.forEach(item => {
-            item.mrpTotal = item.product.mrp * item.quantity; // Calculate MRP total
+            item.mrpTotal = item.product.mrp * item.quantity; 
             subTotal += item.product.price * item.quantity;
         });
 
@@ -343,7 +343,7 @@ const getCheckoutPage = async (req, res) => {
             subTotal,
             grandTotal,
             shippingCost,
-            referralDiscountAmount, // Pass referral discount amount to the template
+            referralDiscountAmount, 
             addresses,
            
         }); 

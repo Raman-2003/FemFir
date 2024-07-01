@@ -158,15 +158,15 @@ const submitotp = async (req, res) => {
                 isVerified: true,
                 is_blocked: false,
                 isAdmin: false,
-                referralCode: referralCode, // Save the generated referral code
+                referralCode: referralCode, // save the generated referral code
                 hasUsedReferral: false
             }); 
 
-             // Check if a referral code was used and validate it
+             // validate referral code
              if (userRegesterData.referralCode) {
                 const referringUser = await User.findOne({ referralCode: userRegesterData.referralCode });
                 if (referringUser) {
-                    user.hasUsedReferral = true; // Mark that the user has used a referral code
+                    user.hasUsedReferral = true; // mark the user has used a referral code
                 } else {
                     console.log('Invalid referral code');
                 }
@@ -235,7 +235,6 @@ const getProducts = async (req, res) => {
         const searchQuery = req.query.search || '';
         const categoryFilter = req.query.category || ''; 
 
-       
         let sortCondition;
         switch (sortOption) {
             case 'price_high':
@@ -257,11 +256,9 @@ const getProducts = async (req, res) => {
                 sortCondition = {};
         }
 
-        
         const listedCategories = await Category.find({ status: 'listed' }).select('_id name offer');
         const listedCategoryIds = listedCategories.map(category => category._id);
 
-        
         let query = {
             status: 'listed',
             category: { $in: listedCategoryIds }
@@ -275,7 +272,6 @@ const getProducts = async (req, res) => {
             query.name = { $regex: searchQuery, $options: 'i' };
         }
 
-      
         const products = await Product.find(query)
             .populate('category')
             .sort(sortCondition)
@@ -284,11 +280,9 @@ const getProducts = async (req, res) => {
 
         const count = await Product.countDocuments(query);
 
-      
         const productsWithEffectivePrice = products.map(product => {
             let effectivePrice = product.price;
 
-            
             if (product.offer && product.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= currentDate) {
@@ -296,7 +290,6 @@ const getProducts = async (req, res) => {
                 }
             }
 
-         
             if (product.category.offer && product.category.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!product.category.offer.expiryDate || new Date(product.category.offer.expiryDate) >= currentDate) {
@@ -313,20 +306,21 @@ const getProducts = async (req, res) => {
             };
         });
 
-    
         res.render('user/product', {
             products: productsWithEffectivePrice,
             current: page,
             pages: Math.ceil(count / perPage),
             sortOption, 
             query: req.query,
-            categories: listedCategories
+            categories: listedCategories,
+            hasProducts: productsWithEffectivePrice.length > 0 // Add this to indicate if there are products
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Something went wrong');
     }
 };
+
 
 
 const getProductDetails = async (req, res) => {
@@ -371,7 +365,7 @@ const getProductDetails = async (req, res) => {
                 }
             }
 
-            return {
+            return { 
                 ...relatedProduct,
                 effectivePrice: effectivePrice.toFixed(0) 
             };
@@ -418,3 +412,4 @@ module.exports = {
     getProducts,
     getProductDetails
 };
+ 

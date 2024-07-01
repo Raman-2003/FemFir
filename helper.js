@@ -87,10 +87,20 @@ Handlebars.registerHelper('calculateDiscountedPrice', function(price, discountPe
 Handlebars.registerHelper('calculateDiscountedPrice', (price, discountPercentage) => {
     const discountAmount = price * (discountPercentage / 100);
     return (price - discountAmount).toFixed(0);
-});
+}); 
 
 Handlebars.registerHelper('discountedPrice', (price, discount) => {
     return (price - (price * discount / 100)).toFixed(0);
+});
+
+Handlebars.registerHelper('increment', (value) => value + 1);
+Handlebars.registerHelper('decrement', (value) => value - 1);
+Handlebars.registerHelper('range', (start, end) => {
+    let array = [];
+    for (let i = start; i <= end; i++) {
+        array.push(i);
+    }
+    return array;
 });
 
 

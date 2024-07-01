@@ -91,6 +91,7 @@
         }
     </style>
 </head>
+
 <body>    
 <div class="content-body">
     <div class="container-fluid">
@@ -153,11 +154,11 @@
                     <input type="file" id="mainImage" name="mainImage" class="form-control" required style="height:40px">
                     <div id="mainImagePreview" class="image-preview"></div>
                 </div>
-                <div class="form-group">
-                    <label for="subImages">Sub Images</label>
-                    <input type="file" id="subImages" name="subImages" class="form-control" multiple style="height:40px">
-                    <div id="subImagesPreview" class="image-preview"></div>
-                </div>
+               <div class="form-group">
+                        <label for="subImages">Sub Images</label>
+                        <input type="file" id="subImages" name="subImages" class="form-control" multiple style="height:40px">
+                        <div id="subImagesPreview" class="image-preview"></div>
+                    </div>
                 <button type="submit" class="btn btn-primary" style="display: block; width:100%">Add Product</button>
             </form>
         </div>
@@ -178,7 +179,8 @@
 <script src="https://unpkg.com/cropperjs"></script>
 <script>
     let cropper; 
-    let croppingTarget;  
+    let croppingTarget; 
+     let croppingCallback; 
 
     function showCropModal(imageSrc, callback) {
         const cropModal = document.getElementById('cropModal');
@@ -186,6 +188,7 @@
         imageToCrop.src = imageSrc;
         cropModal.style.display = 'block';
 
+        croppingCallback = callback;
       
         if (cropper) {
             cropper.destroy();
@@ -203,7 +206,7 @@
                     const canvas = cropper.getCroppedCanvas();
                     canvas.toBlob((blob) => {
                         const croppedImageUrl = URL.createObjectURL(blob);
-                        callback(croppedImageUrl, blob);
+                        croppingCallback(croppedImageUrl, blob);
                         cropper.destroy();
                         cropModal.style.display = 'none';
                     });
@@ -255,56 +258,56 @@
         }
     });
 
-    document.getElementById('subImages').addEventListener('change', function(event) {
-        const subImagesPreview = document.getElementById('subImagesPreview');
-        subImagesPreview.innerHTML = ''; // Clear previous previews
-        const files = event.target.files;
-        if (files) {
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    showCropModal(e.target.result, function(croppedImageUrl, blob) {
-                        const imgContainer = document.createElement('div');
-                        imgContainer.className = 'image-preview-item';
-                        
-                        const img = document.createElement('img');
-                        img.src = croppedImageUrl;
+     document.getElementById('subImages').addEventListener('change', function(event) {
+            const subImagesPreview = document.getElementById('subImagesPreview');
+            subImagesPreview.innerHTML = '';
+            const files = Array.from(event.target.files);
+            const newFiles = [];
 
-                        const deleteButton = document.createElement('button');
-                        deleteButton.className = 'delete-button';
-                        deleteButton.innerHTML = '&times;';
-                        deleteButton.addEventListener('click', function() {
-                            imgContainer.remove(); 
-                            const dt = new DataTransfer(); 
-                            for (let j = 0; j < files.length; j++) {
-                                if (j !== i) {
-                                    dt.items.add(files[j]);
+            function cropNext(index) {
+                if (index < files.length) {
+                    const file = files[index];
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        showCropModal(e.target.result, function(croppedImageUrl, blob) {
+                            const imgContainer = document.createElement('div');
+                            imgContainer.className = 'image-preview-item';
+
+                            const img = document.createElement('img');
+                            img.src = croppedImageUrl;
+
+                            const deleteButton = document.createElement('button');
+                            deleteButton.className = 'delete-button';
+                            deleteButton.innerHTML = '&times;';
+                            deleteButton.addEventListener('click', function() {
+                                imgContainer.remove();
+                                const dt = new DataTransfer();
+                                for (let j = 0; j < newFiles.length; j++) {
+                                    if (j !== index) {
+                                        dt.items.add(newFiles[j]);
+                                    }
                                 }
-                            }
-                            document.getElementById('subImages').files = dt.files; 
+                                document.getElementById('subImages').files = dt.files;
+                            });
+
+                            imgContainer.appendChild(img);
+                            imgContainer.appendChild(deleteButton);
+                            subImagesPreview.appendChild(imgContainer);
+
+                            newFiles.push(new File([blob], file.name, { type: file.type }));
+                            cropNext(index + 1);
                         });
-
-                        imgContainer.appendChild(img);
-                        imgContainer.appendChild(deleteButton);
-                        subImagesPreview.appendChild(imgContainer);
-
-                     
-                        const dt = new DataTransfer();
-                        for (let k = 0; k < files.length; k++) {
-                            if (k === i) {
-                                dt.items.add(new File([blob], files[k].name, { type: files[k].type }));
-                            } else {
-                                dt.items.add(files[k]);
-                            }
-                        }
-                        document.getElementById('subImages').files = dt.files;
-                    });
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    const dt = new DataTransfer();
+                    newFiles.forEach(file => dt.items.add(file));
+                    document.getElementById('subImages').files = dt.files;
                 }
-                reader.readAsDataURL(files[i]);
             }
-        }
-    });
 
+            cropNext(0);
+        });
       
     function validatePrice() {
         const priceInput = document.getElementById('price');
@@ -334,4 +337,5 @@
 </script>
 
 </body>
-</html>
+
+</html> 

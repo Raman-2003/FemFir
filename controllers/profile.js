@@ -14,10 +14,15 @@ module.exports = {
             if (!user) {
                 return res.redirect('/login');
             }
-
+    
             const id = user._id;
             const userData = await User.findById(id).lean();
             const userAddress = await Address.find({ userId: id }).lean();
+    
+            // Pagination settings
+            const perPage = 5;
+            const page = parseInt(req.query.page) || 1;
+    
             const userOrders = await Order.find({ userId: id })
                 .populate({
                     path: 'items.product',
@@ -25,24 +30,33 @@ module.exports = {
                 })
                 .populate('billingAddress')
                 .populate('shippingAddress')
-                .sort({createdAt: -1})
+                .sort({ createdAt: -1 })
+                .skip((perPage * page) - perPage)
+                .limit(perPage)
                 .lean();
-
+    
+            const totalOrders = await Order.countDocuments({ userId: id });
+    
             if (!userData) {
                 return res.redirect('/login');
             }
-
+    
             userData.gender = userData.gender || 'Male';
             userData.hintname = userData.hintname || '';
-
-           
-
-            res.render('user/profile/profiles', { userData, userAddress, userOrders });
+    
+            res.render('user/profile/profiles', {
+                userData,
+                userAddress,
+                userOrders,
+                current: page,
+                pages: Math.ceil(totalOrders / perPage)
+            });
         } catch (error) {
             console.log(error);
             res.status(500).send('Internal Server Error');
         }
     },
+    
 
  // Edit user details
 editDetails: (req, res) => {

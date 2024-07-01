@@ -381,7 +381,7 @@ applyCoupon: async (req, res) => {
         let subTotal = 0;
         user.cart.forEach(item => {
             const totalWithOffers = calculateTotalWithOffers(item.product, item.quantity);
-            item.total = totalWithOffers; // Update the total price for each item considering offers
+            item.total = totalWithOffers;
             subTotal += totalWithOffers;
         });
 
@@ -394,7 +394,7 @@ applyCoupon: async (req, res) => {
                 referralDiscountAmount = (grandTotal * 25) / 100;
                 grandTotal -= referralDiscountAmount;
 
-             // Ensure grand total doesn't drop below the required minimum
+             
         if (grandTotal < 5000) {
              return res.status(400).json({ success: false, message: 'Grand total must be at least 5000 to apply this coupon' });
         }
@@ -408,7 +408,7 @@ applyCoupon: async (req, res) => {
         req.session.coupon = {
             code: coupon.code,
             discountAmount,
-            grandTotal
+            grandTotal: grandTotal.toFixed(0)
         };
 
         // Mark the coupon as used by the user
@@ -427,13 +427,13 @@ applyCoupon: async (req, res) => {
             success: true,
             message: 'Coupon applied successfully',
             discountAmount,
-            referralDiscountAmount, // Include the referral discount
+            referralDiscountAmount, 
             updatedCart: {
                 cart: user.cart,
-                subTotal,
-                discountAmount,
-                referralDiscountAmount, // Include the referral discount 
-                grandTotal
+                subTotal: subTotal.toFixed(0),
+                discountAmount: discountAmount.toFixed(0),
+                referralDiscountAmount: referralDiscountAmount.toFixed(0), 
+                grandTotal: parseInt(grandTotal.toFixed(0)) 
             }
         });
     } catch (error) {
@@ -476,7 +476,7 @@ removeCoupon: async (req, res) => {
         res.json({
             success: true,
             message: 'Coupon removed successfully',
-            updatedCart: { 
+            updatedCart: {  
                 cart: user.cart,
                 subTotal,
                 discountAmount, // No discount amount

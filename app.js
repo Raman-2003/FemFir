@@ -8,7 +8,7 @@ const MongoStore = require('connect-mongo');
 const nocache = require('nocache');
 const bodyParser = require('body-parser');
 const passport = require('./config/passport');
-const Handlebars = require('./helper'); // Correctly import the helper.js file
+const Handlebars = require('./helper'); 
 
 // Require the Routes
 const authRouter = require('./routes/authRoutes');

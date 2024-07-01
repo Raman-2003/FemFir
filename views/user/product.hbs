@@ -86,81 +86,92 @@
         <div class="row">
             <div class="col-md-9">
                 <div class="row">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <!-- Product Search Box -->
-                                <div class="product-search">
-                                    <form method="GET" action="/product" id="searchForm">
-                                        <input type="text" id="search" name="search" placeholder="Search" value="{{query.search}}">
-                                    </form>
-                                </div>
-
-                                <!-- Product Sorting Dropdown --> 
-                                <div class="product-short">
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product by</a>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a href="#" class="dropdown-item sort-option" data-sort="price_high">Price: High to Low</a>
-                                            <a href="#" class="dropdown-item sort-option" data-sort="price_low">Price: Low to High</a>
-                                            <a href="#" class="dropdown-item sort-option" data-sort="name_asc">Name: A to Z</a>
-                                            <a href="#" class="dropdown-item sort-option" data-sort="name_desc">Name: Z to A</a>
-                                            <a href="#" class="dropdown-item sort-option" data-sort="new_arrivals">Newly Arrivals</a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Category Dropdown and Apply Button -->
-                                <form action="/product" method="GET" id="categoryForm">
-                                    <input type="hidden" name="search" value="{{query.search}}">
-                                    <input type="hidden" name="sort" value="{{sortOption}}">
-                                    <select name="category" class="category-dropdown" onchange="document.getElementById('categoryForm').submit()">
-                                        <option value="">All Categories</option>
-                                        {{#each categories}}
-                                        <option value="{{this._id}}" {{#if (eq ../query.category this._id)}}selected{{/if}}>{{this.name}}</option>
-                                        {{/each}}
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{#each products}}
-                    <div class="col-lg-4 col-md-4 col-12 col-sm-6">
-                        <div class="product-item">
-                            <div class="product-image">
-                                <a href="/viewone/{{this._id}}">
-                                    <img src="{{this.mainImage}}" alt="Product Image">
-                                </a>
-                                {{!-- <div class="product-action">
-                                    <a href="#"><i class="fa fa-cart-plus"></i></a>
-                                    <a href="#"><i class="fa fa-heart"></i></a>
-                                    <a href="/viewone/{{this._id}}"><i class="fa fa-search"></i></a>
-                                </div> --}}
-                            </div>
-                            <div class="product-content">
-                                <div class="title"><a href="/viewone/{{this._id}}" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">{{this.name}}</a></div>
-                                {{!-- <div class="price">${{this.price}}</div> --}}
-                                <div class="price">
-                                    {{#if (lt this.effectivePrice this.price)}}
-                                    <div style="display: flex; justify-content:space-evenly; padding-top:7px;">
-                                    <h4 class="text-danger">₹{{this.effectivePrice}}</h4>
-                                    <br><h4 class="text-muted" style="text-decoration: line-through;">${{this.price}}</h4>
-                                    </div>
-                                    {{else}}
-                                    <h4 style="padding-top:5px">₹{{this.price}}</h4>
-                                    {{/if}}
-                                </div>
-                                {{#if (eq this.stock 0)}}
-                                <div style="color: red; font-weight: bold;">OUT OF STOCK</div>
-                                {{else}}
-                                <div>Stock: {{this.stock}}</div>
-                                {{/if}}
-                            </div>
-                        </div>
-                    </div>
-                    {{/each}}
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Product Search Box -->
+                <div class="product-search">
+                    <form method="GET" action="/product" id="searchForm">
+                        <input type="text" id="search" name="search" placeholder="Search" value="{{query.search}}">
+                    </form>
                 </div>
+
+                <!-- Product Sorting Dropdown --> 
+                <div class="product-short">
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product by</a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a href="#" class="dropdown-item sort-option" data-sort="price_high">Price: High to Low</a>
+                            <a href="#" class="dropdown-item sort-option" data-sort="price_low">Price: Low to High</a>
+                            <a href="#" class="dropdown-item sort-option" data-sort="name_asc">Name: A to Z</a>
+                            <a href="#" class="dropdown-item sort-option" data-sort="name_desc">Name: Z to A</a>
+                            <a href="#" class="dropdown-item sort-option" data-sort="new_arrivals">Newly Arrivals</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Dropdown and Apply Button -->
+                <form action="/product" method="GET" id="categoryForm">
+                    <input type="hidden" name="search" value="{{query.search}}">
+                    <input type="hidden" name="sort" value="{{sortOption}}">
+                    <select name="category" class="category-dropdown" onchange="document.getElementById('categoryForm').submit()">
+                        <option value="">All Categories</option>
+                        {{#each categories}}
+                        <option value="{{this._id}}" {{#if (eq ../query.category this._id)}}selected{{/if}}>{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{#if hasProducts}}
+    {{#each products}}
+    <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+        <div class="product-item">
+            <div class="product-image">
+                <a href="/viewone/{{this._id}}">
+                    <img src="{{this.mainImage}}" alt="Product Image">
+                </a>
+                {{!-- <div class="product-action">
+                    <a href="#"><i class="fa fa-cart-plus"></i></a>
+                    <a href="#"><i class="fa fa-heart"></i></a>
+                    <a href="/viewone/{{this._id}}"><i class="fa fa-search"></i></a>
+                </div> --}}
+            </div>
+            <div class="product-content">
+                <div class="title"><a href="/viewone/{{this._id}}" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">{{this.name}}</a></div>
+                {{!-- <div class="price">${{this.price}}</div> --}}
+                <div class="price">
+                    {{#if (lt this.effectivePrice this.price)}}
+                    <div style="display: flex; justify-content:space-evenly; padding-top:7px;">
+                    <h4 class="text-danger">₹{{this.effectivePrice}}</h4>
+                    <br><h4 class="text-muted" style="text-decoration: line-through;">${{this.price}}</h4>
+                    </div>
+                    {{else}}
+                    <h4 style="padding-top:5px">₹{{this.price}}</h4>
+                    {{/if}}
+                </div>
+                {{#if (eq this.stock 0)}}
+                <div style="color: red; font-weight: bold;">OUT OF STOCK</div>
+                {{else}}
+                <div>Stock: {{this.stock}}</div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+    {{/each}}
+    {{else}}
+    <div class="col-12">
+        <div class="text-center">
+            <img src="https://supershopping.lk/images/home/Cart-empty.gif" alt="No Products Found" style="width: 400px;" />
+            <h1 style="font-weight: 700;">No Products Found</h1>
+            <p>Try adjusting your search or category filters.</p>
+        </div>
+    </div>
+    {{/if}}
+</div>
+
 
                 <div class="col-lg-12">
                     <nav aria-label="Page navigation example">
@@ -215,3 +226,4 @@
         });
     });
 </script>
+ 

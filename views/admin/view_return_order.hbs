@@ -121,6 +121,12 @@
         .back-link a:hover {
             color: #357ABD;
         }
+
+        #buttons {
+            display: flex;
+            flex-direction: row;
+
+        }
     </style>
 </head>
 <body>
@@ -148,10 +154,14 @@
                     <ul class="table">
                         {{#each returnOrder.orderId.items}}
                         <li>
-                            <strong>Product:</strong> {{this.product.name}}<br>
-                            <img src="{{this.product.mainImage}}" alt="{{this.product.name}}" style="width: 80px; height: 110px;">
-                            <strong>Quantity:</strong> {{this.quantity}}<br>
-                            <strong>Total:</strong> {{this.total}}
+                           <div style="display: flex; flex-direction:row;"><strong>Product:</strong> <h5>{{this.product.name}}</h5></div>
+                            <img src="{{this.product.mainImage}}" alt="{{this.product.name}}" style="width: 80px; height: 110px;"><br>
+                            <div style="display: flex; flex-direction:row; margin-top: 10px;">
+                            <strong>Quantity:</strong> <h5>{{this.quantity}}</h5>
+                            </div>
+                            <div style="display: flex; flex-direction:row; margin-top:10px">
+                            <strong>Total:</strong> <h5>{{this.total}}</h5>
+                            </div>
                         </li>
                         {{/each}}
                     </ul>
@@ -166,7 +176,7 @@
                             <option value="Rejected" {{#if (eq returnOrder.status 'Rejected')}}selected{{/if}}>Rejected</option>
                             <option value="Canceled" {{#if (eq returnOrder.status 'Canceled')}}selected{{/if}}>Canceled</option>
                         </select>
-                        <button type="submit" class="btn">Update</button>
+                        <button type="submit" class="btn pb-1 pt-1" id="buttons">Update</button>
                     </form>
                 </div>
                 <div class="back-link">

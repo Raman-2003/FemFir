@@ -15,7 +15,7 @@ const logedin = async (req, res, next) => {
 const logedout = async (req, res, next) => {
     try {
         if (req.session.user) {
-            console.log('logout checked');
+            console.log('logout checked'); 
             return res.redirect('/');
         }
         next();

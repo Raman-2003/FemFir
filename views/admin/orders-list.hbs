@@ -140,6 +140,11 @@
         a:hover {
             color: #0056b3;
         }
+        .dates{
+            display: flex;
+           width: 110px;
+           margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -156,9 +161,9 @@
                         <th>Original Price</th>
                         <th>Discounted Price</th>
                         <th>Total Price</th>
-                        <th>Order Date</th>
+                        <th class="dates">Order Date</th>
                         <th>Quantity</th>
-                        <th>Status</th>
+                        {{!-- <th>Status</th> --}}
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -195,7 +200,7 @@
                             {{this.quantity}} <br>
                             {{/each}}
                         </td>
-                        <td>{{this.returnStatus}}</td>
+                        {{!-- <td>{{this.returnStatus}}</td> --}}
                         <td>
                             <form action="/admin/orders/status" method="POST">
                                 <input type="hidden" name="orderId" value="{{this._id}}">

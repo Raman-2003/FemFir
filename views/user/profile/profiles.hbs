@@ -221,6 +221,7 @@
                         <!-- profiles.hbs -->
 
                         <!-- Orders Tab -->
+<!-- Orders Tab -->
 <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
     <div class="orders-container">
         <h4>Order Details</h4>
@@ -241,7 +242,7 @@
                 <tbody>
                     {{#each userOrders}}
                     <tr>
-                        <td>{{@index}}</td>
+                        <td>{{increment @index}}</td>
                         <td>
                             {{#each this.items}}
                             <div><a href="/viewone/{{this.product._id}}">{{this.product.name}}</a></div>
@@ -249,8 +250,7 @@
                         </td>
                         <td>
                             {{#each this.items}}
-                            <div><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"
-                                    style="width: 80px; height: 110px;"></div>
+                            <div><img src="{{this.product.mainImage}}" alt="{{this.product.name}}" style="width: 80px; height: 110px;"></div>
                             {{/each}}
                         </td>
                         <td>
@@ -263,31 +263,19 @@
                         <td>{{this.status}}</td>
                         <td>
                             <button onclick="location.href='/view-order/{{this._id}}'" style="width:90px;">View</button>
-                            
-                           
-                            <!-- Show Cancel button for 'Pending', 'Processed', and 'Shipped' statuses 
+
                             {{#if (or (eq this.status 'Pending') (eq this.status 'Processed') (eq this.status 'Shipped'))}}
                             <form action="/cancel-order/{{this._id}}" method="POST" style="display:inline;">
                                 <button type="submit" style="background-color: red; color: white; width:90px;">Cancel</button>
                             </form>
-                            {{/if}}
-                            -->
-                            {{#if (or (eq this.status 'Pending') (eq this.status 'Processed')  (eq this.status 'Shipped'))}}
-                            <form action="/cancel-order/{{this._id}}" method="POST" style="display:inline;">
-                                <button type="submit" style="background-color: red; color: white; width:90px;">Cancel</button>
-                            </form>
-                            {{/if}}
+                            {{/if}} 
 
-                           
-
-                            <!-- Show Return button for 'Delivered' status -->
                             {{#if (eq this.status 'Delivered')}}
                             <form action="/return-order/{{this._id}}" method="GET" style="display:inline;">
                                 <button type="submit" style="background-color: orange; width:90px; color: white;">Return</button>
                             </form>
                             {{/if}}
 
-                            <!-- Show Cancel Return Request button if the return status is 'Requested' -->
                             {{#if (eq this.status 'Request Processed')}}
                             <form action="/cancel-return/{{this._id}}" method="POST" style="display:inline;">
                                 <button type="submit" style="background-color: grey; color: white; width:90px; height: 60px">Cancel Request</button>
@@ -299,8 +287,35 @@
                 </tbody>
             </table>
         </div>
+        <!-- Pagination Controls -->
+        <nav aria-label="Order pagination">
+            <ul class="pagination justify-content-center">
+                {{#if (gt current 1)}}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{subtract current 1}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {{/if}}
+
+                {{#each (range 1 pages)}}
+                <li class="page-item {{#if (eq this ../current)}}active{{/if}}">
+                    <a class="page-link" href="?page={{this}}">{{this}}</a>
+                </li>
+                {{/each}}
+
+                {{#if (lt current pages)}}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{add current 1}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {{/if}}
+            </ul>
+        </nav>
     </div>
 </div>
+
 
 
 
