@@ -62,7 +62,7 @@ module.exports = {
         }
     },
 
-    placeOrder : async (req, res) => {
+    placeOrder: async (req, res) => {
         try {
             const userData = req.session.user;
             if (!userData) {
@@ -84,18 +84,16 @@ module.exports = {
                 return res.status(400).json({ message: 'Payment method and billing address are required' });
             }
     
-            // const totalAmount = user.cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
             const totalAmount = user.cart.reduce((total, item) => {
                 const discount = item.product.offer?.discountPercentage || 0;
                 const discountedPrice = item.product.price * (1 - discount / 100);
                 return total + discountedPrice * item.quantity;
             }, 0);
-
-            // const items = user.cart.map(item => ({
-            //     product: item.product._id,
-            //     quantity: item.quantity,
-            //     total: item.product.price * item.quantity
-            // }));
+    
+            if (paymentMethod === 'Cash on Delivery' && totalAmount < 1000) {
+                return res.status(400).json({ message: 'Cash on Delivery is only available for orders above 1000 rupees' });
+            }
+    
             const items = user.cart.map(item => {
                 const discount = item.product.offer?.discountPercentage || 0;
                 const discountedPrice = item.product.price * (1 - discount / 100);
@@ -149,7 +147,7 @@ module.exports = {
                 await order.save();
     
                 const options = {
-                    amount: totalAmount * 100, 
+                    amount: totalAmount * 100, // Razorpay expects amount in paise
                     currency: "INR",
                     receipt: String(order._id)
                 };
@@ -173,6 +171,7 @@ module.exports = {
             res.status(500).json({ message: 'Server error', error: error.message });
         }
     },
+    
     
     
 
