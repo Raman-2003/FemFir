@@ -6,7 +6,7 @@ const Address = require('../models/addressSchema');
 
 
 
-const addToCart = async (req, res) => {
+const addToCart = async (req, res) => { 
     try {
         const userData = req.session.user;
         if (!userData) {
@@ -94,7 +94,6 @@ const loadCart = async (req, res) => {
             let effectivePrice = item.product.price;
             let appliedDiscount = 0;
 
-          
             if (item.product.offer && item.product.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!item.product.offer.expiryDate || new Date(item.product.offer.expiryDate) >= currentDate) {
@@ -103,7 +102,6 @@ const loadCart = async (req, res) => {
                 }
             }
 
-       
             if (item.product.category && item.product.category.offer && item.product.category.offer.discountPercentage > 0) {
                 const currentDate = new Date();
                 if (!item.product.category.offer.expiryDate || new Date(item.product.category.offer.expiryDate) >= currentDate) {
@@ -114,7 +112,8 @@ const loadCart = async (req, res) => {
                 }
             }
 
-            item.discountedPrice = effectivePrice; 
+            // Set the discounted price if any discounts are applied, otherwise use the original price
+            item.discountedPrice = appliedDiscount > 0 ? effectivePrice : item.product.price; 
             item.total = effectivePrice * item.quantity; 
             subTotal += item.total; 
 
@@ -134,6 +133,7 @@ const loadCart = async (req, res) => {
         res.status(500).render('error');
     }
 };
+
 
 
 

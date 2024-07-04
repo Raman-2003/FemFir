@@ -22,7 +22,7 @@ const cartController = require('../controllers/cart');
 
 const {
     getCheckoutPage, placeOrder, getOrderDetailsPage, cancelOrder, returnOrder, 
-    getCartCheckoutPage, getInvoice, setDefaultAddress, loadUserCoupons, applyCoupon, removeCoupon
+    getCartCheckoutPage, setDefaultAddress, loadUserCoupons, applyCoupon, removeCoupon
 } = require('../controllers/checkout');
 
 const paymentCtrl = require('../controllers/paymentCtrl')

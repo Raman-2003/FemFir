@@ -55,29 +55,39 @@ const showWishlistPage = async (req, res) => {
             }
         ]);
 
+        let hasOffers = false;
+
         const updatedWishListProd = WishListProd.map(product => {
             let effectivePrice = product.originalPrice;
+            let isDiscounted = false;
 
             if (product.productOffer && product.productOffer.discountPercentage > 0) {
                 effectivePrice = product.originalPrice * (1 - product.productOffer.discountPercentage / 100);
+                isDiscounted = true;
             } else if (product.categoryOffer && product.categoryOffer.discountPercentage > 0) {
                 effectivePrice = product.originalPrice * (1 - product.categoryOffer.discountPercentage / 100);
+                isDiscounted = true;
             }
 
-           
+            if (isDiscounted) {
+                hasOffers = true;
+            }
+
             return {
                 ...product,
-                effectivePrice: effectivePrice.toFixed(0)
+                effectivePrice: effectivePrice.toFixed(0),
+                hasDiscount: isDiscounted
             };
         });
 
-        res.render('user/wishlist', { userData, WishListProd: updatedWishListProd });
+        res.render('user/wishlist', { userData, WishListProd: updatedWishListProd, hasOffers });
 
     } catch (error) {
         console.error("An error occurred while fetching the wishlist:", error);
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
 const addToWishList = async (req, res) => {
@@ -126,7 +136,7 @@ const addToWishList = async (req, res) => {
 
 const removeFromWishList = async (req, res) => {
     try {
-        const { id, wishId } = req.body;
+        const { id, wishId } = req.body; 
 
         const productIdToRemove = new mongoose.Types.ObjectId(id);
         const wishListId = new mongoose.Types.ObjectId(wishId);

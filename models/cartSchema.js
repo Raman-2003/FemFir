@@ -7,7 +7,7 @@ const cartItemSchema = new Schema({
     total: { type: Number, required: true },
     mrpTotal: { type: Number, required: true } // Add MRP total field 
 });
-
+ 
 const cartSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     items: [cartItemSchema]

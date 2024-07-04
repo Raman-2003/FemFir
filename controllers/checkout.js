@@ -29,7 +29,7 @@ const calculateTotalWithOffers = (product, quantity) => {
 };
 
 
-module.exports = {
+module.exports = { 
   
     getCheckoutPage: async (req, res) => {
         try {
@@ -273,22 +273,7 @@ module.exports = {
         }
     },
 
-    getInvoice: async (req, res) => {
-        try {
-            const user = req.session.user;
-            if (!user) return res.redirect('/login');
-
-            const orderId = req.params.id;
-            const order = await Order.findById(orderId).populate('items.product').populate('billingAddress').populate('shippingAddress').lean();
-
-            if (!order || order.userId.toString() !== user._id.toString()) return res.status(404).send('Order not found');
-
-            res.render('user/invoice', { order });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Internal Server Error');
-        }
-    },
+   
 
     setDefaultAddress: async (req, res) => {
         try {

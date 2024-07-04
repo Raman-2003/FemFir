@@ -75,6 +75,15 @@
 .coupon-item:hover {
     background-color: #f9f9f9;
 }
+
+ .original-price {
+        text-decoration: line-through;
+        color: #888;
+    }
+    .discounted-price {
+        color: #d9534f;
+        font-weight: bold;
+    }
     </style>
 </head>
 
@@ -89,6 +98,7 @@
     </div>
 </div>
 <!-- Breadcrumb End -->
+
 
 <!-- Cart Start -->
 <div class="cart-page">
@@ -113,13 +123,16 @@
                                 <td><a href="#"><img src="{{this.product.mainImage}}" alt="{{this.product.name}}"></a></td>
                                 <td><a href="/viewone/{{this.product._id}}">{{this.product.name}}</a></td>
                                 <td class="item-price">
-                                  
+                                    <!-- Display discounted price if available, otherwise show original price -->
                                     {{#if this.product.offer.discountPercentage}}
-                                    <span >₹{{discountedPrice this.product.price this.product.offer.discountPercentage}}</span>
+                                        <span class="original-price">₹{{this.product.price}}</span>
+                                        <span class="discounted-price">₹{{discountedPrice this.product.price this.product.offer.discountPercentage}}</span>
+                                    {{else if this.product.category.offer.discountPercentage}}
+                                        <span class="original-price">₹{{this.product.price}}</span>
+                                        <span class="discounted-price">₹{{discountedPrice this.product.price this.product.category.offer.discountPercentage}}</span>
+                                    {{else}}
+                                        <span>₹{{this.product.price}}</span>
                                     {{/if}}
-                                    {{#if this.product.category.offer.discountPercentage}}
-                                    <span >₹{{discountedPrice this.product.price this.product.category.offer.discountPercentage}}</span>
-                                    {{/if}} 
                                 </td>
                                 <td>
                                     <div class="qty">
@@ -128,7 +141,15 @@
                                         <button class="btn-plus" data-product-id="{{this.product._id}}"><i class="fa fa-plus"></i></button>
                                     </div>
                                 </td>
-                                <td class="item-total" id="lasttotal">₹{{this.total}}</td>
+                                <td class="item-total">
+                                    {{#if this.product.offer.discountPercentage}}
+                                        <span>₹{{discountedPrice this.product.price this.product.offer.discountPercentage}}</span>
+                                    {{else if this.product.category.offer.discountPercentage}}
+                                        <span>₹{{discountedPrice this.product.price this.product.category.offer.discountPercentage}}</span>
+                                    {{else}}
+                                        <span>₹{{this.product.price}}</span>
+                                    {{/if}}
+                                </td>
                                 <td><button class="btn-remove" data-product-id="{{this.product._id}}"><i class="fa fa-trash"></i></button></td>
                             </tr>
                             {{/each}}
@@ -148,7 +169,6 @@
                         <h4>Grand Total<span id="grand-total">₹{{grandTotal}}</span></h4>
                     </div>
                     <div class="cart-btn">
-                        {{!-- <button id="update-cart-btn">Update Cart</button> --}}
                         <button id="checkout-btn" onclick="goToCheckout()">Checkout</button>
                     </div>
                 </div>
@@ -218,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const updateCartSummary = (subTotal, grandTotal) => {
         document.getElementById('sub-total').innerText = `₹${subTotal.toFixed(0)}`;
         document.getElementById('grand-total').innerText = `₹${grandTotal.toFixed(0)}`;
-    };
+    }; 
 
     const updateCartItem = (productId, newTotal) => {
         const cartItem = document.querySelector(`tr[data-product-id="${productId}"] .item-total`);
