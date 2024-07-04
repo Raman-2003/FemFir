@@ -68,7 +68,7 @@
             <li><span>Created At</span><span>{{formatDate order.createdAt}}</span></li>
         </ul>
 
-        <h3>Shipping Address</h3>
+        <h3>Shipping Address</h3> 
         <ul class="order-details">
             <li><span>Name</span><span>{{order.billingAddress.name}}</span></li>
             <li><span>Address Line 1</span><span>{{order.billingAddress.addressLine1}}</span></li>
@@ -87,6 +87,8 @@
         </ul>
 
         <a href="#" class="back-button" onclick="window.history.back()">Back</a>
+
+        <a href="/order/{{order._id}}/invoice" class="btn btn-primary">Download Invoice</a>
     </div>
 </body>
 </html>

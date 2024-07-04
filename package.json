@@ -16,6 +16,7 @@
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "crypto": "^1.0.1",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "errors": "^0.3.0",
     "express": "^4.19.2",
