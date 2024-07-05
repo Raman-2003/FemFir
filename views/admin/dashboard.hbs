@@ -1,3 +1,9 @@
+<!-- Include jQuery and jQuery UI for Datepicker -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <!-- Preloader start -->
 <div id="preloader">
     <div class="sk-three-bounce">
@@ -169,6 +175,35 @@
         </div>
         <!-- End of Top Selling Categories Section -->
 
+        <!-- Chart Section with Filters -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Order Analysis</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-lg-4">
+                        <select id="filterType" class="form-control">
+                            <option value="products">Products</option>
+                            <option value="categories">Categories</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
+                        <input type="text" id="filterDate" class="form-control" placeholder="Select Date">
+                    </div>
+                    <div class="col-lg-4">
+                        <button id="applyFilter" class="btn btn-primary">Apply Filter</button>
+                    </div>
+                </div>
+                <canvas id="orderAnalysisChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End of Chart Section -->
+
     </div>
 </div>
 <!-- Content body end -->
@@ -200,4 +235,65 @@
             categoryListing.style.display = 'none';
         }
     });
+
+  document.getElementById('applyFilter').addEventListener('click', function() {
+        const filterType = document.getElementById('filterType').value;
+        const filterDate = document.getElementById('filterDate').value;
+
+        console.log(`Fetching data for filterType=${filterType}, filterDate=${filterDate}`);
+
+        // Fetch data based on filters and update chart
+        fetch(`/admin/order-analysis?filterType=${filterType}&filterDate=${filterDate}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+                updateChart(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    });
+
+    const ctx = document.getElementById('orderAnalysisChart').getContext('2d');
+    let orderAnalysisChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [], // Will be updated dynamically
+            datasets: [{
+                label: 'Orders',
+                data: [], // Will be updated dynamically
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    function updateChart(data) {
+        orderAnalysisChart.data.labels = data.labels;
+        orderAnalysisChart.data.datasets[0].data = data.orders;
+        orderAnalysisChart.update();
+    }
+
+    $(document).ready(function() {
+        $('#filterDate').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+    });
 </script>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

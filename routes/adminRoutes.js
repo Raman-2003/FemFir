@@ -64,7 +64,7 @@ router.get('/', async (req, res) => {
         },
         { $unwind: '$categoryDetails' }, // Unwind the category details array
         { $sort: { totalQuantity: -1 } }, // Sort by total quantity in descending order
-        { $limit: 5 }, // Limit to top 5 products
+        { $limit: 10 }, // Limit to top 5 products
         {
           $project: {
             productName: '$productDetails.name',
@@ -190,6 +190,105 @@ router.get('/', async (req, res) => {
       res.status(500).send('Server Error');
   }
 });
+
+
+
+
+router.get('/order-analysis', async (req, res) => {
+    const { filterType, filterDate } = req.query;
+
+    console.log(`Received request for filterType=${filterType}, filterDate=${filterDate}`);
+
+    try {
+        let data;
+        if (filterType === 'products') {
+            data = await getProductOrderAnalysis(filterDate);
+        } else {
+            data = await getCategoryOrderAnalysis(filterDate);
+        }
+
+        console.log('Sending data:', data);
+        res.json(data);
+    } catch (error) {
+        console.error('Error processing request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+async function getProductOrderAnalysis(date) {
+    console.log(`Fetching product order analysis for date=${date}`);
+    
+    const startDate = new Date(date);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1); // Set end date to the next day
+
+    // Example query to fetch order data grouped by product
+    const orders = await Order.aggregate([
+        { $match: { createdAt: { $gte: startDate, $lt: endDate } } },
+        { $unwind: '$items' },
+        { $lookup: {
+            from: 'products',
+            localField: 'items.product',
+            foreignField: '_id',
+            as: 'productDetails'
+        }},
+        { $unwind: '$productDetails' },
+        { $group: {
+            _id: '$productDetails.name',
+            totalQuantity: { $sum: '$items.quantity' }
+        }},
+        { $sort: { totalQuantity: 1 } },
+        { $limit: 10 }
+    ]);
+
+    const labels = orders.map(order => order._id);
+    const data = orders.map(order => order.totalQuantity);
+
+    return { labels, orders: data };
+}
+
+async function getCategoryOrderAnalysis(date) {
+    console.log(`Fetching category order analysis for date=${date}`);
+    
+    const startDate = new Date(date);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1); // Set end date to the next day
+
+    // Example query to fetch order data grouped by category
+    const orders = await Order.aggregate([
+        { $match: { createdAt: { $gte: startDate, $lt: endDate } } },
+        { $unwind: '$items' },
+        { $lookup: {
+            from: 'products',
+            localField: 'items.product',
+            foreignField: '_id',
+            as: 'productDetails'
+        }},
+        { $unwind: '$productDetails' },
+        { $lookup: {
+            from: 'categories',
+            localField: 'productDetails.category',
+            foreignField: '_id',
+            as: 'categoryDetails'
+        }},
+        { $unwind: '$categoryDetails' },
+        { $group: {
+            _id: '$categoryDetails.name',
+            totalQuantity: { $sum: '$items.quantity' }
+        }},
+        { $sort: { totalQuantity: 1 } },
+        { $limit: 10 }
+    ]);
+
+    const labels = orders.map(order => order._id);
+    const data = orders.map(order => order.totalQuantity);
+
+    return { labels, orders: data };
+}
+
+
+
+
 
 router.get(['/','/adminlogin'], isLogout, adminLogin);
 router.post('/adminlogin', isLogout, doadminLogin);
