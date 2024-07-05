@@ -195,16 +195,16 @@ router.get('/', async (req, res) => {
 
 
 router.get('/order-analysis', async (req, res) => {
-    const { filterType, filterDate } = req.query;
+    const { filterType,dateRange, filterDate } = req.query;
 
-    console.log(`Received request for filterType=${filterType}, filterDate=${filterDate}`);
+    console.log(`Received request for filterType=${filterType},dateRange=${dateRange}, filterDate=${filterDate}`);
 
     try {
         let data;
         if (filterType === 'products') {
-            data = await getProductOrderAnalysis(filterDate);
+            data = await getProductOrderAnalysis(dateRange, filterDate);
         } else {
-            data = await getCategoryOrderAnalysis(filterDate);
+            data = await getCategoryOrderAnalysis(dateRange, filterDate);
         }
 
         console.log('Sending data:', data);
@@ -215,14 +215,10 @@ router.get('/order-analysis', async (req, res) => {
     }
 });
 
-async function getProductOrderAnalysis(date) {
-    console.log(`Fetching product order analysis for date=${date}`);
-    
-    const startDate = new Date(date);
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 1); // Set end date to the next day
+// Updated function for product order analysis
+async function getProductOrderAnalysis(dateRange, filterDate) {
+    const { startDate, endDate } = getDateRange(dateRange, filterDate);
 
-    // Example query to fetch order data grouped by product
     const orders = await Order.aggregate([
         { $match: { createdAt: { $gte: startDate, $lt: endDate } } },
         { $unwind: '$items' },
@@ -237,7 +233,7 @@ async function getProductOrderAnalysis(date) {
             _id: '$productDetails.name',
             totalQuantity: { $sum: '$items.quantity' }
         }},
-        { $sort: { totalQuantity: 1 } },
+        { $sort: { totalQuantity: -1 } },
         { $limit: 10 }
     ]);
 
@@ -247,14 +243,10 @@ async function getProductOrderAnalysis(date) {
     return { labels, orders: data };
 }
 
-async function getCategoryOrderAnalysis(date) {
-    console.log(`Fetching category order analysis for date=${date}`);
-    
-    const startDate = new Date(date);
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 1); // Set end date to the next day
+// Updated function for category order analysis
+async function getCategoryOrderAnalysis(dateRange, filterDate) {
+    const { startDate, endDate } = getDateRange(dateRange, filterDate);
 
-    // Example query to fetch order data grouped by category
     const orders = await Order.aggregate([
         { $match: { createdAt: { $gte: startDate, $lt: endDate } } },
         { $unwind: '$items' },
@@ -276,7 +268,7 @@ async function getCategoryOrderAnalysis(date) {
             _id: '$categoryDetails.name',
             totalQuantity: { $sum: '$items.quantity' }
         }},
-        { $sort: { totalQuantity: 1 } },
+        { $sort: { totalQuantity: -1 } },
         { $limit: 10 }
     ]);
 
@@ -284,6 +276,40 @@ async function getCategoryOrderAnalysis(date) {
     const data = orders.map(order => order.totalQuantity);
 
     return { labels, orders: data };
+}
+
+// Helper function to get date range based on selected option
+function getDateRange(dateRange, filterDate) {
+    const now = new Date();
+    let startDate, endDate;
+
+    switch (dateRange) {
+        case 'today':
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 1);
+            break;
+        case 'month':
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            break;
+        case 'year':
+            startDate = new Date(now.getFullYear(), 0, 1);
+            endDate = new Date(now.getFullYear() + 1, 0, 1);
+            break;
+        case 'custom':
+            startDate = new Date(filterDate);
+            endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 1);
+            break;
+        default:
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 1);
+            break;
+    }
+
+    return { startDate, endDate };
 }
 
 
