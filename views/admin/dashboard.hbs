@@ -1,135 +1,203 @@
-<!--*******************
-        Preloader start
-    ********************-->
-    <div id="preloader">
-        <div class="sk-three-bounce">
-            <div class="sk-child sk-bounce1"></div>
-            <div class="sk-child sk-bounce2"></div>
-            <div class="sk-child sk-bounce3"></div>
-        </div>
+<!-- Preloader start -->
+<div id="preloader">
+    <div class="sk-three-bounce">
+        <div class="sk-child sk-bounce1"></div>
+        <div class="sk-child sk-bounce2"></div>
+        <div class="sk-child sk-bounce3"></div>
     </div>
-    <!--*******************
-        Preloader end
-    ********************-->
+</div>
+<!-- Preloader end -->
 
-
-        <!--**********************************
-            Content body start 
-        ***********************************-->
-        <div class="content-body">
-            <!-- row -->
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="card">
-                            <div class="stat-widget-two card-body">
-                                <div class="stat-content">
-                                    <div class="stat-text">Overall Sales Count</div>
-                                    <div class="stat-digit"> <span>Count :</span>{{overallSalesCount}}</div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="85"
-                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
+<!-- Content body start -->
+<div class="content-body">
+    <!-- row -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-sm-6">
+                <div class="card">
+                    <div class="stat-widget-two card-body">
+                        <div class="stat-content">
+                            <div class="stat-text">Overall Sales Count</div>
+                            <div class="stat-digit"> <span>Count :</span>{{overallSalesCount}}</div>
                         </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="card">
-                            <div class="stat-widget-two card-body">
-                                <div class="stat-content">
-                                    <div class="stat-text">Overall Order Amount</div>
-                                    <div class="stat-digit"> <i class="fa fa-usd"></i>{{overallOrderAmount}}</div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="85"
-                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="card">
-                        <div class="stat-widget-two card-body">
-                            <div class="stat-content">
-                                <div class="stat-text">Total discount</div>
-                                <div class="stat-digit"> <i class="fa fa-usd"></i> {{totalDiscount}}</div>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="50"
-                                    aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="85"
+                                aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
                 </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="card">
-                            <div class="stat-widget-two card-body">
-                                <div class="stat-content">
-                                    <div class="stat-text">Total users</div>
-                                    <div class="stat-digit"> <i class="fa fa-usd"></i>{{totalUserCount}}</div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="card">
+                    <div class="stat-widget-two card-body">
+                        <div class="stat-content">
+                            <div class="stat-text">Overall Order Amount</div>
+                            <div class="stat-digit"> <i class="fa fa-usd"></i>{{overallOrderAmount}}</div>
                         </div>
-                        <!-- /# card -->
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="85"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
                     </div>
-                    <!-- /# column -->
                 </div>
-                <div class="row">
-                    <div class="col-xl-8 col-lg-8 col-md-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title mb-0">Sales Overview</h4>
-                                <button class="btn btn-success"> <a style="color: black;" href="/admin/report">Sales Report</a></button>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-xl-12 col-lg-8">
-                                        <div id="morris-bar-chart"></div>
-                                    </div>
-                                </div>
-                            </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="card">
+                    <div class="stat-widget-two card-body">
+                        <div class="stat-content">
+                            <div class="stat-text">Total discount</div>
+                            <div class="stat-digit"> <i class="fa fa-usd"></i> {{totalDiscount}}</div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="50"
+                                aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
-                  
-                    <div class="col-xl-4 col-lg-4 col-md-4">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <div class="m-t-10">
-                                    <h4 class="card-title">Customer Feedback</h4>
-                                    <h2 class="mt-3">385749</h2>
-                                </div>
-                                <div class="widget-card-circle mt-5 mb-5" id="info-circle-card">
-                                    <i class="ti-control-shuffle pa"></i>
-                                </div>
-                                <ul class="widget-line-list m-b-15">
-                                    <li class="border-right">92% <br><span class="text-success"><i
-                                                class="ti-hand-point-up"></i> Positive</span></li>
-                                    <li>8% <br><span class="text-danger"><i
-                                                class="ti-hand-point-down"></i>Negative</span></li>
-                                </ul>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="card">
+                    <div class="stat-widget-two card-body">
+                        <div class="stat-content">
+                            <div class="stat-text">Total users</div>
+                            <div class="stat-digit"> <i class="fa fa-usd"></i>{{totalUserCount}}</div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="75"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Overview Section -->
+        <div class="row">
+            <div class="col-xl-8 col-lg-8 col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Sales Overview</h4>
+                        <button class="btn btn-success"> <a style="color: black;" href="/admin/report">Sales Report</a></button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-8">
+                                <div id="morris-bar-chart"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!--**********************************
-            Content body end
-        ***********************************-->
 
-
-        <!--**********************************
-            Footer start
-        ***********************************-->
-        <div class="footer">
-            <div class="copyright">
-                <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
+        <!-- Buttons to Toggle Listings -->
+        <div class="row">
+            <div class="col-lg-12">
+                <button id="toggleProductListing" class="btn btn-primary mb-3">Toggle Product Listing</button>
+                <button id="toggleCategoryListing" class="btn btn-primary mb-3">Toggle Category Listing</button>
             </div>
         </div>
-        <!--**********************************
-            Footer end
-        ***********************************-->
+
+        <!-- Top Ordered Products Section -->
+        <div id="productListing" class="row" style="display: none;">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Top 5 Ordered Products</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr style="color: rgb(34, 95, 193); font-family:Georgia, 'Times New Roman', Times, serif; text-align:center">
+                                        <th>Product Image</th>
+                                        <th>Product Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Ordered Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="color: #333;">
+                                    {{#each topOrderedProducts}}
+                                    <tr>
+                                        <td><img src="{{this.productImage}}" alt="{{this.productName}}" style="width: 80px; height: 120px;"></td>
+                                        <td>{{this.productName}}</td>
+                                        <td>{{this.categoryName}}</td>
+                                        <td>${{this.price}}</td>
+                                        <td style="text-align: center;">{{this.quantity}}</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Selling Categories Section -->
+        <div id="categoryListing" class="row" style="display: none;">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Top 5 Selling Categories</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr style="color: rgb(34, 95, 193); font-family: Georgia, 'Times New Roman', Times, serif; text-align: center">
+                                        <th>Category Image</th>
+                                        <th>Category Name</th>
+                                        <th>Total Selling Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="color: #333; text-align:center">
+                                    {{#each topSellingCategories}}
+                                    <tr>
+                                        <td><img src="/uploads/categories/{{this.categoryImage}}" alt="{{this.categoryName}}" style="width: 80px; height: 120px;"></td>
+                                        <td>{{this.categoryName}}</td>
+                                        <td style="text-align: center;">{{this.totalQuantity}}</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Top Selling Categories Section -->
+
+    </div>
+</div>
+<!-- Content body end -->
+
+<!-- Footer start -->
+<div class="footer">
+    <div class="copyright">
+        <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
+    </div>
+</div>
+<!-- Footer end -->
+
+<!-- JavaScript to Toggle Listings -->
+<script>
+    document.getElementById('toggleProductListing').addEventListener('click', function() {
+        const productListing = document.getElementById('productListing');
+        if (productListing.style.display === 'none') {
+            productListing.style.display = 'block';
+        } else {
+            productListing.style.display = 'none';
+        }
+    });
+
+    document.getElementById('toggleCategoryListing').addEventListener('click', function() {
+        const categoryListing = document.getElementById('categoryListing');
+        if (categoryListing.style.display === 'none') {
+            categoryListing.style.display = 'block';
+        } else {
+            categoryListing.style.display = 'none';
+        }
+    });
+</script>

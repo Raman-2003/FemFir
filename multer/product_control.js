@@ -7,7 +7,7 @@ const categoryStorage = multer.diskStorage({
         cb(null, 'public/uploads/categories/');
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
+        cb(null, Date.now() + path.extname(file.originalname)); 
     }
 });
 

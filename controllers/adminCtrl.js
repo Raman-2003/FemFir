@@ -4,7 +4,8 @@ const User = require('../models/userSchema');
 const Coupon = require('../models/couponSchema');
 const moment = require('moment');
 
-let adminmail;
+
+let adminmail; 
 let hashedPassword;
 let adminRegesterData;
 let adminData;
@@ -22,7 +23,7 @@ const adminHome = async (req, res) => {
     console.log(error.message);
     res.status(500).send('Internal Server Error');
     }
-    };
+};
     
 
 // show login

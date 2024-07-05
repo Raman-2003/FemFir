@@ -28,13 +28,89 @@ const returnOrdersController  = require('../controllers/returnOrders');
 const salesController = require('../controllers/salesController');
 const Sale = require('../models/saleSchema');
 const Order = require('../models/orderSchema');
-const User = require('../models/userSchema');
+const User = require('../models/userSchema'); 
 const mongoose = require('mongoose');
 const moment = require('moment'); // Ensure moment is required
 
 
 router.get('/', async (req, res) => {
   try {
+
+    const topOrderedProducts = await Order.aggregate([
+        { $unwind: '$items' }, // Unwind the items array to process each product individually
+        {
+          $group: {
+            _id: '$items.product',
+            totalQuantity: { $sum: '$items.quantity' },
+            totalPrice: { $sum: '$items.total' }
+          }
+        },
+        {
+          $lookup: {
+            from: 'products', // Join with the products collection
+            localField: '_id',
+            foreignField: '_id',
+            as: 'productDetails'
+          }
+        },
+        { $unwind: '$productDetails' }, // Unwind the product details array
+        {
+            $lookup: {
+                from: 'categories', // Join with the categories collection
+      localField: 'productDetails.category',
+      foreignField: '_id',
+      as: 'categoryDetails'
+            }
+        },
+        { $unwind: '$categoryDetails' }, // Unwind the category details array
+        { $sort: { totalQuantity: -1 } }, // Sort by total quantity in descending order
+        { $limit: 5 }, // Limit to top 5 products
+        {
+          $project: {
+            productName: '$productDetails.name',
+            productImage: '$productDetails.mainImage',
+            categoryName: '$categoryDetails.name',
+            price: '$productDetails.price',
+            quantity: '$totalQuantity'
+          }
+        }
+      ]);
+
+      // New query to get top five selling categories
+    const topSellingCategories = await Order.aggregate([
+        { $unwind: '$items' }, // Unwind the items array to process each product individually
+        {
+          $lookup: {
+            from: 'products', // Join with the products collection
+            localField: 'items.product',
+            foreignField: '_id',
+            as: 'productDetails'
+          }
+        },
+        { $unwind: '$productDetails' }, // Unwind the product details array
+        {
+          $lookup: {
+            from: 'categories', // Join with the categories collection
+            localField: 'productDetails.category',
+            foreignField: '_id',
+            as: 'categoryDetails'
+          }
+        },
+        { $unwind: '$categoryDetails' }, // Unwind the category details array
+        {
+          $group: {
+            _id: '$categoryDetails._id',
+            categoryName: { $first: '$categoryDetails.name' },
+            categoryImage: { $first: '$categoryDetails.image' },
+            totalQuantity: { $sum: '$items.quantity' }
+          }
+        },
+        { $sort: { totalQuantity: -1 } }, // Sort by total quantity in descending order
+        { $limit: 5 } // Limit to top 5 categories
+      ]);
+  
+
+
       const overallSalesCount = await Order.countDocuments({ status: 'Delivered' });
 
       const overallOrderAmountResult = await Order.aggregate([
@@ -108,7 +184,7 @@ router.get('/', async (req, res) => {
 
       const totalUserCount = await User.countDocuments();
 
-      res.render('admin/dashboard', { overallSalesCount, overallOrderAmount, totalDiscount,totalUserCount, layout: 'adminLayout' });
+      res.render('admin/dashboard', { overallSalesCount, overallOrderAmount, totalDiscount,totalUserCount,topOrderedProducts, topSellingCategories, layout: 'adminLayout' });
   } catch (err) {
       console.error(err);
       res.status(500).send('Server Error');
