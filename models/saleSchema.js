@@ -1,4 +1,5 @@
 const mongoose = require('mongoose'); 
+const Ledger = require('../models/ledgerSchema');
 
 const SaleSchema = new mongoose.Schema({
     productName: String,
@@ -25,6 +26,23 @@ const SaleSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Address',
         required: false 
+    }
+});
+
+SaleSchema.post('save', async function(doc, next) {
+    try {
+        await Ledger.create({
+            entryType: 'Sale',
+            entryId: doc._id,
+            userId: doc.user,
+            amount: doc.totalPrice,
+            description: `Sale of ${doc.productName}`,
+            transactionType: 'credit',
+            status: 'completed'
+        });
+        next();
+    } catch (error) {
+        next(error);
     }
 });
 

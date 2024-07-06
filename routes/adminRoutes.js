@@ -31,6 +31,7 @@ const Order = require('../models/orderSchema');
 const User = require('../models/userSchema'); 
 const mongoose = require('mongoose');
 const moment = require('moment'); // Ensure moment is required
+const Ledger = require('../models/ledgerSchema');
 
 
 router.get('/', async (req, res) => {
@@ -312,7 +313,37 @@ function getDateRange(dateRange, filterDate) {
     return { startDate, endDate };
 }
 
+// Route to view ledger entries
+router.get('/ledger', async (req, res) => {
+    try {
+        const ledgerEntries = await Ledger.find().populate('userId').sort({ createdAt: -1 });
+        res.render('admin/ledger', { ledgerEntries , layout: 'adminLayout'});
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
 
+// Route to download ledger entries as CSV
+router.get('/ledger/download', async (req, res) => {
+    try {
+        const ledgerEntries = await Ledger.find().populate('userId').sort({ createdAt: -1 });
+        const csv = ledgerEntries.map(entry => ({
+            EntryType: entry.entryType,
+            UserId: entry.userId.firstname, // Assuming User model has a 'name' field
+            Amount: entry.amount,
+            Description: entry.description,
+            TransactionType: entry.transactionType,
+            Status: entry.status,
+            // CreatedAt: entry.createdAt
+        }));
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment('ledger.csv');
+        res.send(csv.join('\n'));
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 
 

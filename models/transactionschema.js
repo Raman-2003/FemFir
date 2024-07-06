@@ -1,8 +1,6 @@
-
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+const Ledger = require('../models/ledgerSchema');
 
 const TransactionSchema = new Schema({
     userId: {
@@ -34,6 +32,23 @@ const TransactionSchema = new Schema({
     }
 }, {
     timestamps: true 
+});
+
+TransactionSchema.post('save', async function(doc, next) {
+    try {
+        await Ledger.create({
+            entryType: 'Transaction',
+            entryId: doc._id,
+            userId: doc.userId,
+            amount: doc.amount,
+            description: doc.description,
+            transactionType: doc.type,
+            status: doc.status
+        });
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
 module.exports = mongoose.model('Transaction', TransactionSchema);
