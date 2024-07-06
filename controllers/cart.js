@@ -91,6 +91,13 @@ const loadCart = async (req, res) => {
         const cart = user.cart || [];
         let subTotal = 0;
         cart.forEach(item => {
+
+            //  // Check if the product exists
+            //  if (!item.product) {
+            //     console.error('Product not found for cart item:', item);
+            //     return;
+            // }
+            
             let effectivePrice = item.product.price;
             let appliedDiscount = 0;
 

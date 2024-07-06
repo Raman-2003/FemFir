@@ -8,7 +8,7 @@ const moment = require('moment');
 let adminmail; 
 let hashedPassword;
 let adminRegesterData;
-let adminData;
+let adminData; 
 
 // dashboard page
 const adminHome = async (req, res) => {
