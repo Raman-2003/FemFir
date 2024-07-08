@@ -583,7 +583,7 @@
         const codOption = document.getElementById('cashOnDelivery');
         const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
-        // Check if total is less than 1000 and COD is selected
+        // Check if total is less than 1000 and COD is selected 
         if (total < 1000 && paymentMethod === 'Cash on Delivery') {
             Swal.fire({
                 icon: 'error',

@@ -13,7 +13,7 @@ const Transaction = require('../models/transactionschema');
 let instance = new razorpay({
     key_id: "rzp_test_oO3a8uVtaGGjX8",
     key_secret: "761oZRgwI2AxQwnGrp0NBJzt"
-
+ 
 })
 
 // Add this function to helpers.js if it isn't already there
@@ -88,7 +88,7 @@ module.exports = {
                 const discount = item.product.offer?.discountPercentage || 0;
                 const discountedPrice = item.product.price * (1 - discount / 100);
                 return total + discountedPrice * item.quantity;
-            }, 0);
+            }, 0).toFixed(0);
     
             if (paymentMethod === 'Cash on Delivery' && totalAmount < 1000) {
                 return res.status(400).json({ message: 'Cash on Delivery is only available for orders above 1000 rupees' });
@@ -100,16 +100,16 @@ module.exports = {
                 return {
                     product: item.product._id,
                     quantity: item.quantity,
-                    total: discountedPrice * item.quantity,
-                    originalPrice: item.product.price,
-                    discountedPrice: discountedPrice
+                    total: (discountedPrice * item.quantity).toFixed(0),
+                    originalPrice: item.product.price.toFixed(0),
+                    discountedPrice: discountedPrice.toFixed(0)
                 };
             });
     
             const orderDetails = {
                 userId: userId,
                 items: items,
-                totalAmount: totalAmount,
+                totalAmount: parseInt(totalAmount),
                 paymentMethod: paymentMethod,
                 billingAddress: billingAddress,
                 status: 'Pending',
@@ -365,18 +365,20 @@ applyCoupon: async (req, res) => {
         let subTotal = 0;
         user.cart.forEach(item => {
             const totalWithOffers = calculateTotalWithOffers(item.product, item.quantity);
-            item.total = totalWithOffers;
+            item.total = totalWithOffers.toFixed(0);
             subTotal += totalWithOffers;
         });
 
-        const discountAmount = (subTotal * coupon.discount) / 100;
-        let grandTotal = subTotal - discountAmount; 
+        subTotal = parseInt(subTotal.toFixed(0));
+
+        const discountAmount = ((subTotal * coupon.discount) / 100).toFixed(0);
+        let grandTotal = (subTotal - discountAmount).toFixed(0);
  
         // Apply referral discount if it’s the first purchase
         let referralDiscountAmount = 0;
         if (user.hasUsedReferral) {
-                referralDiscountAmount = (grandTotal * 25) / 100;
-                grandTotal -= referralDiscountAmount;
+                referralDiscountAmount = ((grandTotal * 25) / 100).toFixed(0);
+                grandTotal = (grandTotal - referralDiscountAmount).toFixed(0);
 
              
         if (grandTotal < 5000) {
@@ -391,8 +393,8 @@ applyCoupon: async (req, res) => {
         // Store discount details in session
         req.session.coupon = {
             code: coupon.code,
-            discountAmount,
-            grandTotal: grandTotal.toFixed(0)
+            discountAmount: parseInt(discountAmount),
+            grandTotal: parseInt(grandTotal)
         };
 
         // Mark the coupon as used by the user
@@ -404,20 +406,21 @@ applyCoupon: async (req, res) => {
         } 
 
          // Update the user's total discount
-         await User.updateOne({ _id: userId }, { $inc: { totalDiscount: discountAmount+referralDiscountAmount  } });
+         await User.updateOne({ _id: userId }, { $inc: { totalDiscount: parseInt(discountAmount) + parseInt(referralDiscountAmount) } });
+
 
         // Respond with updated cart details
         res.json({
             success: true,
             message: 'Coupon applied successfully',
-            discountAmount,
-            referralDiscountAmount, 
+            discountAmount: parseInt(discountAmount),
+            referralDiscountAmount: parseInt(referralDiscountAmount),
             updatedCart: {
                 cart: user.cart,
-                subTotal: subTotal.toFixed(0),
-                discountAmount: discountAmount.toFixed(0),
-                referralDiscountAmount: referralDiscountAmount.toFixed(0), 
-                grandTotal: parseInt(grandTotal.toFixed(0)) 
+                subTotal: parseInt(subTotal),
+                discountAmount: parseInt(discountAmount),
+                referralDiscountAmount: parseInt(referralDiscountAmount),
+                grandTotal: parseInt(grandTotal)
             }
         });
     } catch (error) {

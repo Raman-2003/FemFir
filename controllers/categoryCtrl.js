@@ -136,7 +136,7 @@ const listCategory = async (req, res) => {
 
 // Unlist a category
 const unlistCategory = async (req, res) => {
-    try {
+    try { 
         await Category.findByIdAndUpdate(req.params.id, { status: 'unlisted' });
         res.redirect('/admin/categories');
     } catch (error) {

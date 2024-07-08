@@ -158,7 +158,7 @@ const submitotp = async (req, res) => {
                 isVerified: true,
                 is_blocked: false,
                 isAdmin: false,
-                referralCode: referralCode, // save the generated referral code
+                referralCode: referralCode,
                 hasUsedReferral: false
             }); 
 

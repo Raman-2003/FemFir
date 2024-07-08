@@ -91,13 +91,11 @@ const loadCart = async (req, res) => {
         const cart = user.cart || [];
         let subTotal = 0;
         cart.forEach(item => {
+            if (!item.product || !item.product.price) {
+                console.error(`Product data is missing for cart item: ${item._id}`);
+                return;
+            }
 
-            //  // Check if the product exists
-            //  if (!item.product) {
-            //     console.error('Product not found for cart item:', item);
-            //     return;
-            // }
-            
             let effectivePrice = item.product.price;
             let appliedDiscount = 0;
 
@@ -119,12 +117,11 @@ const loadCart = async (req, res) => {
                 }
             }
 
-            // Set the discounted price if any discounts are applied, otherwise use the original price
-            item.discountedPrice = appliedDiscount > 0 ? effectivePrice : item.product.price; 
-            item.total = effectivePrice * item.quantity; 
-            subTotal += item.total; 
+            item.discountedPrice = appliedDiscount > 0 ? effectivePrice : item.product.price;
+            item.total = (effectivePrice * item.quantity).toFixed(0);
+            subTotal += parseInt(item.total);
 
-            item.mrpTotal = item.product.mrp * item.quantity; 
+            item.mrpTotal = (item.product.mrp * item.quantity).toFixed(0);
         });
 
         const shippingCost = 0;
@@ -133,13 +130,14 @@ const loadCart = async (req, res) => {
         if (cart.length === 0) {
             res.render('user/empty_cart', { userData });
         } else {
-            res.render('user/cart', { userData, cart, subTotal, grandTotal, shippingCost });
+            res.render('user/cart', { userData, cart, subTotal: subTotal.toFixed(0), grandTotal: grandTotal.toFixed(0), shippingCost: shippingCost.toFixed(0) });
         }
     } catch (error) {
         console.error('Error loading cart:', error);
         res.status(500).render('error');
     }
 };
+
 
 
 
@@ -329,18 +327,22 @@ const getCheckoutPage = async (req, res) => {
         // Calculate cart totals
         let subTotal = 0;
         cart.forEach(item => {
-            item.mrpTotal = item.product.mrp * item.quantity; 
+            item.mrpTotal = (item.product.mrp * item.quantity).toFixed(0); 
             subTotal += item.product.price * item.quantity;
         });
 
+        subTotal = parseInt(subTotal.toFixed(0));
+
         const shippingCost = 0; 
-        let grandTotal = subTotal + shippingCost;
+        let grandTotal = (parseInt(subTotal) + shippingCost).toFixed(0);
+
+
 
         // Calculate referral discount
         let referralDiscountAmount = 0;
-        if (user.hasUsedReferral) {
-            referralDiscountAmount = (grandTotal * 25) / 100;
-            grandTotal -= referralDiscountAmount;
+       if (user.hasUsedReferral) {
+            referralDiscountAmount = ((grandTotal * 25) / 100).toFixed(0);
+            grandTotal = (grandTotal - referralDiscountAmount).toFixed(0);
         }
 
         // Render checkout view with necessary data
@@ -348,9 +350,9 @@ const getCheckoutPage = async (req, res) => {
             userData,
             cart,
             subTotal,
-            grandTotal,
+            grandTotal: parseInt(grandTotal),
             shippingCost,
-            referralDiscountAmount, 
+            referralDiscountAmount: parseInt(referralDiscountAmount), 
             addresses,
            
         }); 

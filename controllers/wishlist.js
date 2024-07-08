@@ -168,8 +168,8 @@ const addToCartFromWishlist = async (req, res) => {
         }
 
         const userId = userData._id;
-        const { id: productId } = req.body; 
-        const quantity = 1; 
+        const { id: productId } = req.body;
+        const quantity = 1;
 
         if (!mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ success: false, message: 'Invalid product ID' });
@@ -185,13 +185,18 @@ const addToCartFromWishlist = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        const cartItem = user.cart.find(item => item.product.toString() === productId);
+        // Ensure user.cart is defined
+        if (!user.cart) {
+            user.cart = [];
+        }
+
+        const cartItem = user.cart.find(item => item.product && item.product.toString() === productId);
 
         if (cartItem) {
             cartItem.quantity += quantity;
-            cartItem.total = cartItem.quantity * product.price;
+            cartItem.total = (cartItem.quantity * product.price).toFixed(0);
         } else {
-            user.cart.push({ product: productId, quantity: quantity, total: product.price * quantity });
+            user.cart.push({ product: productId, quantity: quantity, total: (product.price * quantity).toFixed(0) });
         }
 
         await Wishlist.updateOne({ user: userId }, { $pull: { productId: productId } });
