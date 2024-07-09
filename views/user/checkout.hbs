@@ -129,26 +129,27 @@
                         </div>
 
                         <div class="payment-method">
-        <h2>Payment Method</h2>
-        <div class="custom-control custom-radio">
-            <input type="radio" class="custom-control-input" id="cashOnDelivery" name="paymentMethod" value="Cash on Delivery">
-            <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
-        </div>
-        <div class="custom-control custom-radio">
-            <input type="radio" class="custom-control-input" id="razorpay" name="paymentMethod" value="Razorpay">
-            <label class="custom-control-label" for="razorpay">Razorpay</label>
-        </div>
-        <div class="custom-control custom-radio">
-            <input type="radio" class="custom-control-input" id="wallet" name="paymentMethod" value="Wallet">
-            <label class="custom-control-label" for="wallet">Wallet</label>
-        </div>
-        <!-- Add Money to Wallet Button -->
-        <div class="mt-3">
-            <button class="btn btn-primary">
-                <a href="/wallet" style="color: white; text-decoration:none">Add Money to Wallet</a>
-            </button>
-        </div>
-    </div>
+                            <h2>Payment Method</h2>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="cashOnDelivery" name="paymentMethod"
+                                    value="Cash on Delivery" disabled>
+                                <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="razorpay" name="paymentMethod" value="Razorpay">
+                                <label class="custom-control-label" for="razorpay">Razorpay</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="wallet" name="paymentMethod" value="Wallet">
+                                <label class="custom-control-label" for="wallet">Wallet</label>
+                            </div>
+                            <!-- Add Money to Wallet Button -->
+                            <div class="mt-3">
+                                <button class="btn btn-primary">
+                                    <a href="/wallet" style="color: white; text-decoration:none">Add Money to Wallet</a>
+                                </button>
+                            </div>
+                        </div>
 
 
 
@@ -578,9 +579,26 @@
             placeOrder();
         });
 
-         function validateOrder() {
+        
+
+   // Function to dynamically enable/disable COD option based on order total
+    function checkCODAvailability() {
         const total = parseFloat('{{grandTotal}}'); // Use the actual total from your server-side template
         const codOption = document.getElementById('cashOnDelivery');
+
+        if (total < 1000) {
+            codOption.disabled = true;
+        } else {
+            codOption.disabled = false;
+        }
+    }
+
+   // Call the function to check COD availability when the page loads
+    document.addEventListener('DOMContentLoaded', checkCODAvailability);
+
+    // Validate order before placing
+    function validateOrder() {
+        const total = parseFloat('{{grandTotal}}'); // Use the actual total from your server-side template
         const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
         // Check if total is less than 1000 and COD is selected 
@@ -596,21 +614,6 @@
 
         return true; // Allow form submission
     }
-
-    // Function to dynamically enable/disable COD option based on order total
-    function checkCODAvailability() {
-        const total = parseFloat('{{grandTotal}}'); // Use the actual total from your server-side template
-        const codOption = document.getElementById('cashOnDelivery');
-
-        if (total < 1000) {
-            codOption.disabled = true;
-        } else {
-            codOption.disabled = false;
-        }
-    }
-
-    // Call the function to set the initial state of COD option
-    checkCODAvailability();
 
         function placeOrder() {
             // Simulate order processing with a timeout
