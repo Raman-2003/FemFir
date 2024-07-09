@@ -29,62 +29,81 @@
                                                 class="btn btn-fill-out btn-block hover-up">Submit</button>
                                             <p class="text-primary my-3">Time left: <span id="timer">60</span> seconds
                                             </p>
-                                            <button class="btn  hover-up" id="resendButton" onclick="resendOTP()"><a
+                                            <button class="btn hover-up" id="resendButton" onclick="resendOTP(); return false;"><a
                                                     href="/resend_otp">Resend OTP</a></button>
                                         </div>
+                                    </form>
                                 </div>
-                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
     </section>
 
     <style>
         #resendButton {
             color: #fff;
-            /* Change text color to white */
             background-color: #fff;
         }
     </style>
-
 </main>
 
 <script>
-
-
-    let countdown = 60; 
+    let countdown;
     let timerElement = document.getElementById('timer');
     let resendButton = document.getElementById('resendButton');
     let countdownInterval;
 
     // Function to update the countdown timer
     function updateTimer() {
-        timerElement.textContent = countdown;
+        timerElement.textContent = countdown + " seconds";
         countdown--;
         resendButton.disabled = true;
+
+        // Store the countdown value in sessionStorage
+        sessionStorage.setItem('countdown', countdown);
+
         if (countdown < 0) {
             clearInterval(countdownInterval);
             timerElement.textContent = '0 seconds';
             resendButton.disabled = false;
+            sessionStorage.removeItem('countdown'); // Clear the countdown from sessionStorage
+            sessionStorage.removeItem('countdownStart'); // Clear the countdown start time from sessionStorage
         }
     }
 
     function resendOTP() {
-
         // Reset the timer
         countdown = 60;
-        timerElement.textContent = countdown;
+        timerElement.textContent = countdown + " seconds";
         resendButton.disabled = true;
 
+        // Store the reset countdown value and start time in sessionStorage
+        sessionStorage.setItem('countdown', countdown);
+        sessionStorage.setItem('countdownStart', Date.now());
+
         // Start the countdown again
-        countdownInterval = setTimeout(updateTimer, 1000);
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(updateTimer, 1000);
+    }
+
+    // Load the countdown value and start time from sessionStorage
+    let savedCountdown = parseInt(sessionStorage.getItem('countdown'), 10);
+    let countdownStart = parseInt(sessionStorage.getItem('countdownStart'), 10);
+    if (savedCountdown && countdownStart) {
+        let elapsed = Math.floor((Date.now() - countdownStart) / 1000);
+        countdown = savedCountdown - elapsed;
+        if (countdown <= 0) {
+            countdown = 60;
+        }
+    } else {
+        countdown = 60;
+        sessionStorage.setItem('countdown', countdown);
+        sessionStorage.setItem('countdownStart', Date.now());
     }
 
     // Initial countdown start
     countdownInterval = setInterval(updateTimer, 1000);
-
-</script> 
+</script>

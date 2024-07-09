@@ -330,7 +330,7 @@ router.get('/ledger/download', async (req, res) => {
         const csv = ledgerEntries.map(entry => ({
             EntryType: entry.entryType,
             UserId: entry.userId.firstname, // Assuming User model has a 'name' field
-            Amount: entry.amount,
+            Amount: entry.amount, 
             Description: entry.description,
             TransactionType: entry.transactionType,
             Status: entry.status,

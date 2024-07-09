@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Details</title>
-    <style>
+   <style>
         body {
             font-family: Arial, sans-serif;
         }
@@ -60,8 +60,6 @@
             margin-top: 20px;
         }
 
-
-
         @media (max-width: 600px) {
 
             .profile-details li,
@@ -84,6 +82,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             background-color: #f9f9f9;
+            overflow-x: hidden;
         }
 
         .orders-container h4 {
@@ -98,6 +97,7 @@
             border-spacing: 0;
             margin-bottom: 20px;
             background-color: #fff;
+            overflow-x: hidden;
         }
 
         .orders-table th,
@@ -125,6 +125,51 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .orders-table,
+            .orders-table thead,
+            .orders-table tbody,
+            .orders-table th,
+            .orders-table td,
+            .orders-table tr {
+                display: block;
+            }
+
+            .orders-table th {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            .orders-table tr {
+                border: 1px solid #ccc;
+            }
+
+            .orders-table td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+
+            .orders-table td:before {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                content: attr(data-label);
+                text-align: left;
+                font-weight: bold;
+            }
+
+            .orders-table td:last-child {
+                border-bottom: 0;
+            }
         }
     </style>
 </head>
@@ -225,7 +270,7 @@
 <div class="tab-pane fade" id="orders-tab" role="tabpanel" aria-labelledby="orders-nav">
     <div class="orders-container">
         <h4>Order Details</h4>
-        <div class="table-responsive">
+    
             <table class="orders-table">
                 <thead>
                     <tr>
@@ -286,7 +331,7 @@
                     {{/each}}
                 </tbody>
             </table>
-        </div>
+        
         <!-- Pagination Controls -->
         <nav aria-label="Order pagination">
             <ul class="pagination justify-content-center">

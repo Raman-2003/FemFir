@@ -51,7 +51,7 @@ exports.generateReport = async (req, res) => {
     }
 };
 
-exports.generatePDF = async (req, res) => { 
+exports.generatePDF = async (req, res) => {
     const { reportType, startDate, endDate } = req.query;
     const query = buildQuery(reportType, startDate, endDate);
 
@@ -72,26 +72,34 @@ exports.generatePDF = async (req, res) => {
 
         // Document title
         doc.font('Helvetica-Bold').fontSize(20).text('Sales Report', { align: 'center' });
-        doc.moveDown(2);
+        doc.moveDown(1);
 
-        // Total orders and amount
-        doc.font('Helvetica').fontSize(12).text(`Total Orders: ${totalOrdersCount}`, { align: 'left' });
-        doc.text(`Total Ordered Amount:  ${totalOrderedAmount.toFixed(0)}`, { align: 'left' });
-        doc.moveDown(2);
+        // Display the selected dates and total orders and amount
+        const leftX = 115;
+        const rightX = doc.page.width - 280;
+        const y = doc.y;
+
+        doc.font('Helvetica').fontSize(12).text(`Total Orders: ${totalOrdersCount}`, leftX, y);
+        doc.text(`Total Ordered Amount: ${totalOrderedAmount.toFixed(0)}`, leftX, y + 15);
+
+        if (startDate && endDate) {
+            doc.text(`Start Date: ${moment(startDate).format('DD-MM-YYYY')}`, rightX, y);
+            doc.text(`End Date: ${moment(endDate).format('DD-MM-YYYY')}`, rightX, y + 15);
+        }
+
+        doc.moveDown(4);
 
         const tableHeaders = [
-            { label: "Product", property: 'product', width: 100, renderer: (value, indexColumn, indexRow, row, rectRow, rectCell) => {
-                return row.product ? row.product.name : 'Unknown';
-            }},
+            { label: "Product", property: 'product', width: 100, renderer: (value, indexColumn, indexRow, row, rectRow, rectCell) => row.product ? row.product.name : 'Unknown' },
             { label: "Quantity", property: 'quantity', width: 50, align: 'center' },
             { label: "Price", property: 'price', width: 60, align: 'center' },
-            { label: "MRP ", property: 'mrp', width: 60, align: 'center' },
-            { label: "Discount", property: 'discount', width: 60, align: 'center' }, 
+            { label: "MRP", property: 'mrp', width: 60, align: 'center' },
+            { label: "Discount", property: 'discount', width: 60, align: 'center' },
             { label: "Total Price", property: 'totalPrice', width: 70, align: 'center' },
             { label: "Date", property: 'date', width: 100, align: 'center' },
             { label: "Customer", property: 'customer', width: 100 },
             { label: "Email", property: 'email', width: 120 },
-            { label: "Address", property: 'address', width: 200 } 
+            { label: "Address", property: 'address', width: 200 }
         ];
 
         const tableRows = sales.map(sale => ({
@@ -107,22 +115,26 @@ exports.generatePDF = async (req, res) => {
             address: sale.address ? `${sale.address.name}, ${sale.address.addressLine1}, ${sale.address.locality}, ${sale.address.city}, ${sale.address.state}, ${sale.address.pin}` : 'N/A'
         }));
 
-        const tableWidth = tableHeaders.reduce((sum, header) => sum + header.width, 0) + (tableHeaders.length - 1) * 5; 
+        const tableWidth = tableHeaders.reduce((sum, header) => sum + header.width, 0) + (tableHeaders.length - 1) * 5;
         const startX = (doc.page.width - tableWidth) / 2;
 
         const tableOptions = {
             headers: tableHeaders,
             datas: tableRows,
             options: {
-                columnSpacing: 5, 
+                columnSpacing: 5,
                 padding: 5,
-                x: startX, 
-                width: tableWidth, 
+                x: startX,
+                width: tableWidth,
                 prepareHeader: () => doc.font('Helvetica-Bold').fontSize(9),
                 prepareRow: (row, i) => doc.font('Helvetica').fontSize(8),
-                rowHeight: 20, 
+                rowHeight: 20,
                 columnSpacing: 20,
-                headerHeight: 25 
+                headerHeight: 25,
+                border: {
+                    size: 1,
+                    color: '#000000'
+                }
             }
         };
 
@@ -134,7 +146,7 @@ exports.generatePDF = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
-
+ 
 exports.generateExcel = async (req, res) => {
   const { reportType, startDate, endDate } = req.query;
   const query = buildQuery(reportType, startDate, endDate);

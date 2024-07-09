@@ -24,7 +24,7 @@ const {
     getCheckoutPage, placeOrder, getOrderDetailsPage, cancelOrder, returnOrder, 
     getCartCheckoutPage, setDefaultAddress, loadUserCoupons, applyCoupon, removeCoupon
 } = require('../controllers/checkout');
-
+ 
 const paymentCtrl = require('../controllers/paymentCtrl')
  
 //user controls

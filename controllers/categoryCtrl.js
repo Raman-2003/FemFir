@@ -133,7 +133,7 @@ const listCategory = async (req, res) => {
         res.redirect('/admin/categories');
     }
 };
-
+ 
 // Unlist a category
 const unlistCategory = async (req, res) => {
     try { 

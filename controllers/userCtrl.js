@@ -162,7 +162,7 @@ const submitotp = async (req, res) => {
                 hasUsedReferral: false
             }); 
 
-             // validate referral code
+             // validate referral code 
              if (userRegesterData.referralCode) {
                 const referringUser = await User.findOne({ referralCode: userRegesterData.referralCode });
                 if (referringUser) {
