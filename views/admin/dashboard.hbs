@@ -72,47 +72,62 @@
                             <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="75"
                                 aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        
+
                     </div>
                 </div>
-                
-            </div>
-            
-        </div>
-        
 
-        <!-- Sales Overview Section -->
+            </div>
+
+        </div>
+
+        <div class="mb-4" style="background-color:rgb(224, 221, 219); border-radius: 4px;">
+            <div class="card-header">
+                <h4 class="card-title mb-3">Sales Overview</h4>
+                <button class="btn btn-success mb-3"> <a style="color: black;" href="/admin/report">Sales
+                        Report</a></button>
+            </div>
+        </div>
+
+        <!-- Chart Section with Filters -->
         <div class="row">
-            <div class="col-xl-8 col-lg-8 col-md-8">
+            <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-0">Sales Overview</h4>
-                        <button class="btn btn-success"> <a style="color: black;" href="/admin/report">Sales Report</a></button>
+                        <h4 class="card-title mb-0">Order Analysis</h4>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-xl-12 col-lg-8">
-                                <div id="morris-bar-chart"></div>
+                        <div class="row mb-3">
+                            <div class="col-lg-4">
+                                <select id="filterType" class="form-control">
+                                    <option value="products">Products</option>
+                                    <option value="categories">Categories</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-4">
+                                <select id="dateRange" class="form-control">
+                                    <option value="today">Today</option>
+                                    <option value="month">This Month</option>
+                                    <option value="year">This Year</option>
+                                    <option value="custom">Custom Date</option>
+                                </select>
+                                <input type="text" id="filterDate" class="form-control" placeholder="Select Date"
+                                    style="display:none;">
+                            </div>
+                            <div class="col-lg-4">
+                                <button id="applyFilter" class="btn btn-primary">Apply Filter</button>
                             </div>
                         </div>
-                        
+                        <canvas id="orderAnalysisChart"></canvas>
                     </div>
-                    
                 </div>
             </div>
         </div>
-        
+        <!-- End of Chart Section -->
 
-        <!-- Buttons to Toggle Listings -->
-        <div class="row">
-            <div class="col-lg-12" style="display: flex; justify-content:space-between; mb-5; ">
-                <button id="toggleProductListing" class="btn btn-primary mb-3 py-3">Toggle Product Listing</button>
-                <button id="toggleCategoryListing" class="btn btn-primary mb-3">Toggle Category Listing</button>
-            </div>
-        </div>
+
 
         <!-- Top Ordered Products Section -->
-        <div id="productListing" class="row" style="display: none;">
+        <div id="productListing" class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
@@ -122,7 +137,8 @@
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <thead>
-                                    <tr style="color: rgb(34, 95, 193); font-family:Georgia, 'Times New Roman', Times, serif; text-align:center">
+                                    <tr
+                                        style="color: rgb(34, 95, 193); font-family:Georgia, 'Times New Roman', Times, serif; text-align:center">
                                         <th>Product Image</th>
                                         <th>Product Name</th>
                                         <th>Category</th>
@@ -133,7 +149,8 @@
                                 <tbody style="color: #333;">
                                     {{#each topOrderedProducts}}
                                     <tr>
-                                        <td><img src="{{this.productImage}}" alt="{{this.productName}}" style="width: 80px; height: 120px;"></td>
+                                        <td><img src="{{this.productImage}}" alt="{{this.productName}}"
+                                                style="width: 80px; height: 120px;"></td>
                                         <td>{{this.productName}}</td>
                                         <td>{{this.categoryName}}</td>
                                         <td>${{this.price}}</td>
@@ -149,7 +166,7 @@
         </div>
 
         <!-- Top Selling Categories Section -->
-        <div id="categoryListing" class="row" style="display: none;">
+        <div id="categoryListing" class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
@@ -159,7 +176,8 @@
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <thead>
-                                    <tr style="color: rgb(34, 95, 193); font-family: Georgia, 'Times New Roman', Times, serif; text-align: center">
+                                    <tr
+                                        style="color: rgb(34, 95, 193); font-family: Georgia, 'Times New Roman', Times, serif; text-align: center">
                                         <th>Category Image</th>
                                         <th>Category Name</th>
                                         <th>Total Selling Quantity</th>
@@ -168,7 +186,8 @@
                                 <tbody style="color: #333; text-align:center">
                                     {{#each topSellingCategories}}
                                     <tr>
-                                        <td><img src="/uploads/categories/{{this.categoryImage}}" alt="{{this.categoryName}}" style="width: 80px; height: 120px;"></td>
+                                        <td><img src="/uploads/categories/{{this.categoryImage}}"
+                                                alt="{{this.categoryName}}" style="width: 80px; height: 120px;"></td>
                                         <td>{{this.categoryName}}</td>
                                         <td style="text-align: center;">{{this.totalQuantity}}</td>
                                     </tr>
@@ -183,40 +202,6 @@
         <!-- End of Top Selling Categories Section -->
 
 
-<!-- Chart Section with Filters -->
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title mb-0">Order Analysis</h4>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-lg-4">
-                        <select id="filterType" class="form-control">
-                            <option value="products">Products</option>
-                            <option value="categories">Categories</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-4">
-                        <select id="dateRange" class="form-control">
-                            <option value="today">Today</option>
-                            <option value="month">This Month</option>
-                            <option value="year">This Year</option>
-                            <option value="custom">Custom Date</option>
-                        </select>
-                        <input type="text" id="filterDate" class="form-control" placeholder="Select Date" style="display:none;">
-                    </div>
-                    <div class="col-lg-4">
-                        <button id="applyFilter" class="btn btn-primary">Apply Filter</button>
-                    </div>
-                </div>
-                <canvas id="orderAnalysisChart"></canvas> 
-            </div>
-        </div>
-    </div>
-</div>
-<!-- End of Chart Section -->
 
 
     </div>
@@ -233,25 +218,8 @@
 
 <!-- JavaScript to Toggle Listings -->
 <script>
-    document.getElementById('toggleProductListing').addEventListener('click', function() {
-        const productListing = document.getElementById('productListing');
-        if (productListing.style.display === 'none') {
-            productListing.style.display = 'block';
-        } else {
-            productListing.style.display = 'none';
-        }
-    });
 
-    document.getElementById('toggleCategoryListing').addEventListener('click', function() {
-        const categoryListing = document.getElementById('categoryListing');
-        if (categoryListing.style.display === 'none') {
-            categoryListing.style.display = 'block';
-        } else {
-            categoryListing.style.display = 'none';
-        }
-    });
-
-  document.getElementById('applyFilter').addEventListener('click', function() {
+    document.getElementById('applyFilter').addEventListener('click', function () {
         const filterType = document.getElementById('filterType').value;
         const dateRange = document.getElementById('dateRange').value;
         const filterDate = document.getElementById('filterDate').value;
@@ -275,7 +243,7 @@
             });
     });
 
-     document.getElementById('dateRange').addEventListener('change', function() {
+    document.getElementById('dateRange').addEventListener('change', function () {
         const dateRange = this.value;
         const filterDate = document.getElementById('filterDate');
         if (dateRange === 'custom') {
@@ -293,8 +261,8 @@
             datasets: [{
                 label: 'Orders',
                 data: [], // Will be updated dynamically
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(117, 206, 211, 0.2)',
+                borderColor: 'rgba(65, 61, 180, 1)',
                 borderWidth: 1
             }]
         },
@@ -314,7 +282,7 @@
         orderAnalysisChart.update();
     }
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#filterDate').datepicker({
             dateFormat: 'yy-mm-dd'
         });

@@ -62,6 +62,7 @@ module.exports = {
         }
     },
 
+  
     placeOrder: async (req, res) => {
         try {
             const userData = req.session.user;
@@ -171,6 +172,8 @@ module.exports = {
             res.status(500).json({ message: 'Server error', error: error.message });
         }
     },
+    
+    
     
     
     

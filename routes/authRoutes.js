@@ -6,6 +6,7 @@ const User = require('../models/userSchema');
 const Order = require('../models/orderSchema');
 const PDFDocument = require('pdfkit-table');
 const moment = require('moment');
+const Sale = require('../models/saleSchema');
 
 const {
     getHome, showloginPage, doLogin, doLogout, showsignupPage, dosignup, getotppage, 
@@ -125,8 +126,8 @@ router.get('/order/:id/invoice', async (req, res) => {
             return res.status(404).send('Order not found');
         }
 
-        // Create a new PDF document with A3 size
-        const doc = new PDFDocument({ size: 'A3', margin: 50 });
+        // Create a new PDF document with A1 size
+        const doc = new PDFDocument({ size: 'A1', margin: 50 });
 
         // Set the response headers for PDF download
         res.setHeader('Content-Disposition', `attachment; filename=invoice_${orderId}.pdf`);
@@ -137,105 +138,58 @@ router.get('/order/:id/invoice', async (req, res) => {
 
         // Invoice Title and Date
         doc.fontSize(20).text('Invoice', { align: 'center' });
-        doc.fontSize(12).text(`Order Date: ${moment(order.createdAt).format('YYYY-MM-DD')}`, { align: 'center' });
-        doc.moveDown(2);
+        doc.moveDown(1);
+        doc.fontSize(12).text(`Order Date: ${moment(order.createdAt).format('DD-MM-YYYY')}`, { align: 'center' });
+        doc.moveDown(4);
 
         // Center alignment helper function
         const calculateX = (width) => (doc.page.width - width) / 2;
 
-        // Prepare User Details as Table Data
-        const userDetailsTable = {
-            headers: [{ label: 'Field', property: 'field', width: 150 }, { label: 'Details', property: 'details', width: 400 }],
-            datas: [
-                { field: 'Customer Name', details: `${order.userId.firstname} ${order.userId.lastname}` },
-                { field: 'Email', details: order.userId.email }
-            ],
-            options: {
-                columnSpacing: 5,
-                padding: 5,
-                x: calculateX(550), // Center align
-                width: 550, // Total width of the table
-                prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12), // Styling headers
-                prepareRow: (row, i) => doc.font('Helvetica').fontSize(10) // Styling rows
-            }
-        };
-
-        // Draw User Details Table
-        await doc.table(userDetailsTable);
-        doc.moveDown(2);
-
-        // Prepare Address Details as Table Data
-        const shippingAddress = order.shippingAddress ? `${order.shippingAddress.name}, ${order.shippingAddress.addressLine1}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.pin}` : 'No shipping address provided';
+        // Prepare all details in a single table
         const billingAddress = order.billingAddress ? `${order.billingAddress.name}, ${order.billingAddress.addressLine1}, ${order.billingAddress.city}, ${order.billingAddress.state}, ${order.billingAddress.pin}` : 'No billing address provided';
 
-        const addressDetailsTable = {
-            headers: [{ label: 'Field', property: 'field', width: 150 }, { label: 'Details', property: 'details', width: 400 }],
-            datas: [
-                { field: 'Shipping Address', details: shippingAddress },
-                { field: 'Billing Address', details: billingAddress }
-            ],
-            options: {
-                columnSpacing: 5,
-                padding: 5,
-                x: calculateX(550), // Center align
-                width: 550, // Total width of the table
-                prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12), // Styling headers
-                prepareRow: (row, i) => doc.font('Helvetica').fontSize(10) // Styling rows
-            }
-        };
+        const orderItems = order.items.map(item => `${item.product.name} (Qty: ${item.quantity}, Unit Price: ₹${item.product.price.toFixed(2)}, Total: ₹${item.total.toFixed(2)})`).join('\n');
 
-        // Draw Address Details Table
-        await doc.table(addressDetailsTable);
-        doc.moveDown(2);
-
-        // Prepare Order Items as Table Data
-        const orderItemsTable = {
+        const table = {
             headers: [
-                { label: 'Product Name', property: 'productName', width: 200 },
-                { label: 'Quantity', property: 'quantity', width: 100, align: 'center' },
-                { label: 'Unit Price (₹)', property: 'unitPrice', width: 100, align: 'center' },
-                { label: 'Total Price (₹)', property: 'totalPrice', width: 100, align: 'center' }
+                { label: 'Customer Name', property: 'customerName', width: 150 },
+                { label: 'Email', property: 'email', width: 200 },
+                { label: 'Billing Address', property: 'billingAddress', width: 300 },
+                { label: 'Order Items', property: 'orderItems', width: 300 },
+                { label: 'Total Amount', property: 'totalAmount', width: 150 },
+                { label: 'Payment Method', property: 'paymentMethod', width: 150 },
+                { label: 'Status', property: 'status', width: 100 }
             ],
-            datas: order.items.map(item => ({
-                productName: item.product.name,
-                quantity: item.quantity,
-                unitPrice: `₹${item.product.price.toFixed(2)}`,
-                totalPrice: `₹${item.total.toFixed(2)}`
-            })),
-            options: {
-                columnSpacing: 5,
-                padding: 5,
-                x: calculateX(500), // Center align
-                width: 500, // Total width of the table
-                prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12), // Styling headers
-                prepareRow: (row, i) => doc.font('Helvetica').fontSize(10) // Styling rows
-            }
-        };
-
-        // Draw Order Items Table
-        await doc.table(orderItemsTable);
-        doc.moveDown(2);
-
-        // Prepare Order Summary as Table Data
-        const orderDetailsTable = {
-            headers: [{ label: 'Field', property: 'field', width: 150 }, { label: 'Details', property: 'details', width: 400 }],
             datas: [
-                { field: 'Total Amount', details: `₹${order.totalAmount.toFixed(2)}` },
-                { field: 'Payment Method', details: order.paymentMethod },
-                { field: 'Status', details: order.status }
+                {
+                    customerName: `${order.userId.firstname} ${order.userId.lastname}`,
+                    email: order.userId.email,
+                    billingAddress: billingAddress,
+                    orderItems: orderItems,
+                    totalAmount: `₹${order.totalAmount.toFixed(2)}`,
+                    paymentMethod: order.paymentMethod,
+                    status: order.status
+                }
             ],
             options: {
                 columnSpacing: 5,
                 padding: 5,
-                x: calculateX(550), // Center align
-                width: 550, // Total width of the table
+                x: calculateX(1350), // Center align
+                width: 1350, // Total width of the table
                 prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12), // Styling headers
-                prepareRow: (row, i) => doc.font('Helvetica').fontSize(10) // Styling rows
+                prepareRow: (row, i) => doc.font('Helvetica').fontSize(10), // Styling rows
+                rowHeight: 20,
+                columnSpacing: 20,
+                headerHeight: 25,
+                border: {
+                    size: 1,
+                    color: '#000000'
+                }
             }
         };
 
-        // Draw Order Summary Table
-        await doc.table(orderDetailsTable);
+        // Draw the table
+        await doc.table(table);
 
         // Finalize the PDF and end the stream
         doc.end();
@@ -244,66 +198,6 @@ router.get('/order/:id/invoice', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-
-
-
-// Function to draw a table
-function drawTable(doc, headers, rows) {
-    const tableTop = doc.y;
-    const columnWidth = (doc.page.width - doc.options.margins.left - doc.options.margins.right) / headers.length;
-    const rowHeight = 30;
-    let currentX = doc.x;
-    let currentY = tableTop;
-
-    // Draw Headers
-    headers.forEach(header => {
-        doc.rect(currentX, currentY, columnWidth, rowHeight).stroke();
-        doc.font('Helvetica-Bold').fontSize(12).text(header, currentX + 5, currentY + 7, { width: columnWidth, align: 'center' });
-        currentX += columnWidth;
-    });
-
-    // Draw Rows
-    currentY += rowHeight;
-    rows.forEach(row => {
-        currentX = doc.x;
-        row.forEach(cell => {
-            doc.rect(currentX, currentY, columnWidth, rowHeight).stroke();
-            doc.font('Helvetica').fontSize(12).text(cell, currentX + 5, currentY + 7, { width: columnWidth, align: 'center' });
-            currentX += columnWidth;
-        });
-        currentY += rowHeight;
-    });
-}
-
-
-// Function to draw table
-function drawTable(doc, headers, rows) {
-    const tableTop = doc.y;
-    const itemSpacing = 30;
-    let startX = doc.x;
-
-    // Draw Header
-    headers.forEach(header => {
-        doc.font('Helvetica-Bold').fontSize(12).text(header, startX, tableTop, { width: 200, align: 'center' });
-        startX += 200;
-    });
-
-    doc.moveDown();
-
-    // Draw Rows
-    let currentY = tableTop + itemSpacing;
-    rows.forEach(row => {
-        startX = doc.x;
-        row.forEach((cell, i) => {
-            doc.font('Helvetica').fontSize(12).text(cell, startX, currentY, { width: 200, align: 'center' });
-            startX += 200;
-        });
-        currentY += itemSpacing;
-        doc.moveDown();
-    });
-}
-
-
 
 // Address routes
 router.post('/address/:id/setDefault', logedin, isBlocked, setDefaultAddress); 
@@ -316,4 +210,4 @@ router.post('/verify-payment', paymentCtrl.verifyPayment);
 router.post('/initiate-payment', paymentCtrl.initiatePayment);
 
 module.exports = router;
- 
+  

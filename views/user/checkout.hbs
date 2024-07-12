@@ -95,7 +95,8 @@
         <div class="container">
             <div class="row d-flex">
                 <div class="col-md-7 col-lg-7">
-                    <form id="checkoutForm" action="/checkout/placeOrder" method="POST" onsubmit="return validateOrder()">
+                    <form id="checkoutForm" action="/checkout/placeOrder" method="POST"
+                        onsubmit="return validateOrder()">
                         <div class="billing-address">
                             <h2>Billing Address</h2>
                             <select class="form-control mb-3" name="billingAddress" id="billingAddressSelect">
@@ -131,16 +132,18 @@
                         <div class="payment-method">
                             <h2>Payment Method</h2>
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="cashOnDelivery" name="paymentMethod"
-                                    value="Cash on Delivery" disabled>
+                                <input type="radio" class="custom-control-input" id="cashOnDelivery"
+                                    name="paymentMethod" value="Cash on Delivery" disabled>
                                 <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
                             </div>
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="razorpay" name="paymentMethod" value="Razorpay">
+                                <input type="radio" class="custom-control-input" id="razorpay" name="paymentMethod"
+                                    value="Razorpay">
                                 <label class="custom-control-label" for="razorpay">Razorpay</label>
                             </div>
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="wallet" name="paymentMethod" value="Wallet">
+                                <input type="radio" class="custom-control-input" id="wallet" name="paymentMethod"
+                                    value="Wallet">
                                 <label class="custom-control-label" for="wallet">Wallet</label>
                             </div>
                             <!-- Add Money to Wallet Button -->
@@ -153,7 +156,8 @@
 
 
 
-                         <button type="submit" class="btn btn-primary mt-3" id="placeOrderButton" style="width: 127px;">Place Order</button>
+                        <button type="submit" class="btn btn-primary mt-3" id="placeOrderButton"
+                            style="width: 127px;">Place Order</button>
                     </form>
                 </div>
 
@@ -216,16 +220,17 @@
                                 <span>{{this.total}}</span>
                                 {{/each}}
                             </li>
-                            <li class="list-group-item d-flex justify-content-between {{#unless referralDiscountAmount}}d-none{{/unless}}">
+                            <li
+                                class="list-group-item d-flex justify-content-between {{#unless referralDiscountAmount}}d-none{{/unless}}">
                                 <span>Referral Discount</span>
                                 <span>-{{referralDiscountAmount}}</span>
-                            </li> 
+                            </li>
                             <li
                                 class="list-group-item d-flex justify-content-between coupon-discount {{#unless discountAmount}}d-none{{/unless}}">
-                                <span>Coupon Discount</span> 
+                                <span>Coupon Discount</span>
                                 <span>-{{discountAmount}}</span>
                             </li>
-                            
+
                             <li class="list-group-item d-flex justify-content-between">
                                 <span>Shipping cost</span>
                                 <span>Free</span>
@@ -302,6 +307,16 @@
                                     },
                                     "theme": {
                                         "color": "#3399cc"
+                                    },
+                                    "modal": {
+                                        "ondismiss": function () {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Payment failed!',
+                                                text: 'Your payment was not successful. Please try again.',
+                                                confirmButtonText: 'OK'
+                                            });
+                                        }
                                     }
                                 };
 
@@ -311,9 +326,16 @@
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             console.error('Error:', errorThrown);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'There was an error processing your payment. Please try again.',
+                                confirmButtonText: 'OK'
+                            });
                         }
                     });
-                } else if (paymentMethod === 'Wallet') {
+                }
+                else if (paymentMethod === 'Wallet') {
                     $.ajax({
                         url: '/checkout/placeOrder',
                         type: 'POST',
@@ -497,7 +519,7 @@
                                 icon: 'error',
                                 title: 'Error',
                                 text: 'Unable to remove coupon. Please try again later.',
-                            }); 
+                            });
                         }
                     });
                 } else {
@@ -509,53 +531,53 @@
                 }
             });
 
-           function updateCartSummary(updatedCart) {
-    let cartSummaryHtml = '';
+            function updateCartSummary(updatedCart) {
+                let cartSummaryHtml = '';
 
-    updatedCart.cart.forEach(item => {
-        cartSummaryHtml += `
+                updatedCart.cart.forEach(item => {
+                    cartSummaryHtml += `
             <li class="list-group-item">
                 <div>${item.product.name}</div>
                 <div class="mt-3">Quantity: ${item.quantity}</div>
                 <div style="padding-top:15px">Price: ${item.total}</div> <!-- Show calculated total -->
             </li>
         `;
-    });
+                });
 
-    cartSummaryHtml += `
+                cartSummaryHtml += `
         <li class="list-group-item d-flex justify-content-between">
             <span>Subtotal</span>
             <span>${updatedCart.subTotal}</span>
         </li>
     `;
 
-    if (updatedCart.discountAmount) {
-        cartSummaryHtml += `
+                if (updatedCart.discountAmount) {
+                    cartSummaryHtml += `
             <li class="list-group-item d-flex justify-content-between coupon-discount">
                 <span>Coupon Discount</span>
                 <span>- ${updatedCart.discountAmount}</span>
             </li>
         `;
-    }
- 
-    if (updatedCart.referralDiscountAmount) {
-        cartSummaryHtml += `
+                }
+
+                if (updatedCart.referralDiscountAmount) {
+                    cartSummaryHtml += `
             <li class="list-group-item d-flex justify-content-between referral-discount">
                 <span>Referral Discount</span>
                 <span>- ${updatedCart.referralDiscountAmount}</span>
             </li>
         `;
-    }
+                }
 
-    cartSummaryHtml += `
+                cartSummaryHtml += `
         <li class="list-group-item d-flex justify-content-between">
             <span>Total</span>
             <span>${updatedCart.grandTotal}</span>
         </li>
     `;
 
-    document.querySelector('.order-summary .list-group').innerHTML = cartSummaryHtml;
-}
+                document.querySelector('.order-summary .list-group').innerHTML = cartSummaryHtml;
+            }
 
 
 
@@ -579,41 +601,41 @@
             placeOrder();
         });
 
-        
 
-   // Function to dynamically enable/disable COD option based on order total
-    function checkCODAvailability() {
-        const total = parseFloat('{{grandTotal}}'); // Use the actual total from your server-side template
-        const codOption = document.getElementById('cashOnDelivery');
 
-        if (total < 1000) {
-            codOption.disabled = true;
-        } else {
-            codOption.disabled = false;
-        }
-    }
+        // Function to dynamically enable/disable COD option based on order total
+        function checkCODAvailability() {
+            const total = parseFloat('{{grandTotal}}'); // Use the actual total from your server-side template
+            const codOption = document.getElementById('cashOnDelivery');
 
-   // Call the function to check COD availability when the page loads
-    document.addEventListener('DOMContentLoaded', checkCODAvailability);
-
-    // Validate order before placing
-    function validateOrder() {
-        const total = parseFloat('{{grandTotal}}'); // Use the actual total from your server-side template
-        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-
-        // Check if total is less than 1000 and COD is selected 
-        if (total < 1000 && paymentMethod === 'Cash on Delivery') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Order Total Below Limit',
-                text: 'Cash on Delivery is available for orders above 1000 rupees. Please select another payment method.',
-                confirmButtonText: 'Okay'
-            });
-            return false; // Prevent form submission
+            if (total < 1000) {
+                codOption.disabled = true;
+            } else {
+                codOption.disabled = false;
+            }
         }
 
-        return true; // Allow form submission
-    }
+        // Call the function to check COD availability when the page loads
+        document.addEventListener('DOMContentLoaded', checkCODAvailability);
+
+        // Validate order before placing
+        function validateOrder() {
+            const total = parseFloat('{{grandTotal}}'); // Use the actual total from your server-side template
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+            // Check if total is less than 1000 and COD is selected 
+            if (total < 1000 && paymentMethod === 'Cash on Delivery') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Order Total Below Limit',
+                    text: 'Cash on Delivery is available for orders above 1000 rupees. Please select another payment method.',
+                    confirmButtonText: 'Okay'
+                });
+                return false; // Prevent form submission
+            }
+
+            return true; // Allow form submission
+        }
 
         function placeOrder() {
             // Simulate order processing with a timeout

@@ -49,13 +49,14 @@ module.exports = {
                 userAddress,
                 userOrders,
                 current: page,
-                pages: Math.ceil(totalOrders / perPage) 
+                pages: Math.ceil(totalOrders / perPage)
             });
         } catch (error) {
             console.log(error);
             res.status(500).send('Internal Server Error');
         }
     },
+    
     
 
  // Edit user details
