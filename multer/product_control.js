@@ -3,7 +3,7 @@ const path = require('path');
 
 // Category storage engine
 const categoryStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function (req, file, cb) { 
         cb(null, 'public/uploads/categories/');
     },
     filename: function (req, file, cb) {

@@ -109,7 +109,7 @@ const getEditProductForm = async (req, res) => {
         console.error('Error fetching product:', error.message);
         res.redirect('/admin/products');
     }
-};
+}; 
 
 const editProduct = async (req, res) => {
     try {

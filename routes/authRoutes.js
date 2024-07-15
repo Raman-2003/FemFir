@@ -144,7 +144,7 @@ router.get('/order/:id/invoice', async (req, res) => {
 
         // Center alignment helper function
         const calculateX = (width) => (doc.page.width - width) / 2;
-
+ 
         // Prepare all details in a single table
         const billingAddress = order.billingAddress ? `${order.billingAddress.name}, ${order.billingAddress.addressLine1}, ${order.billingAddress.city}, ${order.billingAddress.state}, ${order.billingAddress.pin}` : 'No billing address provided';
 

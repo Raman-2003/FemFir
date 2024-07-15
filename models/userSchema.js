@@ -67,7 +67,7 @@ const userSchema =new mongoose.Schema({
     totalDiscount: { type: Number, default: 0 },
     referralCode: { type: String, unique: true }, 
     hasUsedReferral: { type: Boolean, default: false }
- 
+  
 },{
     timestamps:true
 }) 

@@ -55,7 +55,7 @@ const productSchema = new mongoose.Schema({
     }    
 }, {
     timestamps: true
-});
+}); 
 
 
 // Static method to calculate discounted price

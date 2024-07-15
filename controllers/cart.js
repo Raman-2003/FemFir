@@ -3,7 +3,7 @@ const Product = require('../models/productSchema');
 const Coupon = require('../models/couponSchema');
 const moment = require('moment');
 const Address = require('../models/addressSchema');
-
+const Order = require('../models/orderSchema')
 
 
 const addToCart = async (req, res) => { 
@@ -295,7 +295,7 @@ const checkoutFailure = async (req, res) => {
         res.status(500).render('error');
     }
 };
- 
+
 
 const getCheckoutPage = async (req, res) => {
     try {
@@ -306,41 +306,40 @@ const getCheckoutPage = async (req, res) => {
         }
 
         const userId = userData._id;
-        
+
         // Fetch user details including cart items
         const user = await User.findById(userId).populate('cart.product').lean();
         const cart = user.cart || [];
 
-       
         const promises = cart.map(async item => {
             const product = await Product.findById(item.product._id);
             if(!product || product.stock === 0){
                 throw new Error(`Product ${item.product.name} is out of stock`);
             }
-        })
+        });
 
         await Promise.all(promises);
-        
-       
+
         const addresses = await Address.find({ userId }).lean();
 
         // Calculate cart totals
         let subTotal = 0;
         cart.forEach(item => {
-            item.mrpTotal = (item.product.mrp * item.quantity).toFixed(0); 
+            item.mrpTotal = (item.product.mrp * item.quantity).toFixed(0);
             subTotal += item.product.price * item.quantity;
         });
 
         subTotal = parseInt(subTotal.toFixed(0));
 
-        const shippingCost = 0; 
+        const shippingCost = 0;
         let grandTotal = (parseInt(subTotal) + shippingCost).toFixed(0);
 
+        // Check if the user has placed any orders before
+        const hasOrders = await Order.findOne({ userId });
 
-
-        // Calculate referral discount
+        // Calculate referral discount if it's the first order
         let referralDiscountAmount = 0;
-       if (user.hasUsedReferral) {
+        if (!hasOrders && user.hasUsedReferral) {
             referralDiscountAmount = ((grandTotal * 25) / 100).toFixed(0);
             grandTotal = (grandTotal - referralDiscountAmount).toFixed(0);
         }
@@ -352,15 +351,17 @@ const getCheckoutPage = async (req, res) => {
             subTotal,
             grandTotal: parseInt(grandTotal),
             shippingCost,
-            referralDiscountAmount: parseInt(referralDiscountAmount), 
+            referralDiscountAmount: parseInt(referralDiscountAmount),
             addresses,
-           
-        }); 
+        });
     } catch (error) {
         console.error('Error rendering checkout page:', error);
         res.status(500).render('error');
     }
 };
+
+
+
 
 module.exports = {
     addToCart,

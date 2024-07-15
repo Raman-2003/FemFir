@@ -16,6 +16,7 @@ let instance = new razorpay({
  
 })
 
+
 // Add this function to helpers.js if it isn't already there
 const calculateTotalWithOffers = (product, quantity) => {
     let total = product.price * quantity; 
@@ -27,7 +28,6 @@ const calculateTotalWithOffers = (product, quantity) => {
 
     return total;
 };
-
 
 module.exports = { 
   
@@ -85,7 +85,7 @@ module.exports = {
                 return res.status(400).json({ message: 'Payment method and billing address are required' });
             }
     
-            const totalAmount = user.cart.reduce((total, item) => {
+            let totalAmount = user.cart.reduce((total, item) => {
                 const discount = item.product.offer?.discountPercentage || 0;
                 const discountedPrice = item.product.price * (1 - discount / 100);
                 return total + discountedPrice * item.quantity;
@@ -93,6 +93,15 @@ module.exports = {
     
             if (paymentMethod === 'Cash on Delivery' && totalAmount < 1000) {
                 return res.status(400).json({ message: 'Cash on Delivery is only available for orders above 1000 rupees' });
+            }
+    
+            // Apply referral discount only if it's the first order
+            const hasOrders = await Order.findOne({ userId });
+            if (!hasOrders && user.hasUsedReferral) {
+                const referralDiscountAmount = ((totalAmount * 25) / 100).toFixed(0);
+                totalAmount = (totalAmount - referralDiscountAmount).toFixed(0);
+                user.hasUsedReferral = false; // Mark referral as used
+                await user.save();
             }
     
             const items = user.cart.map(item => {
@@ -172,10 +181,6 @@ module.exports = {
             res.status(500).json({ message: 'Server error', error: error.message });
         }
     },
-    
-    
-    
-    
     
 
     getOrderDetailsPage: async (req, res) => {

@@ -62,7 +62,7 @@
         <h2>Order Details</h2>
         <ul class="order-details" style="color: black;">
             <li><span>Order ID</span><span>{{order._id}}</span></li>
-            <li><span>Total Amount</span><span>${{order.totalAmount}}</span></li>
+            <li><span>Total Amount</span><span>₹{{order.totalAmount}}</span></li>
             <li><span>Payment Method</span><span>{{order.paymentMethod}}</span></li>
             <li><span>Status</span><span>{{order.status}}</span></li>
             <li><span>Created At</span><span>{{formatDate order.createdAt}}</span></li>
@@ -82,7 +82,7 @@
         <h3>Items</h3>
         <ul class="order-details" style="color: black;">
             {{#each order.items}}
-            <li><span>{{this.product.name}}</span><span>{{this.quantity}} x ${{this.total}}</span></li>
+            <li><span>{{this.product.name}}</span><span>{{this.quantity}} x ₹{{this.total}}</span></li>
             {{/each}}
         </ul>
 

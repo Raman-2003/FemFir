@@ -26,7 +26,7 @@ const logedout = async (req, res, next) => {
 
 const isBlocked = async (req, res, next) => {
     try {
-        if (!req.session.user || !req.session.user._id) {
+        if (!req.session.user || !req.session.user._id) { 
             return res.redirect('/login');
         }
         

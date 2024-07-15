@@ -29,7 +29,7 @@ const addCategory = async (req, res) => {
 
         const normalizedName = name.toLowerCase();
 
-        // Check if category with the same name already exists
+        // Check if category name already exists
         const existingCategory = await Category.findOne({ nameLower: normalizedName });
         if (existingCategory) {
             return res.render('admin/addCategory', {
@@ -145,7 +145,7 @@ const unlistCategory = async (req, res) => {
     }
 };
 
-module.exports = {
+module.exports = { 
     getCategories,
     getAddCategoryPage,
     addCategory,

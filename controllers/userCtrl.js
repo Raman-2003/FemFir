@@ -140,7 +140,7 @@ const getotppage = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-};
+}; 
 
 
 // verify otp
@@ -149,6 +149,17 @@ const submitotp = async (req, res) => {
         userotp = req.body.otp;
         if (userotp == otp) {
             const referralCode = generateReferralCode();
+            let hasUsedReferral = false;
+
+            if (userRegesterData.referralCode) {
+                const referringUser = await User.findOne({ referralCode: userRegesterData.referralCode });
+                if (referringUser) {
+                    hasUsedReferral = true;
+                } else {
+                    console.log('Invalid referral code');
+                }
+            }
+
             const user = new User({
                 firstname: userRegesterData.firstname,
                 lastname: userRegesterData.lastname,
@@ -159,18 +170,9 @@ const submitotp = async (req, res) => {
                 is_blocked: false,
                 isAdmin: false,
                 referralCode: referralCode,
-                hasUsedReferral: false
-            }); 
-
-             // validate referral code 
-             if (userRegesterData.referralCode) {
-                const referringUser = await User.findOne({ referralCode: userRegesterData.referralCode });
-                if (referringUser) {
-                    user.hasUsedReferral = true; // mark the user has used a referral code
-                } else {
-                    console.log('Invalid referral code');
-                }
-            }
+                hasUsedReferral: hasUsedReferral,
+                referralDiscountUsed: false // Initialize as false
+            });
 
             await user.save();
             res.redirect('/login');
@@ -182,6 +184,9 @@ const submitotp = async (req, res) => {
         console.log(error);
     }
 };
+
+
+
 
 // resend otp
 const resendOtp = async (req, res) => {

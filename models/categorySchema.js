@@ -16,7 +16,7 @@ const categorySchema = new mongoose.Schema({
         required: true
     },
     status: {
-        type: String, 
+        type: String,  
         enum: ['listed', 'unlisted'],
         default: 'unlisted'
     },
