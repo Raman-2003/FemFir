@@ -317,7 +317,11 @@ function getDateRange(dateRange, filterDate) {
 router.get('/ledger', async (req, res) => {
     try {
         const ledgerEntries = await Ledger.find().populate('userId').sort({ createdAt: -1 });
-        res.render('admin/ledger', { ledgerEntries , layout: 'adminLayout'});
+
+        // Calculate the total amount
+        const totalAmount = ledgerEntries.reduce((sum, entry) => sum + entry.amount, 0);
+
+        res.render('admin/ledger', { ledgerEntries ,totalAmount, layout: 'adminLayout'});
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }
@@ -365,7 +369,7 @@ router.get('/categories/list/:id', isLogin, categoryController.listCategory);
 router.get('/categories/unlist/:id', isLogin, categoryController.unlistCategory);
 
 // User Management
-router.get('/userm', isLogin, getAllUsers);
+router.get('/userm', isLogin, getAllUsers); 
 router.get('/block/:id', isLogin, blockUser);
 router.get('/unblock/:id', isLogin, unblockUser);
 

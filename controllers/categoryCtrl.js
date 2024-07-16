@@ -49,7 +49,7 @@ const addCategory = async (req, res) => {
 
         res.redirect('/admin/categories');
     } catch (error) {
-        console.error(error);
+        console.error(error); 
         res.redirect('/admin/categories');
     }
 };

@@ -110,7 +110,7 @@ const getEditProductForm = async (req, res) => {
         res.redirect('/admin/products');
     }
 }; 
-
+ 
 const editProduct = async (req, res) => {
     try {
         const { name, description, price, mrp, stock, category, discountPercentage, expiryDate, status } = req.body; 

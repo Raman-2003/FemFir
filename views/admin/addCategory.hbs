@@ -82,8 +82,8 @@
         }
  
         .btn-crop {
-            margin-top: 10px;       `
-            background: green;
+           background-color :green;
+            margin-top: 10px;       
             color: white;
             border: none;
             padding: 10px 20px;
@@ -91,7 +91,7 @@
         }
 
         .btn-close {
-            background: red;
+            background-color: red;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -126,7 +126,7 @@
             <div class="alert alert-danger" role="alert">
                 {{errorMessage}}
             </div>
-            {{/if}}
+            {{/if}} 
             <form action="/admin/categories/add" method="POST" enctype="multipart/form-data" style="margin-top: 25px;">
                 <div class="form-group">
                     <label for="name">Name</label>
@@ -170,27 +170,42 @@
     <script>
         let cropper;
 
+        // then this is a second one
         function showCropModal(imageSrc, callback) {
             const cropModal = document.getElementById('cropModal');
             const imageToCrop = document.getElementById('imageToCrop');
             imageToCrop.src = imageSrc;
-            cropModal.style.display = 'block';
+            cropModal.style.display = 'block';  // modal ah show panna vaikrom 'block' == 'visible'
 
             if (cropper) {
                 cropper.destroy();
             }
 
             cropper = new Cropper(imageToCrop, {
-                aspectRatio: NaN,
-                viewMode: 1,
-                movable: true,
-                cropBoxResizable: true,
-                autoCropArea: 1,
+                aspectRatio: NaN,  // allowing freeform cropping. not ensure specific ratio like 1:1 square. 
+                                   // Always NaN is better than 1,2,3 such that. NaN allows free ratio cropping.
+                
+                viewMode: 1,       // we can able to move across the crop section area especially  "Y-axis" in viewMode : 0. 
+                                   // we don't want this feature. so, we can give viewMode : 1. So, it can move only within crop section.     
+                
+                movable: true,     // we can move the base image behind the crop layer. it do not distrub our work.
+                                   // but, movable : false => it fixed the back image within container at center point.
+
+                cropBoxResizable: true,  // kandippa 'true' dhan kudukanum. apo dhan we can able to crop the image as we need.
+
+                autoCropArea: 1,   //sets the crop area to fill the image initially. its better to give '1'. 
+
                 ready() {
                     document.getElementById('cropButton').onclick = function () {
-                        const canvas = cropper.getCroppedCanvas();
-                        canvas.toBlob((blob) => {
-                            const croppedImageUrl = URL.createObjectURL(blob);
+                        const canvas = cropper.getCroppedCanvas();  // getCroppedCanvas() gives new canvas. canvas === another picture. "getCroppedCanvas" means "getCroppedImage"
+                       
+                                                   // toBlob converts the canvas content to a Blob object.
+                        canvas.toBlob((blob) => {  // toBlob is used to generate binary data. means 'canvas' la irukra image ah 'duplicate' pannum.
+
+                            const croppedImageUrl = URL.createObjectURL(blob);  // createObjectURL() method creates a temporary URL represnts the "cropped image" blob.
+                                                                                // This URL can be used to display the blob (an image) in the browser. 
+                                                                                // It is particularly useful for "previewing images" before they are uploaded.
+ 
                             callback(croppedImageUrl, blob);
                             cropper.destroy();
                             cropModal.style.display = 'none';
@@ -200,13 +215,16 @@
             });
         }
 
-        function closeCropModal() {
+        // this is a final
+        function closeCropModal() {    // like, we again resets the crop logic from new.
             document.getElementById('cropModal').style.display = 'none';
             if (cropper) {
                 cropper.destroy();
             }
         }
 
+
+        //First you focus on this logic.
         document.getElementById('mainImage').addEventListener('change', function (event) {
             const file = event.target.files[0];
             if (file) {
@@ -221,7 +239,13 @@
                         imgContainer.className = 'image-preview-item';
 
                         const img = document.createElement('img');
-                        img.src = croppedImageUrl; 
+                        img.src = croppedImageUrl;                                    
+                        /* Here we are trying to create a div element with img and delete btn 
+                                <div class = " image-preview-item " >
+                                    <img src = " croppedImageUrl " >
+                                    <button class = "delete-button">  </button>
+                                </div>    
+                       */
 
                         const deleteButton = document.createElement('button');
                         deleteButton.className = 'delete-button';

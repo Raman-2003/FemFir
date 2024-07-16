@@ -4,7 +4,7 @@ const layouts = require('handlebars-layouts');
 // Register custom Handlebars helpers
 Handlebars.registerHelper('eq', function (a, b) {
     return a === b;
-});
+}); 
 
 Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
     switch (operator) {
@@ -30,7 +30,7 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
 });
 
 Handlebars.registerHelper('or', function () {
-    const args = Array.from(arguments).slice(0, -1);
+    const args = Array.from(arguments).slice(0, -1); 
     return args.some(Boolean);
 });
 

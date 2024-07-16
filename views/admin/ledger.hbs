@@ -3,41 +3,66 @@
 <head>
     <title>Ledger Book</title>
     <style>
-       
+        .content-body {
+            background-color: rgb(196, 241, 241);
+            position: relative;
+        }
+        .container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .total-amount {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: rgb(52, 114, 116);
+        }
+        .tables th, .tables td {
+            padding-top: 15px;
+            padding-bottom: 15px;
+            text-align: center;
+            font-weight: bolder;
+        }
     </style>
 </head>
 <body>
-    <div class="content-body" style="background-color: rgb(196, 241, 241);">
-    <div class="container" style="width:100%; display:flex; flex-direction:column;">
-    <h1 class="pb-4" style="color: rgb(52, 114, 116);">Ledger Book</h1>
-    <table border="1" class="tables">
-        <thead style="color: rgb(60, 49, 49); ">
-            <tr >
-                <th style="padding-top:15px; padding-bottom:15px; text-align:center">Entry Type</th>
-                <th style="padding-top:15px; padding-bottom:15px; text-align:center">User</th>
-                <th style="padding-top:15px; padding-bottom:15px; text-align:center">Amount</th>
-                <th style="padding-top:15px; padding-bottom:15px; text-align:center">Description</th>
-                <th style="padding-top:15px; padding-bottom:15px; text-align:center">Transaction Type</th>
-                <th style="padding-top:15px; padding-bottom:15px; text-align:center">Status</th>
-                {{!-- <th style="padding-top:15px; padding-bottom:15px; text-align:center">Created At</th> --}}
-            </tr>
-        </thead>
-        <tbody>
-            {{#each ledgerEntries}}
-                <tr style="color: rgb(50, 72, 111);">
-                    <td style="padding-top:15px; padding-bottom:15px; text-align:center; font-weight:bolder">{{this.entryType}}</td>
-                    <td style="padding-top:15px; padding-bottom:15px; text-align:center; font-weight:bolder">{{this.userId.firstname}}</td>
-                    <td style="padding-top:15px; padding-bottom:15px; text-align:center; font-weight:bolder">{{this.amount}}</td>
-                    <td style="padding-top:15px; padding-bottom:15px; text-align:center; font-weight:bolder">{{this.description}}</td>
-                    <td style="padding-top:15px; padding-bottom:15px; text-align:center; font-weight:bolder">{{this.transactionType}}</td>
-                    <td style="padding-top:15px; padding-bottom:15px; text-align:center; font-weight:bolder">{{this.status}}</td>
-                    {{!-- <td style="padding-top:15px; padding-bottom:15px; text-align:center; font-weight:bolder">{{this.createdAt}}</td> --}}
-                </tr>
-            {{/each}}
-        </tbody>
-    </table>
-    {{!-- <a href="/admin/ledger/download" class="mt-5" style="display:inline-block; justify-content:flex-end; background-color:burlywood; padding-top:12px; padding-bottom:12px;">Download as CSV</a> --}}
-    </div>
+    <div class="content-body">
+        <div class="container">
+            <div class="total-amount" style="margin-top: 140px; margin-right:30px">
+                Total Amount: ₹{{totalAmount}}
+            </div>
+            <h1 class="pb-4" style="color: rgb(52, 114, 116);">Ledger Book</h1>
+            <table border="1" class="tables">
+                <thead style="color: rgb(60, 49, 49);">
+                    <tr>
+                        <th>Entry Type</th>
+                        <th>User</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Transaction Type</th>
+                        <th>Status</th>
+                        {{!-- <th>Created At</th> --}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each ledgerEntries}}
+                        <tr style="color: rgb(50, 72, 111);">
+                            <td>{{this.entryType}}</td>
+                            <td>{{this.userId.firstname}}</td>
+                            <td>{{this.amount}}</td>
+                            <td>{{this.description}}</td>
+                            <td>{{this.transactionType}}</td>
+                            <td>{{this.status}}</td>
+                            {{!-- <td>{{this.createdAt}}</td> --}}
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            {{!-- <a href="/admin/ledger/download" class="mt-5" style="display:inline-block; justify-content:flex-end; background-color:burlywood; padding-top:12px; padding-bottom:12px;">Download as CSV</a> --}}
+        </div>
     </div>
 </body>
 </html>
