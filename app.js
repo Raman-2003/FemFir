@@ -19,7 +19,7 @@ const app = express();
 require('dotenv').config();
 const PORT = process.env.PORT || 8000; 
 const MONGO_URL = process.env.MONGODB_URL;
-require('./config/dbConnect');
+require('./config/dbConnect'); 
 
 // Middleware
 app.use(express.json());

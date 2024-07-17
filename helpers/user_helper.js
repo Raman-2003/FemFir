@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer');
 const argon2 = require('argon2');
-const bcrypt = require('bcrypt');
 
 //email Verification
 const verifyEmail = async(email)=> {
