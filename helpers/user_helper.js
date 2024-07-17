@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const argon2 = require('argon2');
+require('dotenv').config(); 
 
 //email Verification
 const verifyEmail = async(email)=> {
@@ -10,15 +11,15 @@ const verifyEmail = async(email)=> {
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
-            host:'smpt.gmail.com',
+            host:'smpt.gmail.com', 
             port: 567,
             secure:false,
-
+ 
             auth:{
-                user:'krishbiden441@gmail.com',
-                pass: 'hgzxztlcdhdackts'
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS 
             }
-
+ 
         })
 
         const mailOptions = {

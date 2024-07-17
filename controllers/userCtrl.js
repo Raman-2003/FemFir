@@ -3,7 +3,7 @@ const  Category  = require('../models/categorySchema');
 const Product = require('../models/productSchema');
 const userHelper = require('../helpers/user_helper');
 const argon2 = require('argon2');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 let otp;
 let userotp;
