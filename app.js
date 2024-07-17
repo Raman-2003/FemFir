@@ -17,7 +17,7 @@ const app = express();
 
 // Configs
 require('dotenv').config();
-const PORT = process.env.APP_PORT || 8000; 
+const PORT = process.env.PORT || 8000; 
 const MONGO_URL = process.env.MONGODB_URL;
 require('./config/dbConnect');
 
