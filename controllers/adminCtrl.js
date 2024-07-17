@@ -183,7 +183,7 @@ const getAllUsers = async(req,res) => {
             createdDate: moment(cpn.createdDate).format("MMMM D, YYYY")
         }));
 
-        res.render("admin/coupon", { couponData, layout: 'adminlayout' });
+        res.render("admin/coupon", { couponData, layout: 'adminLayout' });
     } catch (error) {
         console.log(error);
         res.status(500).send('Error loading coupons');
@@ -197,7 +197,7 @@ const getAllUsers = async(req,res) => {
          const message = req.session.message;
          req.session.message = null; // Clear the session message
  
-         res.render("admin/add_coupon", { message, layout: 'adminlayout' });
+         res.render("admin/add_coupon", { message, layout: 'adminLayout' });
      } catch (error) {
          console.log(error);
          res.status(500).send('Error rendering add coupon page');
@@ -254,7 +254,7 @@ const getAllUsers = async(req,res) => {
          const coupon = await Coupon.findById(id);
  
          if (coupon) {
-             res.render("admin/edit_coupon", { coupon, layout: 'adminlayout' });
+             res.render("admin/edit_coupon", { coupon, layout: 'adminLayout' });
          } else {
              res.redirect("/admin/coupons");
          }

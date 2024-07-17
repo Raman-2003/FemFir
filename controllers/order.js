@@ -44,7 +44,7 @@ const getOrderListPageAdmin = async (req, res) => {
             orders,
             totalPages,
             currentPage,
-            layout: 'adminlayout'
+            layout: 'adminLayout'
         });
     } catch (error) {
         console.error(error.message);
@@ -125,7 +125,7 @@ const getOrderDetailsPageAdmin = async (req, res) => {
 
         res.render("admin/order-details-admin", {
             order,
-            layout: 'adminlayout'
+            layout: 'adminLayout'
         });
     } catch (error) {
         console.error(error.message);
