@@ -18,7 +18,7 @@ async function updateOverallOrderAmount(changeAmount) {
 
 const getOrderListPageAdmin = async (req, res) => {
     try {
-        const PAGE_SIZE = 10; 
+        const PAGE_SIZE = 12; 
         const currentPage = parseInt(req.query.page) || 1;
         const skip = (currentPage - 1) * PAGE_SIZE;
  
@@ -40,10 +40,13 @@ const getOrderListPageAdmin = async (req, res) => {
         const totalOrders = await Order.countDocuments({});
         const totalPages = Math.ceil(totalOrders / PAGE_SIZE);
 
+        const pagination = Array.from({ length: totalPages }, (_, i) => i + 1);
+
         res.render("admin/orders-list", {
             orders,
             totalPages,
             currentPage,
+            pagination,
             layout: 'adminLayout'
         });
     } catch (error) {
@@ -62,7 +65,7 @@ const changeOrderStatus = async (req, res) => {
             .populate('billingAddress'); 
 
         if (!order) {
-            console.error(`Order with ID ${orderId} not found`);
+            console.error(`Order with ID ${orderId} not found`); 
             return res.status(404).send("Order not found");
         }
 
