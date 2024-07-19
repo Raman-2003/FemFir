@@ -122,7 +122,7 @@ const doadminsignup = async (req, res) => {
     }
 };
 
-
+ 
 //user management get all users informations 
 const getAllUsers = async(req,res) => {
     try{    

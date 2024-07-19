@@ -65,7 +65,6 @@ const getEditCategoryPage = async (req, res) => {
     }
 };
 
-// Update an existing category
 const updateCategory = async (req, res) => {
     try {
         const { name, description, discountPercentage, expiryDate } = req.body;
@@ -90,18 +89,16 @@ const updateCategory = async (req, res) => {
             });
         }
 
-        const offers = {
-            discountPercentage: discountPercentage || 0,
-            expiryDate: expiryDate || null
-        };
-
         // Update category with new details
         await Category.findByIdAndUpdate(req.params.id, { 
             name, 
             description, 
             image, 
             nameLower: normalizedName,
-            offers 
+            offer: {
+                discountPercentage: discountPercentage || 0,
+                expiryDate: expiryDate || null
+            }
         });
 
         res.redirect('/admin/categories');
@@ -110,6 +107,7 @@ const updateCategory = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
+
 
 
 // Delete a category

@@ -218,7 +218,7 @@ const saveAdditionalInfo = async(req,res)=>{
             if(password){
                 const hashedPassword = await bcrypt.hash(password, 10);
                 user.password = hashedPassword
-            }
+            }  
             user.mobile = mobile;
             await user.save()
 
