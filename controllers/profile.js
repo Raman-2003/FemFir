@@ -258,7 +258,7 @@ cancelOrder: async (req, res) => {
             const order = await Order.findById(orderId)
                 .populate({
                     path: 'items.product',
-                    select: 'name mainImage'
+                    select: 'name mainImage' 
                 })
                 .populate({
                     path: 'billingAddress',

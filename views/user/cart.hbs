@@ -136,9 +136,9 @@
                                 </td>
                                 <td>
                                     <div class="qty">
-                                        <button class="btn-minus" data-product-id="{{this.product._id}}"><i class="fa fa-minus"></i></button>
+                                        {{!-- <button class="btn-minus" data-product-id="{{this.product._id}}"></button> --}}
                                         <input type="number" value="{{this.quantity}}" class="quantity-input" data-product-id="{{this.product._id}}">
-                                        <button class="btn-plus" data-product-id="{{this.product._id}}"><i class="fa fa-plus"></i></button>
+                                        {{!-- <button class="btn-plus" data-product-id="{{this.product._id}}"></button> --}}
                                     </div>
                                 </td>
                                 <td class="item-total">
@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 updateCartSummary(data.subTotal, data.grandTotal, data.discountAmount);
             }
-            handleResponse(data, 'Cart updated successfully', 'Failed to update cart');
+            handleResponse(data, 'Cart updated successfully....', 'Failed to update cart');
         })
         .catch(error => {
             console.error('Error updating cart:', error);
@@ -349,28 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('update-cart-btn').addEventListener('click', () => {
-        const quantities = Array.from(document.querySelectorAll('.quantity-input')).map(input => ({
-            productId: input.getAttribute('data-product-id'),
-            quantity: parseInt(input.value)
-        }));
-
-        fetch('/cart/update', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ quantities }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            handleResponse(data, 'Cart updated successfully', 'Failed to update cart');
-            updateCartSummary(data.subTotal, data.grandTotal);
-        })
-        .catch(error => {
-            console.error('Error updating cart:', error);
-        });
-    });
+   
 });
 </script>
  

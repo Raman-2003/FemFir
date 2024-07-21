@@ -95,6 +95,39 @@
       padding: 8px;
     }
   }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 300px;
+      text-align: center;
+      border-radius: 10px;
+    }
+    .close-btn {
+      color: white;
+      background-color: red;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  
 
 </style>
 
@@ -122,6 +155,15 @@
 </form>
 </div>
 </div>
+
+  <!-- Custom Modal -->
+  <div id="customModal" class="modal">
+    <div class="modal-content">
+      <p style="color: #333;">Date cannot be in the future</p>
+      <button class="close-btn" id="closeModalBtn">OK</button>
+    </div>
+  </div>
+
 <script>
   document.getElementById('reportType').addEventListener('change', function() {
     if (this.value === 'custom') {
@@ -130,5 +172,47 @@
       document.getElementById('customDates').style.display = 'none';
     }
   });
+
+   document.addEventListener('DOMContentLoaded', function() {
+      const reportType = document.getElementById('reportType');
+      const customDates = document.getElementById('customDates');
+      const startDate = document.getElementById('startDate');
+      const endDate = document.getElementById('endDate');
+      const modal = document.getElementById('customModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+
+      // Show/Hide custom date fields based on report type selection
+      reportType.addEventListener('change', function() {
+        if (reportType.value === 'custom') {
+          customDates.style.display = 'block';
+        } else {
+          customDates.style.display = 'none';
+        }
+      });
+
+      // Validate date inputs to ensure they are not in the future
+      const validateDate = (dateInput) => {
+        const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+        if (dateInput.value > currentDate) {
+          modal.style.display = 'flex';
+          dateInput.value = '';
+        }
+      };
+
+      startDate.addEventListener('change', () => validateDate(startDate));
+      endDate.addEventListener('change', () => validateDate(endDate));
+
+      // Close modal
+      closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+// Close modal when clicking outside of the modal content
+      window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+
 </script>
   

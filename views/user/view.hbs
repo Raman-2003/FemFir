@@ -7,7 +7,6 @@
     <script src="https://unpkg.com/js-image-zoom@0.4.1/js-image-zoom.js" type="application/javascript"></script>
 
     <style>
-      
         .action button {
             font-family: 'Arial', sans-serif;
             font-size: 16px;
@@ -19,7 +18,7 @@
             transition: background-color 0.3s ease;
         }
 
-        
+
         .add-to-wishlist {
             background-color: #0c5d83;
             color: #fffafa;
@@ -29,7 +28,7 @@
             background-color: #ecb939;
         }
 
-      
+
         .add-to-cart {
             background-color: #155c83;
             color: white;
@@ -39,65 +38,65 @@
             background-color: #e68a00;
         }
 
-      
+
         .action button:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
         }
 
         .price {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
 
-.discounted-price {
-    padding-top: 15px;
-    color: #d9534f; 
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 5px; 
-}
+        .discounted-price {
+            padding-top: 15px;
+            color: #d9534f;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
-.original-price {
-    padding-left: 40px;
-    padding-top: 10px;
-    text-decoration: line-through;
-    color: #6c757d; 
-    font-size: 1.2em;
-    margin-bottom: 5px; 
-}
+        .original-price {
+            padding-left: 40px;
+            padding-top: 10px;
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
 
-.current-price {
-    color: #000; 
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-bottom: 5px; 
-}
+        .current-price {
+            color: #000;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
-.mrp {
-    padding-top: 24px;
-    color: #6c757d; 
-    font-size: 1.0em;
-    font-weight:normal;
-    font-family: "Yantramanav", sans-serif;
-    font-weight: 500;
-    font-style: normal;
+        .mrp {
+            padding-top: 24px;
+            color: #6c757d;
+            font-size: 1.0em;
+            font-weight: normal;
+            font-family: "Yantramanav", sans-serif;
+            font-weight: 500;
+            font-style: normal;
 
 
-}
-
+        }
     </style>
 </head>
 
 <body>
     <!-- Product Detail Start -->
-    <div class="product-detail">
+    <div class="product-detail"> 
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="row align-items-center product-detail-top">
-                        <div class="col-md-5">
+                    {{!-- Main content (detail)--}}
+                    <div class="row align-items-center">
+                        <div class="col-md-5 ">
                             <div class="product-slider-single" id="summasample">
                                 <img src="{{product.mainImage}}" alt="{{product.name}}">
                                 {{#each product.subImages}}
@@ -117,14 +116,17 @@
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                 </div>
-                               
+
                                 <div class="price">
                                     <div style="display: flex; flex-direction:row">
                                         {{#if bestDiscount}}
-                                        <h3 class="discounted-price">₹{{calculateDiscountedPrice product.price bestDiscount}}</h3>
+                                        <h3 class="discounted-price">₹{{calculateDiscountedPrice product.price
+                                            bestDiscount}}</h3>
                                         <span class="original-price">₹{{product.price}}</span>
                                         {{else}}
-                                        <h3 class="current-price" style="font-size:30px; padding-top:15px; font-weight:400; color:#414344">₹{{product.price}}</h3>
+                                        <h3 class="current-price"
+                                            style="font-size:30px; padding-top:15px; font-weight:400; color:#414344">
+                                            ₹{{product.price}}</h3>
                                         {{/if}}
                                     </div>
                                     {{#if product.mrp}}
@@ -142,16 +144,18 @@
                                     <h4>Category:</h4>
                                     <p>{{product.category.name}}</p>
                                 </div>
-                        
+
                                 <div class="quantity">
                                     <h4>Quantity:</h4>
                                     <div class="qty">
-                                        <button class="btn-minus" data-product-id="{{product._id}}"><i class="fa fa-minus"></i></button>
+                                        <button class="btn-minus" data-product-id="{{product._id}}"><i
+                                                class="fa fa-minus"></i></button>
                                         <input type="text" value="1" data-product-id="{{product._id}}">
-                                        <button class="btn-plus" data-product-id="{{product._id}}"><i class="fa fa-plus"></i></button>
+                                        <button class="btn-plus" data-product-id="{{product._id}}"><i
+                                                class="fa fa-plus"></i></button>
                                     </div>
                                 </div>
-                        
+
                                 <div class="action">
                                     <!-- Add to Wishlist Button -->
                                     <button class="add-to-wishlist" data-product-id="{{product._id}}">Add to
@@ -159,192 +163,195 @@
                                     <!-- Add to Cart Button -->
                                     <button class="add-to-cart" data-product-id="{{product._id}}">Add to Cart</button>
                                 </div>
-                        
+
                             </div>
                         </div>
-                        </div>
-                        
-                        <div class="row product-detail-bottom">
-                            <div class="col-lg-12">
-                                <ul class="nav nav-pills nav-justified">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" data-toggle="pill" href="#description">Description</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-toggle="pill" href="#reviews">Reviews (1)</a>
-                                    </li>
-                                </ul>
-                        
-                                <div class="tab-content">
-                                    <div id="description" class="container tab-pane active"><br>
-                                        <h4>Product description</h4>
-                                        <p>{{product.description}}</p>
-                                    </div>
-                                    <div id="reviews" class="container tab-pane fade"><br>
-                                        <div class="reviews-submitted">
-                                            {{#each product.reviews}}
-                                            <div class="reviewer">{{this.reviewer}} - <span>{{this.date}}</span></div>
-                                            <div class="ratting">
-                                                {{#times this.rating}}
-                                                <i class="fa fa-star"></i>
-                                                {{/times}}
-                                                {{#times (subtract 5 this.rating)}}
-                                                <i class="fa fa-star-o"></i>
-                                                {{/times}}
-                                            </div>
-                                            <p>{{this.comment}}</p>
-                                            {{/each}}
+                    </div>
+
+                    <div class="row product-detail-bottom">
+                        <div class="col-lg-12">
+                            <ul class="nav nav-pills nav-justified">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="pill" href="#description">Description</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#reviews">Reviews (1)</a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div id="description" class="container tab-pane active"><br>
+                                    <h4>Product description</h4>
+                                    <p>{{product.description}}</p>
+                                </div>
+                                <div id="reviews" class="container tab-pane fade"><br>
+                                    <div class="reviews-submitted">
+                                        {{#each product.reviews}}
+                                        <div class="reviewer">{{this.reviewer}} - <span>{{this.date}}</span></div>
+                                        <div class="ratting">
+                                            {{#times this.rating}}
+                                            <i class="fa fa-star"></i>
+                                            {{/times}}
+                                            {{#times (subtract 5 this.rating)}}
+                                            <i class="fa fa-star-o"></i>
+                                            {{/times}}
                                         </div>
-                                        <div class="reviews-submit">
-                                            <h4>Give your Review:</h4>
-                                            <div class="ratting">
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
+                                        <p>{{this.comment}}</p>
+                                        {{/each}}
+                                    </div>
+                                    <div class="reviews-submit">
+                                        <h4>Give your Review:</h4>
+                                        <div class="ratting">
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                            <i class="fa fa-star-o"></i>
+                                        </div>
+                                        <div class="row form">
+                                            <div class="col-sm-6">
+                                                <input type="text" placeholder="Name">
                                             </div>
-                                            <div class="row form">
-                                                <div class="col-sm-6">
-                                                    <input type="text" placeholder="Name">
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <input type="email" placeholder="Email">
-                                                </div>
-                                                <div class="col-sm-12">
-                                                    <textarea placeholder="Review"></textarea>
-                                                </div>
-                                                <div class="col-sm-12">
-                                                    <button>Submit</button>
-                                                </div>
+                                            <div class="col-sm-6">
+                                                <input type="email" placeholder="Email">
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <textarea placeholder="Review"></textarea>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <button>Submit</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Related Products Section -->
-                        <div class="container">
-                            <div class="section-header">
-                                <h3>Related Products</h3>
-                                <p>Made from 100% pure silk, this saree exudes luxury and sophistication. The vibrant colors
-                                    and subtle sheen of the silk fabric will make you stand out at any occasion.</p>
+                    </div>
+
+                    <!-- Related Products Section -->
+                    <div class="container">
+                        <div class="section-header">
+                            <h3>Related Products</h3>
+                            <p>Made from 100% pure silk, this saree exudes luxury and sophistication. The vibrant colors
+                                and subtle sheen of the silk fabric will make you stand out at any occasion.</p>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <h3>Related Products</h3>
+                        </div>
+                        {{#each relatedProducts}}
+                        <div class="col-md-3">
+                            <div class="product-item">
+                                <div class="product-thumb">
+                                    <img src="{{this.mainImage}}" class="img-fluid">
+                                    <div class="preview-meta">
+                                        <ul></ul>
+                                    </div>
+                                </div>
+                                <div class="product-content">
+                                    <h4 style="font-size: larger;"><a href="/viewone/{{this._id}}">{{this.name}}</a>
+                                    </h4>
+                                    <div class="price">
+                                        {{#if (lt this.effectivePrice this.price)}}
+                                        <div style="display: flex; column-gap:70px;">
+                                            <h5 class="text-danger" style="margin-left: 30px;">${{this.effectivePrice}}
+                                            </h5>
+                                            <h5 class="text-muted" style="text-decoration: line-through;">
+                                                ${{this.price}}</h5>
+                                        </div>
+                                        {{else}}
+                                        <span>${{this.price}}</span>
+                                        {{/if}}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="row mt-5">
-    <div class="col-12">
-        <h3>Related Products</h3>
-    </div>
-    {{#each relatedProducts}}
-    <div class="col-md-3">
-        <div class="product-item">
-            <div class="product-thumb">
-                <img src="{{this.mainImage}}" class="img-fluid">  
-                <div class="preview-meta">
-                    <ul></ul>
-                </div>
-            </div>
-            <div class="product-content">
-                <h4 style="font-size: larger;"><a href="/viewone/{{this._id}}">{{this.name}}</a></h4>
-                <div class="price">
-                    {{#if (lt this.effectivePrice this.price)}}
-                    <div style="display: flex; column-gap:70px;">
-                    <h5 class="text-danger" style="margin-left: 30px;">${{this.effectivePrice}}</h5>
-                    <h5 class="text-muted" style="text-decoration: line-through;">${{this.price}}</h5>
+                        {{/each}}
                     </div>
-                    {{else}}
-                    <span>${{this.price}}</span>
-                    {{/if}}
+
                 </div>
             </div>
         </div>
     </div>
-    {{/each}}
-</div>
+    <!-- Product Detail End -->
+ 
+    <script>
+        var options = {
+            width: 400,
+            height: 650,
+            zoomWidth: 500,
+            offset: { vertical: 0, horizontal: 10 },
+            scale: 1.2
+        }
+        new ImageZoom(document.getElementById('summasample'), options);
 
-                        </div>
-                        </div>
-                        </div>
-                        </div>
-                        <!-- Product Detail End -->
-                        
-                        <script>
-                            var options = {
-                                width: 400,
-                                height: 650,
-                                zoomWidth: 500,
-                                offset: { vertical: 0, horizontal: 10 },
-                                scale: 1.2
-                            }
-                            new ImageZoom(document.getElementById('summasample'), options);
-
-                            document.addEventListener('DOMContentLoaded', () => {
-                                const stock = {{ product.stock }}
+        document.addEventListener('DOMContentLoaded', () => {
+            const stock = {{ product.stock }}
                            
-                            const addToWishlistButton = document.querySelector('.add-to-wishlist');
-                            const quantityInputs = document.querySelectorAll('.quantity input');
+        const addToWishlistButton = document.querySelector('.add-to-wishlist');
+        const quantityInputs = document.querySelectorAll('.quantity input');
 
-                            // Quantity minus button functionality
-                            document.querySelectorAll('.btn-minus').forEach(button => {
-                                button.addEventListener('click', () => {
-                                    const productId = button.getAttribute('data-product-id');
-                                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-                                    let newQuantity = parseInt(quantityInput.value) - 1;
-                                    if (newQuantity > 0) {
-                                        quantityInput.value = newQuantity;
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Warning!',
-                                            text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
-                                            icon: 'warning',
-                                            timer: 2000,
-                                            showConfirmButton: false
-                                        });
-                                        quantityInput.value = 1;
-                                    }
-                                });
-                            });
+        // Quantity minus button functionality
+        document.querySelectorAll('.btn-minus').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                let newQuantity = parseInt(quantityInput.value) - 1;
+                if (newQuantity > 0) {
+                    quantityInput.value = newQuantity;
+                } else {
+                    Swal.fire({
+                        title: 'Warning!',
+                        text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
+                        icon: 'warning',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    quantityInput.value = 1;
+                }
+            });
+        });
 
-                            // Quantity plus button functionality
-                            document.querySelectorAll('.btn-plus').forEach(button => {
-                                button.addEventListener('click', () => {
-                                    const productId = button.getAttribute('data-product-id');
-                                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-                                    let newQuantity = parseInt(quantityInput.value) + 1;
-                                    if (newQuantity <= stock) {
-                                        quantityInput.value = newQuantity;
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Stock Limit Reached!',
-                                            text: `Stock is only available ${stock}.`,
-                                            icon: 'info',
-                                            timer: 2000,
-                                            showConfirmButton: false
-                                        });
-                                    }
-                                });
-                            });
+        // Quantity plus button functionality
+        document.querySelectorAll('.btn-plus').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                let newQuantity = parseInt(quantityInput.value) + 1;
+                if (newQuantity <= stock) {
+                    quantityInput.value = newQuantity;
+                } else {
+                    Swal.fire({
+                        title: 'Stock Limit Reached!',
+                        text: `Stock is only available ${stock}.`,
+                        icon: 'info',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
 
-                            if (addToWishlistButton) {
-                                addToWishlistButton.addEventListener('click', async function () {
-                                    const productId = this.dataset.productId;
-                                    const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
-                                    const quantity = parseInt(quantityInput.value);
+        if (addToWishlistButton) {
+            addToWishlistButton.addEventListener('click', async function () {
+                const productId = this.dataset.productId;
+                const quantityInput = document.querySelector(`input[data-product-id="${productId}"]`);
+                const quantity = parseInt(quantityInput.value);
 
-                                    if (quantity < 1) {
-                                        Swal.fire({
-                                            title: 'Warning!',
-                                            text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
-                                            icon: 'warning',
-                                            timer: 2000,
-                                            showConfirmButton: false
-                                        });
-                                        return;
-                                    }
+                if (quantity < 1) {
+                    Swal.fire({
+                        title: 'Warning!',
+                        text: 'Quantity is zero. Please increase your quantity before adding to wishlist.',
+                        icon: 'warning',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    return;
+                }
 
-                                    try {
+                try {
                     const response = await fetch('/wishlist/add', {
                         method: 'POST',
                         headers: {

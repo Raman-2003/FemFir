@@ -94,7 +94,7 @@
                                             value="{{query.search}}">
                                     </form>
                                 </div>
-
+ 
                                 <!-- Product Sorting Dropdown -->
                                 <div class="product-short">
                                     <div class="dropdown">
@@ -122,8 +122,7 @@
                                         onchange="document.getElementById('categoryForm').submit()">
                                         <option value="">All Categories</option>
                                         {{#each categories}}
-                                        <option value="{{this._id}}" {{#if (eq ../query.category
-                                            this._id)}}selected{{/if}}>{{this.name}}</option>
+                                        <option value="{{this._id}}" {{#if (eq ../query.category this._id)}}selected{{/if}}>{{this.name}}</option>
                                         {{/each}}
                                     </select>
                                 </form>
@@ -220,6 +219,8 @@
                 document.getElementById("searchForm").submit();
             }
         });
+        
+       
 
         // Update sorting parameter
         const sortOptions = document.querySelectorAll('.sort-option');

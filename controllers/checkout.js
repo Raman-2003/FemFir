@@ -161,11 +161,16 @@ module.exports = {
                     currency: "INR",
                     receipt: String(order._id)
                 };
-                instance.orders.create(options, function(err, razorpayOrder) {
+                instance.orders.create(options, async function(err, razorpayOrder) {
                     if (err) {
                         console.error(err);
                         return res.status(500).json({ message: 'Razorpay order creation failed', error: err });
                     }
+    
+                    // Clear the user's cart after successful order creation
+                    user.cart = [];
+                    await user.save();
+    
                     res.json({ success: true, orderId: order._id, razorpayOrder });
                 });
             } else {
@@ -181,6 +186,7 @@ module.exports = {
             res.status(500).json({ message: 'Server error', error: error.message });
         }
     },
+    
     
 
     getOrderDetailsPage: async (req, res) => {

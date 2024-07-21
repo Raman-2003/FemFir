@@ -234,27 +234,27 @@ const saveAdditionalInfo = async(req,res)=>{
 
 const getProducts = async (req, res) => {
     try {
-        const perPage = 9;
+        const perPage = 12;
         const page = parseInt(req.query.page) || 1;
-        const sortOption = req.query.sort || 'default';
+        const sortOption = req.query.sort || 'default'; 
         const searchQuery = req.query.search || '';
-        const categoryFilter = req.query.category || ''; 
+        const categoryFilter = req.query.category || '';
 
         let sortCondition;
         switch (sortOption) {
-            case 'price_high':
-                sortCondition = { price: -1 };
+            case 'price_high': 
+                sortCondition = { price: -1 }; 
                 break;
-            case 'price_low':
-                sortCondition = { price: 1 };
+            case 'price_low': 
+                sortCondition = { price: 1 }; 
                 break;
-            case 'name_asc':
+            case 'name_asc': 
                 sortCondition = { name: 1 };
                 break;
-            case 'name_desc':
+            case 'name_desc': 
                 sortCondition = { name: -1 };
                 break;
-            case 'new_arrivals':
+            case 'new_arrivals': 
                 sortCondition = { createdAt: -1 };
                 break;
             default:
@@ -307,7 +307,7 @@ const getProducts = async (req, res) => {
 
             return {
                 ...product.toObject(),
-                effectivePrice: effectivePrice.toFixed(0) 
+                effectivePrice: effectivePrice.toFixed(0)
             };
         });
 
@@ -315,16 +315,16 @@ const getProducts = async (req, res) => {
             products: productsWithEffectivePrice,
             current: page,
             pages: Math.ceil(count / perPage),
-            sortOption, 
+            sortOption,
             query: req.query,
             categories: listedCategories,
-            hasProducts: productsWithEffectivePrice.length > 0 // Add this to indicate if there are products
+            hasProducts: productsWithEffectivePrice.length > 0
         });
     } catch (error) {
-        console.error(error);
+        console.log('Error occurred in getProducts:', error);
         res.status(500).send('Something went wrong');
     }
-};
+}
 
 
 
@@ -346,7 +346,7 @@ const getProductDetails = async (req, res) => {
         if (relatedProducts.length === 0) {
             relatedProducts = await Product.find({ _id: { $ne: product._id } }).limit(3).populate('category').lean();
         }
-
+ 
         
         const currentDate = new Date();
         const relatedProductsWithEffectivePrice = relatedProducts.map(relatedProduct => {

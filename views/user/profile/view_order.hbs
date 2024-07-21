@@ -6,61 +6,90 @@
     <title>Order Details</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
         }
 
         .order-container {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .order-container h2 {
+        .order-container h2, .order-container h3 {
             text-align: center;
+            color: #333;
             margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
         }
 
         .order-details {
-            list-style-type: none;
+            list-style: none;
             padding: 0;
+            margin: 20px 0;
         }
 
         .order-details li {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 16px;
+        }
+
+        .order-details li span:first-child {
+            font-weight: bold;
+            color: #555;
         }
 
         .order-details li:last-child {
             border-bottom: none;
         }
 
-        .back-button {
+        .back-button, .invoice-button {
             display: block;
-            width: 100%;
-            padding: 10px;
+            width: calc(50% - 10px);
+            padding: 12px 20px;
             text-align: center;
-            background-color: #ff477e;
+            background-color: #007bff;
             color: #fff;
             text-decoration: none;
             border: none;
-            border-radius: 4px;
-            margin-top: 20px;
+            border-radius: 5px;
+            margin: 20px auto 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .back-button:hover {
-            background-color: #ff678e;
+        .invoice-button {
+            background-color: #28a745;
+        }
+
+        .back-button:hover, .invoice-button:hover {
+            background-color: #0056b3;
+        }
+
+        .invoice-button:hover {
+            background-color: #218838;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="order-container">
         <h2>Order Details</h2>
-        <ul class="order-details" style="color: black;">
+        <ul class="order-details">
             <li><span>Order ID</span><span>{{order._id}}</span></li>
             <li><span>Total Amount</span><span>₹{{order.totalAmount}}</span></li>
             <li><span>Payment Method</span><span>{{order.paymentMethod}}</span></li>
@@ -68,7 +97,7 @@
             <li><span>Created At</span><span>{{formatDate order.createdAt}}</span></li>
         </ul>
 
-        <h3>Shipping Address</h3> 
+        <h3>Shipping Address</h3>
         <ul class="order-details">
             <li><span>Name</span><span>{{order.billingAddress.name}}</span></li>
             <li><span>Address Line 1</span><span>{{order.billingAddress.addressLine1}}</span></li>
@@ -77,18 +106,17 @@
             <li><span>PIN Code</span><span>{{order.billingAddress.pin}}</span></li>
         </ul>
 
-     
-
         <h3>Items</h3>
-        <ul class="order-details" style="color: black;">
+        <ul class="order-details">
             {{#each order.items}}
             <li><span>{{this.product.name}}</span><span>{{this.quantity}} x ₹{{this.total}}</span></li>
             {{/each}}
         </ul>
 
-        <a href="#" class="back-button" onclick="window.history.back()">Back</a>
-
-        <a href="/order/{{order._id}}/invoice" class="btn btn-info mt-3" style="display: block;">Download Invoice</a>
+        <div class="buttons">
+            <a href="#" class="back-button" onclick="window.history.back()">Back</a>
+            <a href="/order/{{order._id}}/invoice" class="invoice-button">Download Invoice</a>
+        </div>
     </div>
 </body>
 </html>
